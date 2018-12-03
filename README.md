@@ -50,6 +50,7 @@ optional arguments:
 
 Example configuration files are provided.
 <h2>TODO</h2>
+
 * Allow to specify custom scripts to execute directly in chroot environment
 * Add comments
 * Allow kernel customization
