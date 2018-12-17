@@ -1,18 +1,30 @@
 #!/usr/bin/env python3
 import os
-import sys
 import argparse
 import os.path
 import sys
 import pexpect
 import subprocess
-from shutil import which
+import shutil
 
 
+# Check if a program exists
 def exists(program):
-    return which(program) is not None
+    return shutil.which(program) is not None
 
 
+# Copy the content of a folder, or a single file if 'src' is actually a file, to another folder
+def copytree(src, dst, symlinks=False, ignore=None):
+    for item in os.listdir(src):
+        source = os.path.join(src, item)
+        dest_dir = os.path.join(dst, item)
+        if os.path.isdir(source):
+            shutil.copytree(source, dest_dir, symlinks, ignore)
+        else:
+            shutil.copy2(source, dest_dir)
+
+
+# Parse arguments from JLIVECD project .conf file
 def parse_jlivecd_config(conf_file):
     var_dict = {}
     with open(conf_file, 'r') as file:
@@ -22,15 +34,21 @@ def parse_jlivecd_config(conf_file):
                 if key_value_pair[1][-1] == '\n':
                     key_value_pair[1] = key_value_pair[1][:-1]            # Discard the newline character
                 if key_value_pair[1][0] == '\"' or key_value_pair[1][0] == '\'':
-                    var_dict.update({key_value_pair[0] : key_value_pair[1][1:-1]})
+                    var_dict.update({key_value_pair[0]: key_value_pair[1][1:-1]})
                 else:
-                    var_dict.update({key_value_pair[0] : key_value_pair[1]})
+                    var_dict.update({key_value_pair[0]: key_value_pair[1]})
     return var_dict
 
 
 class JlivecdWrapper:
-    def __init__(self, project_full_path, iso_full_path='', jlivecd_conf_file='config.conf', osmode='debian', imagename='custom_iso', new_project=True, cmdline_args=False, args=None):
-        self.jlivecd_args = { 'OS': osmode, 'IMAGENAME': imagename, 'CHROOT': 'chroot ./edit /bin/bash' }
+    def __init__(self, project_full_path, iso_full_path='', jlivecd_conf_file='config.conf', osmode='debian',
+                 imagename='custom_iso', new_project=True, custom_folder=None, cmdline_args=False, args=None,
+                 chroot_cmd=None):
+
+        # These are JLIVECD .conf file variables that are passed directly to the program
+        self.jlivecd_args = {'OS': osmode, 'IMAGENAME': imagename, 'CHROOT': '\"chroot ./edit\"'}
+
+        # Self-explaining
         if new_project:
             self.jlivecd_args.update({'NEW_PROJECT': 'y'})
         else:
@@ -40,7 +58,10 @@ class JlivecdWrapper:
         if iso_full_path is not '':
             self.iso = iso_full_path
         self.project_path = project_full_path
-
+        self.custom_folder = custom_folder
+        self.chroot_cmd = chroot_cmd
+        # If command line arguments are not passed to the script, falce checks if a custom .conf file has been
+        # passed. If not, the default config.conf is used
         if not cmdline_args:
             conf = ''
             if os.path.isfile(jlivecd_conf_file):
@@ -53,6 +74,8 @@ class JlivecdWrapper:
                 else:
                     raise FileNotFoundError('Cannot find a valid configuration file.')
             self.jlivecd_args.update(parse_jlivecd_config(conf))
+            if self.chroot_cmd is not None:
+                self.jlivecd_args.update({'CHROOT': "chroot ./edit /bin/bash -c \"{0}\"".format(self.chroot_cmd)})
         else:
             self.jlivecd_args.update(args)
 
@@ -68,6 +91,7 @@ class JlivecdWrapper:
         if jlc is None:
             raise Exception('Cannot execute JLIVECD.')
 
+        # Send JLIVECD output directly to stdout
         jlc.logfile = sys.stdout
 
         jlc.expect("=== Is this a new project: \(y/n\)\?: ")
@@ -84,18 +108,33 @@ class JlivecdWrapper:
             jlc.expect('=== Enter the directory path where you have saved your project: ')
             jlc.sendline(self.project_path)
 
-        jlc.expect("=== Enter.+?cd/dvd name \(default '(.+?)*'\): ")
+        jlc.expect(r"=== Enter.+?cd/dvd name \(default '(.+?)*'\): ")
         jlc.sendline(self.jlivecd_args['IMAGENAME'])
 
-        # Change chroot command during execution to prevent errors
-        if 'CHROOT' not in parse_jlivecd_config(os.path.join(self.project_path, 'config.conf')).keys():
-            with open(os.path.join(self.project_path, 'config.conf'), 'w') as config:
-                config.write("{0}={1}".format('CHROOT', self.jlivecd_args['CHROOT']))
-
         jlc.expect("=== Enable access control.+?")
+
+        # Change chroot command during execution to prevent errors
+        with open(os.path.join(self.project_path, 'config.conf'), 'w') as config:
+            config.write("{0}={1}".format('CHROOT', "\"" + self.jlivecd_args['CHROOT'] + "\""))
+
+        # Add a custom folder containing temporary files to the chroot environment's root directory
+        # N.B.: this folder will be deleted and won't be available in the live ISO
+        if self.custom_folder is not None:
+            custom_folder_path = os.path.join(self.project_path, 'edit/' +
+                                              os.path.normpath(os.path.basename(self.custom_folder)))
+            if not os.path.isdir(custom_folder_path):
+                os.mkdir(custom_folder_path)
+            copytree(self.custom_folder, custom_folder_path)
+
         jlc.sendline(self.jlivecd_args['XHOST'])
 
         jlc.expect("=== Rebuild initramfs.+?")
+        # Delete custom files directory after exiting chroot environment
+        if self.custom_folder:
+            custom_folder_path = os.path.join(self.project_path, 'edit/' +
+                                              os.path.normpath(os.path.basename(self.custom_folder)))
+            if os.path.isdir(custom_folder_path):
+                shutil.rmtree(custom_folder_path)
         jlc.sendline('n')
 
         jlc.expect("=== Retain home directory.+?")
@@ -111,6 +150,7 @@ class JlivecdWrapper:
         jlc.sendline(self.jlivecd_args['NOHYBRID'])
 
         jlc.expect(["\*\*\* END \*\*\*", "Press enter to exit"])
+
         if self.jlivecd_args['UEFI'] == 'y':
             if exists("xorriso"):
                 extracted_files_path = os.path.join(self.project_path, "extracted")
@@ -182,11 +222,16 @@ parser.add_argument('-b', '--hybrid', action='store_true',
                     help='Specify whether to build a hybrid image (it means it can be booted from disk storage devices). The default value is False.')
 parser.add_argument('-w', '--write-conf', dest='write_conf', action='store_true',
                     help='Write current settings to project config')
+parser.add_argument('-x', '--execute-chroot', action='store', type=str, default='', dest='execute',
+                    help='Specify a command (or a script) to execute in the chroot environment. Note that an eventual '
+                         'custom script can be executed by placing it in a folder and add it with the --add-folder argument')
+parser.add_argument('--add-folder', action='store', type=str, dest='folder', default='',
+                    help='Specify a temporary folder that will be available in the chroot environment\'s root directory')
 parser.add_argument('--verbose', '-v', action='count',
                     help='Specify the verbosity level')
 parser.add_argument('project_path', action='store', type=str,
                     help='Specify the (FULL) path where your project is (or will be) saved. This is a required option')
-parser.add_argument('iso_path', action='store', type=str, default='',
+parser.add_argument('--iso-path', action='store', type=str, default='', dest='iso_path',
                     help='Specify the (FULL) path where the ISO you want to customize is stored. The default value is \'\'')
 
 arguments = parser.parse_args()
@@ -198,18 +243,21 @@ if arguments.new and arguments.iso_path is '':
 wrapper = None
 if arguments.conf is not '':
     wrapper = JlivecdWrapper(project_full_path=arguments.project_path, iso_full_path=arguments.iso_path,
-                             jlivecd_conf_file=arguments.conf, imagename=arguments.label, new_project=arguments.new)
+                             jlivecd_conf_file=arguments.conf, custom_folder=arguments.folder,
+                             imagename=arguments.label, new_project=arguments.new, chroot_cmd=arguments.execute)
 else:
     args_dict = {
         'XHOST': 'y' if arguments.access_control else 'n',
         'RETAINHOME': 'y' if arguments.retain_home else 'n',
         'FASTCOMPRESSION': 'y' if arguments.fast_comp else 'n',
         'UEFI': 'y' if arguments.uefi else 'n',
-        'NOHYBRID': 'n' if arguments.hybrid else 'y'
+        'NOHYBRID': 'n' if arguments.hybrid else 'y',
+        'CHROOT': "chroot ./edit /bin/bash -c '{0}'".format(arguments.execute) if arguments.execute else 'chroot ./edit /bin/bash'
     }
     wrapper = JlivecdWrapper(project_full_path=arguments.project_path, iso_full_path=arguments.iso_path,
-                             imagename=arguments.label, new_project=arguments.new, cmdline_args=True, args=args_dict)
-wrapper.execute()
+                             imagename=arguments.label, new_project=arguments.new, custom_folder=arguments.folder,
+                             cmdline_args=True, args=args_dict)
+    if arguments.write_conf:
+        wrapper.write_configuration()
 
-if arguments.write_conf:
-    wrapper.write_configuration()
+wrapper.execute()

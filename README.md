@@ -15,8 +15,6 @@ prompts
 positional arguments:
   project_path          Specify the (FULL) path where your project is (or will
                         be) saved. This is a required option
-  iso_path              Specify the (FULL) path where the ISO you want to
-                        customize is stored. The default value is ''
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -45,16 +43,38 @@ optional arguments:
                         value is False.
   -w, --write-conf      Write current settings to project config
   --verbose, -v         Specify the verbosity level
-
+  --iso-path              Specify the (FULL) path where the ISO you want to
+                        customize is stored. The default value is ''
+  -x, --execute-chroot  Specify a command (or a script) to execute in the chroot environment. Note that an eventual
+                        custom script can be executed by placing it in a folder and add it with the --add-folder argument                
+  --add-folder          Specify a temporary folder that will be available in the chroot environment's root directory
 ```
 
 Example configuration files are provided.
+
+<h2>WEEEDebian build</h2>
+Checklist:
+* A brand new Debian live ISO
+* [JLIVECD]("https://github.com/neurobin/JLIVECD")
+* F.A.L.C.E.
+* A bit of asd
+
+32-bit:
+```
+sudo falce -n --add-folder weeedebian_files -x /weeedebian_files/martello.sh -n \
+-l weeedebian_i386 -c WEEEDebian/WEEEDebian_i386.conf \
+--iso-path /path/to/iso /path/to/project/folder
+```
+64-bit:
+```
+sudo falce -n --add-folder weeedebian_files -x /weeedebian_files/martello.sh -n \
+-l weeedebian_files -c WEEEDebian/WEEEDebian_amd64_nouefi.conf \
+--iso-path /path/to/iso /path/to/project/folder
+```
 <h2>TODO</h2>
 
-* Allow to specify custom scripts to execute directly in chroot environment
 * Add comments
 * Allow kernel customization
 * Add support for Ubuntu and Arch
 * Give some purpose to -v argument
 * Handle exceptions
-* Provide an installation method
