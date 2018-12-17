@@ -1,6 +1,11 @@
 #!/bin/bash
 # Short script from Dave
 
+if [[ $EUID -ne 0 ]]; then
+   echo "Run me as root!" 1>&2
+   exit 1
+fi
+
 shopt -s nocasematch
 LIST_OF_APPS="lshw lspci dmidecode smartctl decode-dimms"
 declare -A LIST_PACKAGES=( ["smartctl"]="smartmontools" ["decode-dimms"]="i2c-tools" ["dmidecode"]="dmidecode" ["lshw"]="lshw" ["lspci"]="pciutils")
@@ -35,6 +40,11 @@ else
 	touch $FILE_VAR
 	echo "File created $FILE_VAR"
 fi
+
+# Allow everyone to access the file, because sudo (or su)
+chmod 666 $FILE_VAR
+# Will chown to the regular user if called with sudo.
+chown "$(logname)" $FILE_VAR
 
 modprobe at24
 modprobe eeprom
