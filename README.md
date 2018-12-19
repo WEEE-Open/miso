@@ -53,7 +53,9 @@ optional arguments:
 Example configuration files are provided.
 
 <h2>WEEEDebian build</h2>
+
 Checklist:
+
 * A brand new Debian live ISO
 * [JLIVECD]("https://github.com/neurobin/JLIVECD")
 * F.A.L.C.E.
