@@ -26,7 +26,11 @@ if [[ $ans == "y" ]]; then
     sudo -H -u root mv /weeedebian_files/scriptino.sh /usr/bin/scriptino
     sudo -H -u root rsync -a -r --force /weeedebian_files/xfce4 /home/weee/.config/xfce4
     sudo -H -u weee setxkbmap it
-
+    sudo -H -u root mkdir /etc/systemd/system/getty@.service.d
+    sudo -H -u root touch /etc/systemd/system/getty@.service.d/override.conf
+    sudo -H -u root printf "[Service]\n" > /etc/systemd/system/getty@.service.d/override.conf
+    sudo -H -u root printf "ExecStart=\n" > /etc/systemd/system/getty@.service.d/override.conf
+    sudo -H -u root printf "ExecStart=-/sbin/agetty --noissue --autologin weee %%I $TERM" > /etc/systemd/system/getty@.service.d/override.conf 
     # Starts an xfce4 session if you need to modify xfce4 settings for user weee
     read -p 'Start xfce4 (Press Ctrl+C in this terminal to close it) [y/n]?: ' ans
         if [[ $ans == "y" ]]; then

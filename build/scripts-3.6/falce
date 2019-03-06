@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/python3
 import os
 import argparse
 import os.path
@@ -51,9 +51,7 @@ class JlivecdWrapper:
         # Self-explaining
         if new_project:
             self.jlivecd_args.update({'NEW_PROJECT': 'y'})
-            print("New project\n")
         else:
-            print("Old project\n")
             self.jlivecd_args.update({'NEW_PROJECT': 'n'})
 
         self.is_new = new_project
@@ -201,7 +199,7 @@ if os.getuid() != 0:
 parser = argparse.ArgumentParser(description="F.A.L.C.E." +
                                              "Fondamentale Armamentario per la Lavorazione di Custom ISO per le Evenienze: " +
                                              "Build a custom ISO with JLIVECD without annoying interactive prompts")
-parser.add_argument('-n', '--new', action='store_true', default=False,
+parser.add_argument('-n', '--new', action='store_true',
                     help='Specify whether you are opening a new project or an existing one. The default value is False')
 parser.add_argument('-c', '--conf', action='store', type=str, default='',
                     help='Specify a JLIVECD configuration file ' +
@@ -237,8 +235,7 @@ parser.add_argument('--iso-path', action='store', type=str, default='', dest='is
                     help='Specify the (FULL) path where the ISO you want to customize is stored. The default value is \'\'')
 
 arguments = parser.parse_args()
-if arguments.new:
-    print("New project\n")
+
 if arguments.new and arguments.iso_path is '':
         print("A ISO image is required for a new project. Exiting...")
         sys.exit(1)
