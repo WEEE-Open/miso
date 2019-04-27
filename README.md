@@ -75,7 +75,7 @@ Checklist:
 The first time use -n to create a new project:
 
 ```shell
-sudo falce -n --add-folder weeedebian_files -x /weeedebian_files/martello.sh \
+sudo ./falce -n --add-folder weeedebian_files -x /weeedebian_files/martello.sh \
 -l weeedebian_64_bit -c WEEEDebian/WEEEDebian_amd64.conf \
 --iso-path /path/to/debian-live-X.Y.Z-amd64-lxde.iso /full/path/to/project/folder
 ```
@@ -83,7 +83,7 @@ sudo falce -n --add-folder weeedebian_files -x /weeedebian_files/martello.sh \
 subsequent runs should be the same, but without the -n option:
 
 ```shell
-sudo falce -n --add-folder weeedebian_files -x /weeedebian_files/martello.sh \
+sudo ./falce --add-folder weeedebian_files -x /weeedebian_files/martello.sh \
 -l weeedebian_64_bit -c WEEEDebian/WEEEDebian_amd64.conf \
 --iso-path /path/to/debian-live-X.Y.Z-amd64-lxde.iso /full/path/to/project/folder
 ```
@@ -93,7 +93,7 @@ sudo falce -n --add-folder weeedebian_files -x /weeedebian_files/martello.sh \
 It's mostly the same:
 
 ```shell
-sudo falce -n --add-folder weeedebian_files -x /weeedebian_files/martello.sh \
+sudo ./falce -n --add-folder weeedebian_files -x /weeedebian_files/martello.sh \
 -l weeedebian_32_bit -c WEEEDebian/WEEEDebian_i386.conf \
 --iso-path /path/to/debian-live-X.Y.Z-i386-lxde.iso /full/path/to/project/folder
 ```
