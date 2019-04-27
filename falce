@@ -211,7 +211,7 @@ parser.add_argument('-c', '--conf', action='store', type=str, default='',
                          'Note that using a configuration file will cause the script to ignore eventual ' +
                          'command line arguments.')
 parser.add_argument('-l', '--label', action='store', type=str, default='falce',
-                    help='Specify the ISO label (default is \'falce\'')
+                    help='Specify the ISO label (default is \'falce\')')
 parser.add_argument('-a', '--access-control', dest='access_control', action='store_true',
                     help='Prevent access control. Doing it will prevent GUI apps to run. The default value is False')
 parser.add_argument('-r', '--retain-home', dest='retain_home', action='store_false',

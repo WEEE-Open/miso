@@ -1,15 +1,19 @@
-<h1>F.A.L.C.E.</h1>
-Fondamentale Armamentario per la Lavorazione di Custom ISO per le Evenienze
-<br>Build a custom ISO with JLIVECD without annoying interactive prompts
+# F.A.L.C.E.
 
-<h2>Usage</h2>
+Fondamentale Armamentario per la Lavorazione di Custom ISO per le Evenienze
+
+Build a custom ISO with JLIVECD without annoying interactive prompts
+
+## Usage
 
 ```
 usage: falce [-h] [-n] [-c CONF] [-l LABEL] [-a] [-r] [-f] [-u] [-b] [-w]
-               [--verbose]
-               project_path iso_path
+             [-x EXECUTE] [--add-folder FOLDER] [--verbose]
+             [--iso-path ISO_PATH]
+             project_path
 
-F.A.L.C.E.: Fondamentale Armamentario per la Lavorazione di Custom ISO per le Evenienze. Build a custom ISO with JLIVECD without annoying interactive
+F.A.L.C.E.Fondamentale Armamentario per la Lavorazione di Custom ISO per le
+Evenienze: Build a custom ISO with JLIVECD without annoying interactive
 prompts
 
 positional arguments:
@@ -27,7 +31,7 @@ optional arguments:
                         configuration file will cause the script to ignore
                         eventual command line arguments.
   -l LABEL, --label LABEL
-                        Specify the ISO label (default is 'soviet'
+                        Specify the ISO label (default is 'falce')
   -a, --access-control  Prevent access control. Doing it will prevent GUI apps
                         to run. The default value is False
   -r, --retain-home     Keep the contents of the home folder when building the
@@ -42,17 +46,22 @@ optional arguments:
                         can be booted from disk storage devices). The default
                         value is False.
   -w, --write-conf      Write current settings to project config
+  -x EXECUTE, --execute-chroot EXECUTE
+                        Specify a command (or a script) to execute in the
+                        chroot environment. Note that an eventual custom
+                        script can be executed by placing it in a folder and
+                        add it with the --add-folder argument
+  --add-folder FOLDER   Specify a temporary folder that will be available in
+                        the chroot environment's root directory
   --verbose, -v         Specify the verbosity level
-  --iso-path              Specify the (FULL) path where the ISO you want to
+  --iso-path ISO_PATH   Specify the (FULL) path where the ISO you want to
                         customize is stored. The default value is ''
-  -x, --execute-chroot  Specify a command (or a script) to execute in the chroot environment. Note that an eventual
-                        custom script can be executed by placing it in a folder and add it with the --add-folder argument                
-  --add-folder          Specify a temporary folder that will be available in the chroot environment's root directory
+
 ```
 
 Example configuration files are provided.
 
-<h2>WEEEDebian build</h2>
+## WEEEDebian build
 
 Checklist:
 
@@ -61,19 +70,35 @@ Checklist:
 * F.A.L.C.E.
 * A bit of asd
 
-32-bit:
+### 64-bit
+
+The first time use -n to create a new project:
+
+```shell
+sudo falce -n --add-folder weeedebian_files -x /weeedebian_files/martello.sh \
+-l weeedebian_64_bit -c WEEEDebian/WEEEDebian_amd64.conf \
+--iso-path /path/to/debian-live-X.Y.Z-amd64-lxde.iso /full/path/to/project/folder
 ```
-sudo falce -n --add-folder weeedebian_files -x /weeedebian_files/martello.sh -n \
--l weeedebian_i386 -c WEEEDebian/WEEEDebian_i386.conf \
---iso-path /path/to/iso /path/to/project/folder
+
+subsequent runs should be the same, but without the -n option:
+
+```shell
+sudo falce -n --add-folder weeedebian_files -x /weeedebian_files/martello.sh \
+-l weeedebian_64_bit -c WEEEDebian/WEEEDebian_amd64.conf \
+--iso-path /path/to/debian-live-X.Y.Z-amd64-lxde.iso /full/path/to/project/folder
 ```
-64-bit:
+
+### 32-bit
+
+It's mostly the same:
+
+```shell
+sudo falce -n --add-folder weeedebian_files -x /weeedebian_files/martello.sh \
+-l weeedebian_32_bit -c WEEEDebian/WEEEDebian_i386.conf \
+--iso-path /path/to/debian-live-X.Y.Z-i386-lxde.iso /full/path/to/project/folder
 ```
-sudo falce -n --add-folder weeedebian_files -x /weeedebian_files/martello.sh -n \
--l weeedebian_files -c WEEEDebian/WEEEDebian_amd64_nouefi.conf \
---iso-path /path/to/iso /path/to/project/folder
-```
-<h2>TODO</h2>
+
+## TODO
 
 * Add comments
 * Allow kernel customization
