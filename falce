@@ -124,8 +124,9 @@ class JlivecdWrapper:
         if self.custom_folder is not None:
             custom_folder_path = os.path.join(self.project_path, 'edit/' +
                                               os.path.normpath(os.path.basename(self.custom_folder)))
-            if not os.path.isdir(custom_folder_path):
-                os.mkdir(custom_folder_path)
+            if os.path.isdir(custom_folder_path):
+                shutil.rmtree(custom_folder_path)
+            os.mkdir(custom_folder_path)
             copytree(self.custom_folder, custom_folder_path)
 
         jlc.sendline(self.jlivecd_args['XHOST'])
