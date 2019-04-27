@@ -29,6 +29,10 @@ if [[ $ans == "y" ]]; then
     echo === XFCE configuration ===
     sudo -H -u root rsync -a -r --force /weeedebian_files/xfce4 /home/weee/.config/xfce4
 
+    echo === Link to tarallo ===
+    sudo -H -u weee mkdir -p /home/weee/Desktop
+    sudo -H -u weee mv /weeedebian_files/Tarallo.desktop /home/weee/Desktop
+
     echo === Keymap configuration ===
     sudo -H -u root echo "KEYMAP=it" > /etc/vconsole.conf
     # Probably not needed:
