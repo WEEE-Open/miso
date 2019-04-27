@@ -21,16 +21,30 @@ if [[ $ans == "y" ]]; then
         adduser weee sudo
         passwd weee
     fi
-    # Moves scriptino.sh from custom folder
+
+    echo === Prepare scriptino.sh ===
     sudo -H -u root chmod +x /weeedebian_files/scriptino.sh
     sudo -H -u root mv /weeedebian_files/scriptino.sh /usr/bin/scriptino
+
+    echo === XFCE configuration ===
     sudo -H -u root rsync -a -r --force /weeedebian_files/xfce4 /home/weee/.config/xfce4
-    sudo -H -u weee setxkbmap it
-    sudo -H -u root mkdir /etc/systemd/system/getty@.service.d
+
+    echo === Keymap configuration ===
+    sudo -H -u root echo "KEYMAP=it" > /etc/vconsole.conf
+    # Probably not needed:
+    # sudo -H -u root echo "LANG=it_IT.UTF-8" > /etc/locale.conf
+    # 00-keyboard.conf can be managed by localectl. In fact, this is one of such files produced by localectl.
+    mkdir -p /etc/X11/xorg.conf.d
+    sudo -H -u root mv /weeedebian_files/00-keyboard.conf /etc/X11/xorg.conf.d/00-keyboard.conf
+
+    echo === Autologin stuff ===
+    sudo -H -u root mkdir -p /etc/systemd/system/getty@.service.d
     sudo -H -u root touch /etc/systemd/system/getty@.service.d/override.conf
     sudo -H -u root printf "[Service]\n" > /etc/systemd/system/getty@.service.d/override.conf
-    sudo -H -u root printf "ExecStart=\n" > /etc/systemd/system/getty@.service.d/override.conf
-    sudo -H -u root printf "ExecStart=-/sbin/agetty --noissue --autologin weee %%I $TERM" > /etc/systemd/system/getty@.service.d/override.conf 
+    sudo -H -u root printf "ExecStart=\n" >> /etc/systemd/system/getty@.service.d/override.conf
+    sudo -H -u root printf "ExecStart=-/sbin/agetty --noissue --autologin weee %%I $TERM" >> /etc/systemd/system/getty@.service.d/override.conf
+
+	echo === Automatic configuration done ===
     # Starts an xfce4 session if you need to modify xfce4 settings for user weee
     read -p 'Start xfce4 (Press Ctrl+C in this terminal to close it) [y/n]?: ' ans
         if [[ $ans == "y" ]]; then
