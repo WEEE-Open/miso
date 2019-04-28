@@ -6,7 +6,11 @@ export PATH="$PATH:/usr/sbin:/usr/bin:/sbin:/bin"
 read -p 'Execute martello.sh? [y/n]: ' ans
 if [[ $ans == "y" ]]; then
 
-    sudo -H -u root /bin/bash -c 'apt update -y && apt install -y i2c-tools lshw smartmontools cifs-utils dmidecode pciutils gvfs-backends gsmartcontrol git'
+	echo === Software installation ===
+    sudo -H -u root /bin/bash -c 'apt update -y'
+    sudo -H -u root /bin/bash -c 'apt install -y i2c-tools lshw smartmontools cifs-utils dmidecode pciutils gvfs-backends gsmartcontrol git'
+
+    echo === Modules configuration ===
     if [[ -z `grep eeprom /etc/modules-load.d/eeprom.conf` ]]; then
         printf "eeprom\n" > /etc/modules-load.d/eeprom.conf
     fi
@@ -14,6 +18,7 @@ if [[ $ans == "y" ]]; then
         printf "at24\n" > /etc/modules-load.d/eeprom.conf
     fi
     if [[ -z `grep weee /etc/passwd` ]]; then
+        echo === User configuration ===
         if [[ -d "/home/weee" ]]; then
             rm -rf "/home/weee"
         fi
