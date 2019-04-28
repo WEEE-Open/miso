@@ -32,6 +32,7 @@ if [[ $ans == "y" ]]; then
     echo === Link to tarallo ===
     sudo -H -u weee mkdir -p /home/weee/Desktop
     sudo -H -u weee cp /weeedebian_files/Tarallo.desktop /home/weee/Desktop
+    sudo -H -u weee chmod +x /home/weee/Desktop/Tarallo.desktop
 
     echo === Keymap configuration ===
     sudo -H -u root echo "KEYMAP=it" > /etc/vconsole.conf
@@ -57,4 +58,3 @@ if [[ $ans == "y" ]]; then
 else
     exit
 fi
-# TODO: add a link to Tarallo

@@ -1,4 +1,7 @@
 [Desktop Entry]
-Icon=text-html
+Version=1.0
 Type=Link
-URL[$e]=https://tarallo.weeeopen.it/
+Name=Tarallo
+Comment=Do the inventario opportuno
+# Icon=/...
+URL=https://tarallo.weeeopen.it/
