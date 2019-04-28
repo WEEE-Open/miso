@@ -32,6 +32,10 @@ if [[ $ans == "y" ]]; then
     echo === Sudo configuration ===
     sudo -H -u root cp /weeedebian_files/weee /etc/sudoers.d/weee
 
+	echo === Top configuration ===
+    sudo -H -u root cp /weeedebian_files/toprc /root/.toprc
+    sudo -H -u weee cp /weeedebian_files/toprc /home/weee/.toprc
+
     echo === Prepare scriptino.sh ===
     sudo -H -u root chmod +x /weeedebian_files/scriptino.sh
     sudo -H -u root cp /weeedebian_files/scriptino.sh /usr/bin/scriptino
