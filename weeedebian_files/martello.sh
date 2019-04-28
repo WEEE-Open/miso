@@ -17,17 +17,21 @@ if [[ $ans == "y" ]]; then
         if [[ -d "/home/weee" ]]; then
             rm -rf "/home/weee"
         fi
-        adduser weee
-        adduser weee sudo
-        passwd weee
+        # The encrypted password is "asd"
+        useradd -m -G sudo -s /bin/bash weee -p "$6$cFAyjyCf$HiQKwzGvDioyYINpJ0kKmHEy6kXUlBJViMkd1ceizIpBFOftLVnjCuT6wvfLVhG7qnCo10q3vGzsaeyFIYHMO."
     fi
+
+    echo === Sudo configuration ===
+    sudo -H -u root cp /weeedebian_files/weee /etc/sudoers.d/weee
 
     echo === Prepare scriptino.sh ===
     sudo -H -u root chmod +x /weeedebian_files/scriptino.sh
     sudo -H -u root cp /weeedebian_files/scriptino.sh /usr/bin/scriptino
 
     echo === XFCE configuration ===
-    sudo -H -u root rsync -a -r --force /weeedebian_files/xfce4 /home/weee/.config/xfce4
+    sudo -H -u weee mkdir -p /home/weee/.config/xfce4
+    sudo -H -u root rsync -a --force /weeedebian_files/xfce4 /home/weee/.config
+    sudo -H -u root chown weee: -R /home/weee/.config
 
     echo === Link to tarallo ===
     sudo -H -u weee mkdir -p /home/weee/Desktop
