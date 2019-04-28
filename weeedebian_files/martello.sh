@@ -5,6 +5,20 @@ export PATH="$PATH:/usr/sbin:/usr/bin:/sbin:/bin"
 # So it's necessary to ask whether the user wants to execute the script or not
 read -p 'Execute martello.sh? [y/n]: ' ans
 if [[ $ans == "y" ]]; then
+    echo === Keymap configuration ===
+    sudo -H -u root echo "KEYMAP=it" > /etc/vconsole.conf
+    # Probably not needed:
+    # sudo -H -u root echo "LANG=it_IT.UTF-8" > /etc/locale.conf
+    # 00-keyboard.conf can be managed by localectl. In fact, this is one of such files produced by localectl.
+    mkdir -p /etc/X11/xorg.conf.d
+    sudo -H -u root cp /weeedebian_files/00-keyboard.conf /etc/X11/xorg.conf.d/00-keyboard.conf
+
+    echo === Locale configuration ===
+    sudo -H -u root cp /weeedebian_files/locale.gen /etc/locale.gen
+    sudo -H -u root cp /weeedebian_files/locale.conf /etc/locale.conf
+    sudo -H -u root locale-gen
+    . /etc/locale.conf
+    locale
 
 	echo === Software installation ===
     sudo -H -u root /bin/bash -c 'apt update -y'
@@ -49,14 +63,6 @@ if [[ $ans == "y" ]]; then
     sudo -H -u weee mkdir -p /home/weee/Desktop
     sudo -H -u weee cp /weeedebian_files/Tarallo.desktop /home/weee/Desktop
     sudo -H -u weee chmod +x /home/weee/Desktop/Tarallo.desktop
-
-    echo === Keymap configuration ===
-    sudo -H -u root echo "KEYMAP=it" > /etc/vconsole.conf
-    # Probably not needed:
-    # sudo -H -u root echo "LANG=it_IT.UTF-8" > /etc/locale.conf
-    # 00-keyboard.conf can be managed by localectl. In fact, this is one of such files produced by localectl.
-    mkdir -p /etc/X11/xorg.conf.d
-    sudo -H -u root cp /weeedebian_files/00-keyboard.conf /etc/X11/xorg.conf.d/00-keyboard.conf
 
     echo === Autologin stuff ===
     sudo -H -u root mkdir -p /etc/systemd/system/getty@.service.d
