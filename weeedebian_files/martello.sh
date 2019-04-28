@@ -24,14 +24,14 @@ if [[ $ans == "y" ]]; then
 
     echo === Prepare scriptino.sh ===
     sudo -H -u root chmod +x /weeedebian_files/scriptino.sh
-    sudo -H -u root mv /weeedebian_files/scriptino.sh /usr/bin/scriptino
+    sudo -H -u root cp /weeedebian_files/scriptino.sh /usr/bin/scriptino
 
     echo === XFCE configuration ===
     sudo -H -u root rsync -a -r --force /weeedebian_files/xfce4 /home/weee/.config/xfce4
 
     echo === Link to tarallo ===
     sudo -H -u weee mkdir -p /home/weee/Desktop
-    sudo -H -u weee mv /weeedebian_files/Tarallo.desktop /home/weee/Desktop
+    sudo -H -u weee cp /weeedebian_files/Tarallo.desktop /home/weee/Desktop
 
     echo === Keymap configuration ===
     sudo -H -u root echo "KEYMAP=it" > /etc/vconsole.conf
@@ -39,7 +39,7 @@ if [[ $ans == "y" ]]; then
     # sudo -H -u root echo "LANG=it_IT.UTF-8" > /etc/locale.conf
     # 00-keyboard.conf can be managed by localectl. In fact, this is one of such files produced by localectl.
     mkdir -p /etc/X11/xorg.conf.d
-    sudo -H -u root mv /weeedebian_files/00-keyboard.conf /etc/X11/xorg.conf.d/00-keyboard.conf
+    sudo -H -u root cp /weeedebian_files/00-keyboard.conf /etc/X11/xorg.conf.d/00-keyboard.conf
 
     echo === Autologin stuff ===
     sudo -H -u root mkdir -p /etc/systemd/system/getty@.service.d
