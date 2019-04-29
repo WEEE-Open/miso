@@ -65,8 +65,8 @@ if [[ $ans == "y" ]]; then
     sudo -H -u weee chmod +x /home/weee/Desktop/Tarallo.desktop
 
     echo === Pointerkeys thing ===
-    sudo -H u weee mkdir -p /home/weee/.config/autostart
-    sudo -H u weee cp /weeedebian_files/Pointerkeys.desktop /home/weee/.config/autostart/Pointerkeys.desktop
+    sudo -H -u weee mkdir -p /home/weee/.config/autostart
+    sudo -H -u weee cp /weeedebian_files/Pointerkeys.desktop /home/weee/.config/autostart/Pointerkeys.desktop
 
     echo === Autologin stuff ===
     sudo -H -u root cp /weeedebian_files/lightdm.conf /etc/lightdm/lightdm.conf
