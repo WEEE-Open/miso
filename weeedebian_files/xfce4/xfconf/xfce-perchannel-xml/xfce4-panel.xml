@@ -5,12 +5,14 @@
   <property name="panels" type="array">
     <value type="int" value="1"/>
     <property name="panel-1" type="empty">
-      <property name="position" type="string" value="p=6;x=0;y=0"/>
+      <property name="position" type="string" value="p=8;x=512;y=753"/>
       <property name="length" type="uint" value="100"/>
       <property name="position-locked" type="bool" value="true"/>
       <property name="size" type="uint" value="27"/>
       <property name="plugin-ids" type="array">
         <value type="int" value="1"/>
+        <value type="int" value="7"/>
+        <value type="int" value="8"/>
         <value type="int" value="3"/>
         <value type="int" value="15"/>
         <value type="int" value="4"/>
@@ -30,7 +32,7 @@
       <property name="show-tooltips" type="bool" value="false"/>
       <property name="show-generic-names" type="bool" value="false"/>
       <property name="custom-menu" type="bool" value="false"/>
-      <property name="button-title" type="string" value=""/>
+      <property name="button-title" type="string" value="Menu"/>
     </property>
     <property name="plugin-2" type="string" value="actions">
       <property name="appearance" type="uint" value="1"/>
@@ -66,6 +68,16 @@
       <property name="names-visible" type="array">
         <value type="string" value="networkmanager applet"/>
         <value type="string" value="ibus panel"/>
+      </property>
+    </property>
+    <property name="plugin-7" type="string" value="launcher">
+      <property name="items" type="array">
+        <value type="string" value="15565706491.desktop"/>
+      </property>
+    </property>
+    <property name="plugin-8" type="string" value="launcher">
+      <property name="items" type="array">
+        <value type="string" value="15565706632.desktop"/>
       </property>
     </property>
   </property>
