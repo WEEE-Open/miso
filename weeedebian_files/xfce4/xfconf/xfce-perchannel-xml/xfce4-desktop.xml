@@ -127,4 +127,7 @@
       </property>
     </property>
   </property>
+  <property name="desktop-icons" type="empty">
+    <property name="icon-size" type="uint" value="46"/>
+  </property>
 </channel>
