@@ -65,6 +65,7 @@ if [[ $ans == "y" ]]; then
     sudo -H -u weee chmod +x /home/weee/Desktop/Tarallo.desktop
 
     echo === Autologin stuff ===
+    sudo -H -u root cp /weeedebian_files/lightdm.conf /etc/lightdm/lightdm.conf
     sudo -H -u root mkdir -p /etc/systemd/system/getty@.service.d
     sudo -H -u root touch /etc/systemd/system/getty@.service.d/override.conf
     sudo -H -u root printf "[Service]\n" > /etc/systemd/system/getty@.service.d/override.conf
