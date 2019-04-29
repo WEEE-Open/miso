@@ -60,7 +60,7 @@
       <property name="mode" type="uint" value="2"/>
       <property name="timezone" type="string" value="Europe/Rome"/>
       <property name="tooltip-format" type="string" value=""/>
-      <property name="digital-format" type="string" value=""/>
+      <property name="digital-format" type="string" value="%H:%M"/>
     </property>
     <property name="plugin-6" type="string" value="systray">
       <property name="names-visible" type="array">
