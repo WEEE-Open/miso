@@ -62,6 +62,7 @@ if [[ $ans == "y" ]]; then
     echo === Link to tarallo ===
     sudo -H -u weee mkdir -p /home/weee/Desktop
     sudo -H -u weee cp /weeedebian_files/Tarallo.desktop /home/weee/Desktop
+    sudo -H -u weee cp /weeedebian_files/tarallo.png /home/weee/.config/tarallo.png
     sudo -H -u weee chmod +x /home/weee/Desktop/Tarallo.desktop
 
     echo === Pointerkeys thing ===
