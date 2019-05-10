@@ -22,7 +22,7 @@ if [[ $ans == "y" ]]; then
 
 	echo === Software installation ===
     sudo -H -u root /bin/bash -c 'apt update -y'
-    sudo -H -u root /bin/bash -c 'apt install -y i2c-tools lshw smartmontools cifs-utils dmidecode pciutils gvfs-backends gsmartcontrol git gparted'
+    sudo -H -u root /bin/bash -c 'apt install -y i2c-tools lshw smartmontools cifs-utils dmidecode pciutils gvfs-backends gsmartcontrol git gparted gksu'
     # Remove useless packages, courtesy of "wajig large". Cool command.
     # Also ispell is probably useless (if it's used only by LibreOffice)
     sudo -H -u root /bin/bash -c 'apt purge --auto-remove -y libreoffice libreoffice-core libreoffice-common gimp gimp-* aspell* hunspell* mythes* *sunpinyin* wpolish wnorwegian tegaki* task-thai task-thai-desktop xfonts-thai xiterm* task-khmer task-khmer-desktop fonts-khmeros khmerconverter'
