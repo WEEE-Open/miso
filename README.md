@@ -66,7 +66,7 @@ Example configuration files are provided.
 Checklist:
 
 * A brand new Debian live ISO
-* [JLIVECD]("https://github.com/neurobin/JLIVECD")
+* [JLIVECD](https://github.com/neurobin/JLIVECD)
 * F.A.L.C.E.
 * A bit of asd
 
