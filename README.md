@@ -88,6 +88,11 @@ sudo ./falce --add-folder weeedebian_files -x /weeedebian_files/martello.sh \
 --iso-path /path/to/debian-live-X.Y.Z-amd64-xfce.iso /full/path/to/project/folder
 ```
 
+if a terminal opens and, instead of asking if you want to run martello.sh (you should run it only once, BTW) warns you
+that zsh was not found: close that window, press ctrl+C in the other terminal, falce will crash. Now restart it without
+the -n options, it should take far less to get to that point again (squashfs has already been uncompressed) and it
+should work as intended, with martello.sh and such.
+
 ### 32-bit
 
 It's mostly the same:
