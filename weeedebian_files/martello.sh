@@ -22,10 +22,10 @@ if [[ $ans == "y" ]]; then
 
 	echo === Software installation ===
     sudo -H -u root /bin/bash -c 'apt update -y'
-    sudo -H -u root /bin/bash -c 'apt install -y i2c-tools lshw smartmontools cifs-utils dmidecode pciutils gvfs-backends gsmartcontrol git gparted gksu'
+    sudo -H -u root /bin/bash -c 'apt upgrade -y'
+    sudo -H -u root /bin/bash -c 'apt install -y i2c-tools lshw smartmontools cifs-utils dmidecode pciutils gvfs-backends gsmartcontrol git gparted gksu openssh-server'
     # Remove useless packages, courtesy of "wajig large". Cool command.
-    # Also ispell is probably useless (if it's used only by LibreOffice)
-    sudo -H -u root /bin/bash -c 'apt purge --auto-remove -y libreoffice libreoffice-core libreoffice-common gimp gimp-* aspell* hunspell* mythes* *sunpinyin* wpolish wnorwegian tegaki* task-thai task-thai-desktop xfonts-thai xiterm* task-khmer task-khmer-desktop fonts-khmeros khmerconverter'
+    sudo -H -u root /bin/bash -c 'apt purge --auto-remove -y libreoffice libreoffice-core libreoffice-common ispell* gimp gimp-* aspell* hunspell* mythes* *sunpinyin* wpolish wnorwegian tegaki* task-thai task-thai-desktop xfonts-thai xiterm* task-khmer task-khmer-desktop fonts-khmeros khmerconverter'
 
     echo === Modules configuration ===
     if [[ -z `grep eeprom /etc/modules-load.d/eeprom.conf` ]]; then
