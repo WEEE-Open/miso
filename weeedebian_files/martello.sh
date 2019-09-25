@@ -21,13 +21,17 @@ if [[ $ans == "y" ]]; then
     locale
 
 	echo === Software installation ===
+    # Remove useless packages, courtesy of "wajig large". Cool command.
+    sudo -H -u root /bin/bash -c 'apt purge --auto-remove -y libreoffice libreoffice-core libreoffice-common ispell* gimp gimp-* aspell* hunspell* mythes* *sunpinyin* wpolish wnorwegian tegaki* task-thai task-thai-desktop xfonts-thai xiterm* task-khmer task-khmer-desktop fonts-khmeros khmerconverter'
+    # Upgrade and install useful packages
     sudo -H -u root /bin/bash -c 'apt update -y'
     sudo -H -u root /bin/bash -c 'apt upgrade -y'
     sudo -H -u root /bin/bash -c 'apt install -y i2c-tools lshw smartmontools cifs-utils dmidecode pciutils gvfs-backends gsmartcontrol git gparted gksu openssh-server'
-    # Remove useless packages, courtesy of "wajig large". Cool command.
-    sudo -H -u root /bin/bash -c 'apt purge --auto-remove -y libreoffice libreoffice-core libreoffice-common ispell* gimp gimp-* aspell* hunspell* mythes* *sunpinyin* wpolish wnorwegian tegaki* task-thai task-thai-desktop xfonts-thai xiterm* task-khmer task-khmer-desktop fonts-khmeros khmerconverter'
 
     echo === Modules configuration ===
+    if [[ ! -f "/etc/modules-load.d/eeprom.conf" ]]; then
+      touch /etc/modules-load.d/eeprom.conf
+    fi
     if [[ -z `grep eeprom /etc/modules-load.d/eeprom.conf` ]]; then
         printf "eeprom\n" > /etc/modules-load.d/eeprom.conf
     fi
@@ -46,7 +50,7 @@ if [[ $ans == "y" ]]; then
     echo === Sudo configuration ===
     sudo -H -u root cp /weeedebian_files/weee /etc/sudoers.d/weee
 
-	echo === Top configuration ===
+	  echo === Top configuration ===
     sudo -H -u root cp /weeedebian_files/toprc /root/.toprc
     sudo -H -u weee cp /weeedebian_files/toprc /home/weee/.toprc
 
