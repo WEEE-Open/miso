@@ -20,13 +20,15 @@ if [[ $ans == "y" ]]; then
     . /etc/locale.conf
     locale
 
-	echo === Software installation ===
+    echo === Software installation ===
     # Remove useless packages, courtesy of "wajig large". Cool command.
     sudo -H -u root /bin/bash -c 'apt purge --auto-remove -y libreoffice libreoffice-core libreoffice-common ispell* gimp gimp-* aspell* hunspell* mythes* *sunpinyin* wpolish wnorwegian tegaki* task-thai task-thai-desktop xfonts-thai xiterm* task-khmer task-khmer-desktop fonts-khmeros khmerconverter'
     # Upgrade and install useful packages
     sudo -H -u root /bin/bash -c 'apt update -y'
     sudo -H -u root /bin/bash -c 'apt upgrade -y'
-    sudo -H -u root /bin/bash -c 'apt install -y i2c-tools lshw smartmontools cifs-utils dmidecode pciutils gvfs-backends gsmartcontrol git gparted gksu openssh-server'
+    sudo -H -u root /bin/bash -c 'apt install -y pciutils i2c-tools lshw mesa-utils smartmontools cifs-utils dmidecode gvfs-backends gsmartcontrol git gparted openssh-server'
+    # TODO: there's no gksu anymore. This command fails.
+    sudo -H -u root /bin/bash -c 'apt install -y gksu'
 
     echo === Modules configuration ===
     if [[ ! -f "/etc/modules-load.d/eeprom.conf" ]]; then
@@ -50,13 +52,24 @@ if [[ $ans == "y" ]]; then
     echo === Sudo configuration ===
     sudo -H -u root cp /weeedebian_files/weee /etc/sudoers.d/weee
 
-	  echo === Top configuration ===
+    echo === Top configuration ===
     sudo -H -u root cp /weeedebian_files/toprc /root/.toprc
     sudo -H -u weee cp /weeedebian_files/toprc /home/weee/.toprc
 
-    echo === Prepare scriptino.sh ===
-    sudo -H -u root chmod +x /weeedebian_files/scriptino.sh
-    sudo -H -u root cp /weeedebian_files/scriptino.sh /usr/bin/scriptino
+    echo === Prepare peracotta ===
+    if [[ -d "/home/weee/peracotta" ]]; then
+		sudo -H -u weee git -C /home/weee/peracotta pull
+	else
+		sudo -H -u weee mkdir -p /home/weee/peracotta
+		sudo -H -u weee git clone https://github.com/WEEE-Open/peracotta.git /home/weee/peracotta
+	fi
+    sudo -H -u weee chmod +x /home/weee/peracotta/generate_files.sh
+	if [[ ! -f "/usr/bin/generate_files.sh" ]]; then
+		sudo -H -u root ln -s /home/weee/peracotta/generate_files.sh /usr/bin/generate_files.sh
+	fi
+	if [[ ! -f "/usr/bin/generate_files" ]]; then
+		sudo -H -u root ln -s /home/weee/peracotta/generate_files.sh /usr/bin/generate_files
+	fi
 
     echo === XFCE configuration ===
     sudo -H -u weee mkdir -p /home/weee/.config/xfce4
@@ -81,11 +94,11 @@ if [[ $ans == "y" ]]; then
     sudo -H -u root printf "ExecStart=\n" >> /etc/systemd/system/getty@.service.d/override.conf
     sudo -H -u root printf "ExecStart=-/sbin/agetty --noissue --autologin weee %%I $TERM" >> /etc/systemd/system/getty@.service.d/override.conf
 
-	echo === Automatic configuration done ===
+    echo === Automatic configuration done ===
     # Starts an xfce4 session if you need to modify xfce4 settings for user weee
-    read -p 'Start xfce4 (Press Ctrl+C in this terminal to close it) [y/n]?: ' ans
+    read -p 'Open a shell in the chroot environment? [y/n] ' ans
         if [[ $ans == "y" ]]; then
-            sudo -H -u weee /bin/bash -c 'xfce4-panel'
+            sudo -H -u weee /bin/bash
         fi
 else
     exit
