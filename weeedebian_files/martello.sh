@@ -52,8 +52,8 @@ if [[ $ans == "y" ]]; then
         # This ALSO does not work:
         #echo "weee:asd" | sudo -H -u root chpasswd
         # So...
-        sed -i '/weee:.+\weee:$6$1JlXeMWKid5Uf4ty$ewHoPm6P9hK8Lm4KW21YMCQju435r4SyWu7S0mwJZ5360SU1L2NKLU5YuQAzidRDmh/R7lIjxR/G8Pd8Yj/Wo0:18214:0:99999:7:::' /etc/shadow
     fi
+    sed -i '/weee:.+\weee:$6$1JlXeMWKid5Uf4ty$ewHoPm6P9hK8Lm4KW21YMCQju435r4SyWu7S0mwJZ5360SU1L2NKLU5YuQAzidRDmh/R7lIjxR/G8Pd8Yj/Wo0:18214:0:99999:7:::' /etc/shadow
 
     echo === Sudo configuration ===
     sudo -H -u root cp /weeedebian_files/weee /etc/sudoers.d/weee
