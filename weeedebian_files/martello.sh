@@ -27,8 +27,6 @@ if [[ $ans == "y" ]]; then
     sudo -H -u root /bin/bash -c 'apt update -y'
     sudo -H -u root /bin/bash -c 'apt upgrade -y'
     sudo -H -u root /bin/bash -c 'apt install -y pciutils i2c-tools lshw mesa-utils smartmontools cifs-utils dmidecode gvfs-backends gsmartcontrol git gparted openssh-server'
-    # TODO: there's no gksu anymore. This command fails.
-    sudo -H -u root /bin/bash -c 'apt install -y gksu'
 
     echo === SSH daemon configuration ===
     sudo -H -u root cp /weeedebian_files/sshd_config /etc/ssh/sshd_config
