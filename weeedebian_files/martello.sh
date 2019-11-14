@@ -45,8 +45,10 @@ if [[ $ans == "y" ]]; then
         if [[ -d "/home/weee" ]]; then
             rm -rf "/home/weee"
         fi
-        # The encrypted password is "asd"
-        useradd -m -G sudo -s /bin/bash weee -p "$6$cFAyjyCf$HiQKwzGvDioyYINpJ0kKmHEy6kXUlBJViMkd1ceizIpBFOftLVnjCuT6wvfLVhG7qnCo10q3vGzsaeyFIYHMO."
+        # The -p parameter is silently ignored for some reason:
+        # -p "$6$cFAyjyCf$HiQKwzGvDioyYINpJ0kKmHEy6kXUlBJViMkd1ceizIpBFOftLVnjCuT6wvfLVhG7qnCo10q3vGzsaeyFIYHMO."
+        useradd -m -G sudo -s /bin/bash weee
+        echo "weee:asd" | sudo -H -u root chpasswd
     fi
 
     echo === Sudo configuration ===
