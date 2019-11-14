@@ -30,6 +30,9 @@ if [[ $ans == "y" ]]; then
     # TODO: there's no gksu anymore. This command fails.
     sudo -H -u root /bin/bash -c 'apt install -y gksu'
 
+    echo === SSH daemon configuration ===
+    sudo -H -u root cp /weeedebian_files/sshd_config /etc/ssh/sshd_config
+
     echo === Modules configuration ===
     if [[ ! -f "/etc/modules-load.d/eeprom.conf" ]]; then
       touch /etc/modules-load.d/eeprom.conf
@@ -60,18 +63,18 @@ if [[ $ans == "y" ]]; then
 
     echo === Prepare peracotta ===
     if [[ -d "/home/weee/peracotta" ]]; then
-		sudo -H -u weee git -C /home/weee/peracotta pull
-	else
-		sudo -H -u weee mkdir -p /home/weee/peracotta
-		sudo -H -u weee git clone https://github.com/WEEE-Open/peracotta.git /home/weee/peracotta
-	fi
-    sudo -H -u weee chmod +x /home/weee/peracotta/generate_files.sh
-	if [[ ! -f "/usr/bin/generate_files.sh" ]]; then
-		sudo -H -u root ln -s /home/weee/peracotta/generate_files.sh /usr/bin/generate_files.sh
-	fi
-	if [[ ! -f "/usr/bin/generate_files" ]]; then
-		sudo -H -u root ln -s /home/weee/peracotta/generate_files.sh /usr/bin/generate_files
-	fi
+      sudo -H -u weee git -C /home/weee/peracotta pull
+    else
+      sudo -H -u weee mkdir -p /home/weee/peracotta
+      sudo -H -u weee git clone https://github.com/WEEE-Open/peracotta.git /home/weee/peracotta
+    fi
+      sudo -H -u weee chmod +x /home/weee/peracotta/generate_files.sh
+    if [[ ! -f "/usr/bin/generate_files.sh" ]]; then
+      sudo -H -u root ln -s /home/weee/peracotta/generate_files.sh /usr/bin/generate_files.sh
+    fi
+    if [[ ! -f "/usr/bin/generate_files" ]]; then
+      sudo -H -u root ln -s /home/weee/peracotta/generate_files.sh /usr/bin/generate_files
+    fi
 
     echo === XFCE configuration ===
     sudo -H -u weee mkdir -p /home/weee/.config/xfce4
@@ -95,6 +98,9 @@ if [[ $ans == "y" ]]; then
     sudo -H -u root printf "[Service]\n" > /etc/systemd/system/getty@.service.d/override.conf
     sudo -H -u root printf "ExecStart=\n" >> /etc/systemd/system/getty@.service.d/override.conf
     sudo -H -u root printf "ExecStart=-/sbin/agetty --noissue --autologin weee %%I $TERM" >> /etc/systemd/system/getty@.service.d/override.conf
+
+    echo === Set hostname ===
+    echo "weeedebian" > /etc/hostname
 
     echo === Automatic configuration done ===
     # Starts an xfce4 session if you need to modify xfce4 settings for user weee
