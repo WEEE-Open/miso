@@ -46,10 +46,13 @@ if [[ $ans == "y" ]]; then
         if [[ -d "/home/weee" ]]; then
             rm -rf "/home/weee"
         fi
+        useradd -m -G sudo -s /bin/bash weee
         # The -p parameter is silently ignored for some reason:
         # -p "$6$cFAyjyCf$HiQKwzGvDioyYINpJ0kKmHEy6kXUlBJViMkd1ceizIpBFOftLVnjCuT6wvfLVhG7qnCo10q3vGzsaeyFIYHMO."
-        useradd -m -G sudo -s /bin/bash weee
-        echo "weee:asd" | sudo -H -u root chpasswd
+        # This ALSO does not work:
+        #echo "weee:asd" | sudo -H -u root chpasswd
+        # So...
+        sed -i '/weee:.+\weee:$6$1JlXeMWKid5Uf4ty$ewHoPm6P9hK8Lm4KW21YMCQju435r4SyWu7S0mwJZ5360SU1L2NKLU5YuQAzidRDmh/R7lIjxR/G8Pd8Yj/Wo0:18214:0:99999:7:::' /etc/shadow
     fi
 
     echo === Sudo configuration ===
