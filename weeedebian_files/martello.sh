@@ -63,6 +63,9 @@ if [[ $ans == "y" ]]; then
     sudo -H -u weee cp /weeedebian_files/toprc /home/weee/.toprc
 
     echo === Prepare peracotta ===
+    # Dependencies
+    sudo -H -u root /bin/bash -c 'apt install -y python3-pip'
+    sudo -H -u root /bin/bash -c 'pip3 install PyQt5 PyQt5-sip'
     if [[ -d "/home/weee/peracotta" ]]; then
       sudo -H -u weee git -C /home/weee/peracotta pull
     else
