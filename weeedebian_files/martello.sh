@@ -68,9 +68,7 @@ if [[ $ans == "y" ]]; then
     sudo -H -u weee cp /weeedebian_files/toprc /home/weee/.toprc
 
     echo === Prepare peracotta ===
-    # Dependencies
     sudo -H -u root /bin/bash -c 'apt install -y python3-pip'
-    #sudo -H -u root /bin/bash -c 'pip3 install PyQt5 PyQt5-sip'
     if [[ -d "/home/weee/peracotta" ]]; then
       sudo -H -u weee git -C /home/weee/peracotta pull
     else
@@ -78,7 +76,7 @@ if [[ $ans == "y" ]]; then
       sudo -H -u weee git clone https://github.com/WEEE-Open/peracotta.git /home/weee/peracotta
     fi
     sudo -H -u weee chmod +x /home/weee/peracotta/generate_files.sh
-    sudo -H -u weee pip3 install requirements.txt
+    sudo -H -u root pip3 install -r /home/weee/peracotta/requirements.txt
     if [[ ! -f "/usr/bin/generate_files.sh" ]]; then
       sudo -H -u root ln -s /home/weee/peracotta/generate_files.sh /usr/bin/generate_files.sh
     fi
