@@ -26,7 +26,8 @@ if [[ $ans == "y" ]]; then
     # Upgrade and install useful packages
     sudo -H -u root /bin/bash -c 'apt update -y'
     sudo -H -u root /bin/bash -c 'apt upgrade -y'
-    sudo -H -u root /bin/bash -c 'apt install -y pciutils i2c-tools lshw mesa-utils smartmontools cifs-utils dmidecode gvfs-backends gsmartcontrol git gparted openssh-server'
+    # libxkbcommon-x11-0 may be not needed (see Add library to installation if needed #28)
+    sudo -H -u root /bin/bash -c 'apt install -y pciutils i2c-tools lshw mesa-utils smartmontools cifs-utils dmidecode gvfs-backends gsmartcontrol git gparted openssh-server zsh libxkbcommon-x11-0'
 
     echo === SSH daemon configuration ===
     sudo -H -u root cp /weeedebian_files/sshd_config /etc/ssh/sshd_config
@@ -41,20 +42,24 @@ if [[ $ans == "y" ]]; then
     if [[ -z `grep at24 /etc/modules-load.d/eeprom.conf` ]]; then
         printf "at24\n" > /etc/modules-load.d/eeprom.conf
     fi
+
+    echo === User configuration ===
     if [[ -z `grep weee /etc/passwd` ]]; then
-        echo === User configuration ===
         if [[ -d "/home/weee" ]]; then
-            rm -rf "/home/weee"
+            sudo -H -u root rm -rf "/home/weee"
         fi
-        useradd -m -G sudo -s /bin/bash weee
+        sudo -H -u root useradd -m -G sudo -s /bin/zsh weee
         # The -p parameter is silently ignored for some reason:
         # -p "$6$cFAyjyCf$HiQKwzGvDioyYINpJ0kKmHEy6kXUlBJViMkd1ceizIpBFOftLVnjCuT6wvfLVhG7qnCo10q3vGzsaeyFIYHMO."
         # This ALSO does not work:
         #echo "weee:asd" | sudo -H -u root chpasswd
         # So...
     fi
-    sed -i '/weee:.+\weee:$6$1JlXeMWKid5Uf4ty$ewHoPm6P9hK8Lm4KW21YMCQju435r4SyWu7S0mwJZ5360SU1L2NKLU5YuQAzidRDmh/R7lIjxR/G8Pd8Yj/Wo0:18214:0:99999:7:::' /etc/shadow
-
+    sudo -H -u root sed -i '/weee:.+\weee:$6$1JlXeMWKid5Uf4ty$ewHoPm6P9hK8Lm4KW21YMCQju435r4SyWu7S0mwJZ5360SU1L2NKLU5YuQAzidRDmh/R7lIjxR/G8Pd8Yj/Wo0:18214:0:99999:7:::' /etc/shadow
+    sudo -H -u root chsh -s /bin/zsh weee
+    if [[ -f "/home/weee" ]]; then
+      sudo -H -u weee wget -O ~/.zshrc https://git.grml.org/f/grml-etc-core/etc/zsh/zshrc
+    fi
     echo === Sudo configuration ===
     sudo -H -u root cp /weeedebian_files/weee /etc/sudoers.d/weee
 
@@ -65,7 +70,7 @@ if [[ $ans == "y" ]]; then
     echo === Prepare peracotta ===
     # Dependencies
     sudo -H -u root /bin/bash -c 'apt install -y python3-pip'
-    sudo -H -u root /bin/bash -c 'pip3 install PyQt5 PyQt5-sip'
+    #sudo -H -u root /bin/bash -c 'pip3 install PyQt5 PyQt5-sip'
     if [[ -d "/home/weee/peracotta" ]]; then
       sudo -H -u weee git -C /home/weee/peracotta pull
     else
@@ -73,7 +78,7 @@ if [[ $ans == "y" ]]; then
       sudo -H -u weee git clone https://github.com/WEEE-Open/peracotta.git /home/weee/peracotta
     fi
     sudo -H -u weee chmod +x /home/weee/peracotta/generate_files.sh
-    sudo -H -u weee pip install requirements.txt
+    sudo -H -u weee pip3 install requirements.txt
     if [[ ! -f "/usr/bin/generate_files.sh" ]]; then
       sudo -H -u root ln -s /home/weee/peracotta/generate_files.sh /usr/bin/generate_files.sh
     fi
