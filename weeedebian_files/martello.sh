@@ -72,7 +72,8 @@ if [[ $ans == "y" ]]; then
       sudo -H -u weee mkdir -p /home/weee/peracotta
       sudo -H -u weee git clone https://github.com/WEEE-Open/peracotta.git /home/weee/peracotta
     fi
-      sudo -H -u weee chmod +x /home/weee/peracotta/generate_files.sh
+    sudo -H -u weee chmod +x /home/weee/peracotta/generate_files.sh
+    sudo -H -u weee pip install requirements.txt
     if [[ ! -f "/usr/bin/generate_files.sh" ]]; then
       sudo -H -u root ln -s /home/weee/peracotta/generate_files.sh /usr/bin/generate_files.sh
     fi
