@@ -69,6 +69,10 @@ if [[ $ans == "y" ]]; then
 
     echo === Prepare peracotta ===
     sudo -H -u root /bin/bash -c 'apt install -y python3-pip'
+    # PyQt > 5.14.0 requires an EXTREMELY RECENT version of pip,
+    # on the most bleeding of all bleeding edges
+    sudo -H -u root pip3 install --upgrade pip
+
     if [[ -d "/home/weee/peracotta" ]]; then
       sudo -H -u weee git -C /home/weee/peracotta pull
     else
@@ -76,7 +80,15 @@ if [[ $ans == "y" ]]; then
       sudo -H -u weee git clone https://github.com/WEEE-Open/peracotta.git /home/weee/peracotta
     fi
     sudo -H -u weee chmod +x /home/weee/peracotta/generate_files.sh
-    sudo -H -u root pip3 install -r /home/weee/peracotta/requirements.txt
+    # PyQt 5 is currently impossible to build, due to a very simple error with a
+    # very simple fix (upgrade pip to 20.2 or above) which simply does not work at
+    # all and does not solve anything (pip is already at 20.4.2), so it's simply
+    # impossible to install requirements. That's it. The end.
+    # sudo -H -u root pip3 install -r /home/weee/peracotta/requirements.txt
+    # At least the apt package works correctly, somehow the Debian maintainers
+    # managed to build it:
+    sudo -H -u root /bin/bash -c 'apt install -y python3-pyqt5'
+
     if [[ ! -f "/usr/bin/generate_files.sh" ]]; then
       sudo -H -u root ln -s /home/weee/peracotta/generate_files.sh /usr/bin/generate_files.sh
     fi
