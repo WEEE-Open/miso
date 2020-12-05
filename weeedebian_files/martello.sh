@@ -30,7 +30,7 @@ if [[ $ans == "y" ]]; then
     # libxkbcommon-x11-0 may be not needed (see Add library to installation if needed #28)
     sudo -H -u root /bin/bash -c 'DEBIAN_FRONTEND=noninteractive apt install -y pciutils i2c-tools lshw mesa-utils smartmontools cifs-utils dmidecode gvfs-backends gsmartcontrol git gparted openssh-server zsh libxkbcommon-x11-0 geany curl wget'
     # Remove unused packages
-    sudo -H -u root /bin/bash -c 'DEBIAN_FRONTEND=noninteractive apt autoremove'
+    sudo -H -u root /bin/bash -c 'DEBIAN_FRONTEND=noninteractive apt autoremove -y'
 
     echo === SSH daemon configuration ===
     sudo -H -u root cp /weeedebian_files/sshd_config /etc/ssh/sshd_config
