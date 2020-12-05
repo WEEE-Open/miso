@@ -28,7 +28,9 @@ if [[ $ans == "y" ]]; then
     sudo -H -u root /bin/bash -c 'DEBIAN_FRONTEND=noninteractive apt update -y'
     sudo -H -u root /bin/bash -c 'DEBIAN_FRONTEND=noninteractive apt upgrade -y'
     # libxkbcommon-x11-0 may be not needed (see Add library to installation if needed #28)
-    sudo -H -u root /bin/bash -c 'DEBIAN_FRONTEND=noninteractive apt install -y pciutils i2c-tools lshw mesa-utils smartmontools cifs-utils dmidecode gvfs-backends gsmartcontrol git gparted openssh-server zsh libxkbcommon-x11-0 geany'
+    sudo -H -u root /bin/bash -c 'DEBIAN_FRONTEND=noninteractive apt install -y pciutils i2c-tools lshw mesa-utils smartmontools cifs-utils dmidecode gvfs-backends gsmartcontrol git gparted openssh-server zsh libxkbcommon-x11-0 geany curl wget'
+    # Remove unused packages
+    sudo -H -u root /bin/bash -c 'DEBIAN_FRONTEND=noninteractive apt autoremove'
 
     echo === SSH daemon configuration ===
     sudo -H -u root cp /weeedebian_files/sshd_config /etc/ssh/sshd_config
@@ -58,12 +60,8 @@ if [[ $ans == "y" ]]; then
     fi
     sudo -H -u root sed -i '/weee:.+\weee:$6$1JlXeMWKid5Uf4ty$ewHoPm6P9hK8Lm4KW21YMCQju435r4SyWu7S0mwJZ5360SU1L2NKLU5YuQAzidRDmh/R7lIjxR/G8Pd8Yj/Wo0:18214:0:99999:7:::' /etc/shadow
     sudo -H -u root chsh -s /bin/zsh weee
-    if [[ -f "/home/weee/.zshrc" ]]; then
-      sudo -H -u weee wget -O /home/weee/.zshrc https://git.grml.org/f/grml-etc-core/etc/zsh/zshrc
-    fi
-    if [[ -f "/root/.zshrc" ]]; then
-      sudo -H -u root cp /home/weee/.zshrc /root/.zshrc
-    fi
+    sudo -H -u weee curl -L -o /home/weee/.zshrc https://git.grml.org/f/grml-etc-core/etc/zsh/zshrc
+    sudo -H -u root cp /home/weee/.zshrc /root/.zshrc
     echo === Sudo configuration ===
     sudo -H -u root cp /weeedebian_files/weee /etc/sudoers.d/weee
 
