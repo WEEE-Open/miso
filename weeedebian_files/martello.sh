@@ -73,7 +73,7 @@ if [[ $ans == "y" ]]; then
     sudo -H -u root /bin/bash -c 'apt install -y python3-pip'
     # PyQt > 5.14.0 requires an EXTREMELY RECENT version of pip,
     # on the most bleeding of all bleeding edges
-    sudo -H -u root pip3 install --upgrade pip
+    #sudo -H -u root pip3 install --upgrade pip
 
     if [[ -d "/home/weee/peracotta" ]]; then
       sudo -H -u weee git -C /home/weee/peracotta pull
@@ -81,7 +81,6 @@ if [[ $ans == "y" ]]; then
       sudo -H -u weee mkdir -p /home/weee/peracotta
       sudo -H -u weee git clone https://github.com/WEEE-Open/peracotta.git /home/weee/peracotta
     fi
-    sudo -H -u weee chmod +x /home/weee/peracotta/generate_files.sh
     # PyQt 5 is currently impossible to build, due to a very simple error with a
     # very simple fix (upgrade pip to 20.2 or above) which simply does not work at
     # all and does not solve anything (pip is already at 20.4.2), so it's simply
@@ -91,11 +90,43 @@ if [[ $ans == "y" ]]; then
     # managed to build it:
     sudo -H -u root /bin/bash -c 'apt install -y python3-pyqt5'
 
-    if [[ ! -f "/usr/bin/generate_files.sh" ]]; then
-      sudo -H -u root ln -s /home/weee/peracotta/generate_files.sh /usr/bin/generate_files.sh
+    PERACOTTA_GENERATE_FILES=$(sudo -H -u weee find /home/weee/peracotta -name "generate_files*" -print -quit)
+    PERACOTTA_MAIN=$(sudo -H -u weee find /home/weee/peracotta -name "main.py" -print -quit)
+    PERACOTTA_MAIN_WITH_GUI=$(sudo -H -u weee find /home/weee/peracotta -name "main_with_gui.py" -print -quit)
+
+    if [[ -f "$PERACOTTA_GENERATE_FILES" ]]; then
+      sudo -H -u weee chmod +x "$PERACOTTA_GENERATE_FILES"
+      sudo -H -u root rm /usr/bin/generate_files.sh 2> /dev/null
+      sudo -H -u root rm /usr/bin/generate_files 2> /dev/null
+      sudo -H -u root ln -s "$PERACOTTA_GENERATE_FILES" /usr/bin/generate_files
     fi
-    if [[ ! -f "/usr/bin/generate_files" ]]; then
-      sudo -H -u root ln -s /home/weee/peracotta/generate_files.sh /usr/bin/generate_files
+    if [[ -f "$PERACOTTA_MAIN" ]]; then
+      sudo -H -u weee chmod +x "$PERACOTTA_MAIN"
+      sudo -H -u root rm /usr/bin/peracotta 2> /dev/null
+      sudo -H -u root ln -s "$PERACOTTA_MAIN" /usr/bin/peracotta
+    fi
+    if [[ -f "$PERACOTTA_MAIN_WITH_GUI" ]]; then
+      sudo -H -u weee chmod +x "$PERACOTTA_MAIN_WITH_GUI"
+      sudo -H -u root rm /usr/bin/peracotta_gui 2> /dev/null
+      sudo -H -u root ln -s "$PERACOTTA_MAIN_WITH_GUI" /usr/bin/peracotta_gui
+    fi
+
+    echo === Add env to peracotta ===
+    if [[ -f "/weeedebian_files/env.txt" ]]; then
+      sudo -H -u weee cp /weeedebian_files/env.txt /home/weee/peracotta/.env
+    else
+      echo "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
+      echo "@                                                          @"
+      echo "@                         WARNING                          @"
+      echo "@                                                          @"
+      echo "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
+      echo "@                                                          @"
+      echo "@   env.txt not found in weeedebian_files.                 @"
+      echo "@   You're missing out many great peracotta features!      @"
+      echo "@   Check README for more info if you want to create the   @"
+      echo "@   file and automate your file!                           @"
+      echo "@                                                          @"
+      echo "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
     fi
 
     echo === XFCE configuration ===
