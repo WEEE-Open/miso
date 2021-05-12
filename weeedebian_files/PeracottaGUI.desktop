@@ -1,0 +1,8 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Peracotta GUI
+Comment=Start peracotta GUI
+Exec=/usr/bin/peracotta_gui
+Icon=/home/weee/.config/peracotta_gui.png
+

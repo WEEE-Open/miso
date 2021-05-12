@@ -1,0 +1,9 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Peracotta
+Comment=Start peracotta in a terminal
+Terminal=true
+Exec=/usr/bin/peracotta
+Icon=/home/weee/.config/peracotta.png
+

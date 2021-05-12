@@ -143,11 +143,20 @@ if [[ $ans == "y" ]]; then
     sudo -H -u root rsync -a --force /weeedebian_files/xfce4 /home/weee/.config
     sudo -H -u root chown weee: -R /home/weee/.config
 
-    echo === Link to tarallo ===
+    echo === Desktop shortcuts ===
     sudo -H -u weee mkdir -p /home/weee/Desktop
+
     sudo -H -u weee cp /weeedebian_files/Tarallo.desktop /home/weee/Desktop
     sudo -H -u weee cp /weeedebian_files/tarallo.png /home/weee/.config/tarallo.png
     sudo -H -u weee chmod +x /home/weee/Desktop/Tarallo.desktop
+
+    sudo -H -u weee cp /weeedebian_files/Peracotta.desktop /home/weee/Desktop
+    sudo -H -u weee cp /weeedebian_files/peracotta.png /home/weee/.config/peracotta.png
+    sudo -H -u weee chmod +x /home/weee/Desktop/Peracotta.desktop
+
+    sudo -H -u weee cp /weeedebian_files/PeracottaGUI.desktop /home/weee/Desktop
+    sudo -H -u weee cp /weeedebian_files/peracotta_gui.png /home/weee/.config/peracotta_gui.png
+    sudo -H -u weee chmod +x /home/weee/Desktop/PeracottaGUI.desktop
 
     echo === Pointerkeys thing ===
     sudo -H -u weee mkdir -p /home/weee/.config/autostart
