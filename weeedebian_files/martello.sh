@@ -77,7 +77,7 @@ if [[ $ans == "y" ]]; then
     sudo -H -u root /bin/bash -c 'apt install -y python3-pip'
     # PyQt > 5.14.0 requires an EXTREMELY RECENT version of pip,
     # on the most bleeding of all bleeding edges
-    sudo -H -u root pip3 install --upgrade pip
+    sudo -H -u root pip3 install --quiet --upgrade pip
     # PyQt 5 is currently impossible to build, due to a very simple error with a
     # very simple fix (upgrade pip to 20.2 or above) which simply does not work at
     # all and does not solve anything (pip is already at 20.4.2), so it's simply
@@ -85,7 +85,7 @@ if [[ $ans == "y" ]]; then
     # sudo -H -u root pip3 install -r /home/weee/peracotta/requirements.txt
     # At least the apt package works correctly, somehow the Debian maintainers
     # managed to build it:
-    sudo -H -u root /bin/bash -c 'apt install -y python3-pyqt5'
+    sudo -H -u root /bin/bash -c 'apt autoremove -y python3-pyqt5'
 
     if [[ -d "/home/weee/peracotta" ]]; then
       sudo -H -u root rm -rf /home/weee/peracotta
@@ -97,7 +97,7 @@ if [[ $ans == "y" ]]; then
     #fi
 
     sudo -H -u root rm /usr/share/polkit-1/actions/generate_files_pkexec.policy 2>/dev/null || true
-    sudo -H -u root pip3 install -r /home/weee/peracotta/requirements.txt
+    sudo -H -u root pip3 --quiet install -r /home/weee/peracotta/requirements.txt
 
     PERACOTTA_GENERATE_FILES=$(sudo -H -u weee find /home/weee/peracotta -name "generate_files*" -print -quit)
     PERACOTTA_MAIN=$(sudo -H -u weee find /home/weee/peracotta -name "main.py" -print -quit)
