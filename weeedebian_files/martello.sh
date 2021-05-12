@@ -71,8 +71,9 @@ if [[ $ans == "y" ]]; then
     sudo -H -u root cp /weeedebian_files/resolved.conf /etc/systemd/resolved.conf
 
     echo === NTP configuration ===
-    sudo -H -u root timedatectl set-ntp 1
-    sudo -H -u root timedatectl set-timezone Europe/Rome
+    sudo -H -u root systemctl enable systemd-timesyncd
+    sudo -H -u root rm -f /etc/localtime
+    sudo -H -u root ln -s /usr/share/zoneinfo/Europe/Rome /etc/localtime
 
     echo === Top configuration ===
     sudo -H -u root cp /weeedebian_files/toprc /root/.toprc
