@@ -62,8 +62,12 @@ if [[ $ans == "y" ]]; then
     sudo -H -u root chsh -s /bin/zsh weee
     sudo -H -u weee curl -L -o /home/weee/.zshrc https://git.grml.org/f/grml-etc-core/etc/zsh/zshrc
     sudo -H -u root cp /home/weee/.zshrc /root/.zshrc
+
     echo === Sudo configuration ===
     sudo -H -u root cp /weeedebian_files/weee /etc/sudoers.d/weee
+
+    echo === DNS configuration ===
+    sudo -H -u root cp /weeedebian_files/resolv.conf /etc/resolv.conf
 
     echo === Top configuration ===
     sudo -H -u root cp /weeedebian_files/toprc /root/.toprc
@@ -73,14 +77,7 @@ if [[ $ans == "y" ]]; then
     sudo -H -u root /bin/bash -c 'apt install -y python3-pip'
     # PyQt > 5.14.0 requires an EXTREMELY RECENT version of pip,
     # on the most bleeding of all bleeding edges
-    #sudo -H -u root pip3 install --upgrade pip
-
-    if [[ -d "/home/weee/peracotta" ]]; then
-      sudo -H -u weee git -C /home/weee/peracotta pull
-    else
-      sudo -H -u weee mkdir -p /home/weee/peracotta
-      sudo -H -u weee git clone https://github.com/WEEE-Open/peracotta.git /home/weee/peracotta
-    fi
+    sudo -H -u root pip3 install --upgrade pip
     # PyQt 5 is currently impossible to build, due to a very simple error with a
     # very simple fix (upgrade pip to 20.2 or above) which simply does not work at
     # all and does not solve anything (pip is already at 20.4.2), so it's simply
@@ -89,6 +86,16 @@ if [[ $ans == "y" ]]; then
     # At least the apt package works correctly, somehow the Debian maintainers
     # managed to build it:
     sudo -H -u root /bin/bash -c 'apt install -y python3-pyqt5'
+
+    if [[ -d "/home/weee/peracotta" ]]; then
+      sudo -H -u weee git -C /home/weee/peracotta pull
+    else
+      sudo -H -u weee mkdir -p /home/weee/peracotta
+      sudo -H -u weee git clone https://github.com/WEEE-Open/peracotta.git /home/weee/peracotta
+    fi
+
+    rm /usr/share/polkit-1/actions/generate_files_pkexec.policy || true
+    sudo -H -u root pip3 install -r /home/weee/peracotta/requirements.txt
 
     PERACOTTA_GENERATE_FILES=$(sudo -H -u weee find /home/weee/peracotta -name "generate_files*" -print -quit)
     PERACOTTA_MAIN=$(sudo -H -u weee find /home/weee/peracotta -name "main.py" -print -quit)
