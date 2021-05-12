@@ -69,6 +69,7 @@ if [[ $ans == "y" ]]; then
     echo === DNS configuration ===
     sudo -H -u root cp /weeedebian_files/resolv.conf /etc/resolv.conf
     sudo -H -u root cp /weeedebian_files/resolved.conf /etc/systemd/resolved.conf
+    sudo -H -u root rm -f /var/run/NetworkManager/* 2>/dev/null
 
     echo === NTP configuration ===
     sudo -H -u root systemctl enable systemd-timesyncd
