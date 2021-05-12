@@ -68,6 +68,11 @@ if [[ $ans == "y" ]]; then
 
     echo === DNS configuration ===
     sudo -H -u root cp /weeedebian_files/resolv.conf /etc/resolv.conf
+    sudo -H -u root cp /weeedebian_files/resolved.conf /etc/systemd/resolved.conf
+
+    echo === NTP configuration ===
+    sudo -H -u root timedatectl set-ntp 1
+    sudo -H -u root timedatectl set-timezone Europe/Rome
 
     echo === Top configuration ===
     sudo -H -u root cp /weeedebian_files/toprc /root/.toprc
