@@ -111,12 +111,12 @@ if [[ $ans == "y" ]]; then
     fi
     if [[ -f "$PERACOTTA_MAIN" ]]; then
       sudo -H -u weee chmod +x "$PERACOTTA_MAIN"
-#      sudo -H -u root rm /usr/bin/peracotta 2> /dev/null
+      sudo -H -u root rm /usr/bin/peracotta 2> /dev/null
 #      sudo -H -u root ln -s "$PERACOTTA_MAIN" /usr/bin/peracotta
     fi
     if [[ -f "$PERACOTTA_MAIN_WITH_GUI" ]]; then
       sudo -H -u weee chmod +x "$PERACOTTA_MAIN_WITH_GUI"
-#      sudo -H -u root rm /usr/bin/peracotta_gui 2> /dev/null
+      sudo -H -u root rm /usr/bin/peracotta_gui 2> /dev/null
 #      sudo -H -u root ln -s "$PERACOTTA_MAIN_WITH_GUI" /usr/bin/peracotta_gui
     fi
 
@@ -133,7 +133,7 @@ if [[ $ans == "y" ]]; then
       echo "@   env.txt not found in weeedebian_files.                 @"
       echo "@   You're missing out many great peracotta features!      @"
       echo "@   Check README for more info if you want to create the   @"
-      echo "@   file and automate your file!                           @"
+      echo "@   file and automate your life!                           @"
       echo "@                                                          @"
       echo "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
     fi
