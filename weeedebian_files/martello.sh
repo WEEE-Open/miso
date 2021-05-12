@@ -58,7 +58,7 @@ if [[ $ans == "y" ]]; then
         #echo "weee:asd" | sudo -H -u root chpasswd
         # So...
     fi
-    sudo -H -u root sed -i '/weee:.+\weee:$6$1JlXeMWKid5Uf4ty$ewHoPm6P9hK8Lm4KW21YMCQju435r4SyWu7S0mwJZ5360SU1L2NKLU5YuQAzidRDmh/R7lIjxR/G8Pd8Yj/Wo0:18214:0:99999:7:::' /etc/shadow
+    sudo -H -u root sed -i 's#weee:.*#weee:$6$1JlXeMWKid5Uf4ty$ewHoPm6P9hK8Lm4KW21YMCQju435r4SyWu7S0mwJZ5360SU1L2NKLU5YuQAzidRDmh/R7lIjxR/G8Pd8Yj/Wo0:18214:0:99999:7:::#' /etc/shadow
     sudo -H -u root chsh -s /bin/zsh weee
     sudo -H -u weee curl -L -o /home/weee/.zshrc https://git.grml.org/f/grml-etc-core/etc/zsh/zshrc
     sudo -H -u root cp /home/weee/.zshrc /root/.zshrc
