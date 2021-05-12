@@ -4,6 +4,6 @@ Type=Application
 Name=Peracotta
 Comment=Start peracotta in a terminal
 Terminal=true
-Exec=/usr/bin/peracotta
+Exec=/home/weee/main.py
 Icon=/home/weee/.config/peracotta.png
-
+Path=/home/weee/peracotta

@@ -111,13 +111,13 @@ if [[ $ans == "y" ]]; then
     fi
     if [[ -f "$PERACOTTA_MAIN" ]]; then
       sudo -H -u weee chmod +x "$PERACOTTA_MAIN"
-      sudo -H -u root rm /usr/bin/peracotta 2> /dev/null
-      sudo -H -u root ln -s "$PERACOTTA_MAIN" /usr/bin/peracotta
+#      sudo -H -u root rm /usr/bin/peracotta 2> /dev/null
+#      sudo -H -u root ln -s "$PERACOTTA_MAIN" /usr/bin/peracotta
     fi
     if [[ -f "$PERACOTTA_MAIN_WITH_GUI" ]]; then
       sudo -H -u weee chmod +x "$PERACOTTA_MAIN_WITH_GUI"
-      sudo -H -u root rm /usr/bin/peracotta_gui 2> /dev/null
-      sudo -H -u root ln -s "$PERACOTTA_MAIN_WITH_GUI" /usr/bin/peracotta_gui
+#      sudo -H -u root rm /usr/bin/peracotta_gui 2> /dev/null
+#      sudo -H -u root ln -s "$PERACOTTA_MAIN_WITH_GUI" /usr/bin/peracotta_gui
     fi
 
     echo === Add env to peracotta ===
