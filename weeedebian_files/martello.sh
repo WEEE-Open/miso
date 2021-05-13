@@ -103,7 +103,7 @@ if [[ $ans == "y" ]]; then
     sudo -H -u weee git clone https://github.com/WEEE-Open/peracotta.git /home/weee/peracotta
     #fi
 
-    sudo -H -u root rm /usr/share/polkit-1/actions/generate_files_pkexec.policy 2>/dev/null || true
+    sudo -H -u weee sh -c 'cd /home/weee/peracotta && python3 polkit.py'
     sudo -H -u root pip3 --quiet install -r /home/weee/peracotta/requirements.txt
 
     PERACOTTA_GENERATE_FILES=$(sudo -H -u weee find /home/weee/peracotta -name "generate_files*" -print -quit)
