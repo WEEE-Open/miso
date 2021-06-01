@@ -93,6 +93,7 @@ if [[ $ans == "y" ]]; then
     # At least the apt package works correctly, somehow the Debian maintainers
     # managed to build it:
     sudo -H -u root /bin/bash -c 'apt autoremove -y python3-pyqt5'
+    sudo -H -u root cp /weeedebian_files/peracotta_update /etc/cron.d/peracotta_update
 
     if [[ -d "/home/weee/peracotta" ]]; then
       sudo -H -u root rm -rf /home/weee/peracotta
