@@ -146,6 +146,12 @@ if [[ $ans == "y" ]]; then
       echo "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
     fi
 
+    echo === s.sh ===
+    sudo -H -u root cp /weeedebian_files/s.sh /usr/sbin/s.sh
+    sudo -H -u root chmod +x /usr/sbin/s.sh
+    sudo -H -u weee cp /weeedebian_files/ssh.desktop /home/weee/Desktop
+    sudo -H -u weee chmod +x /home/weee/Desktop/ssh.desktop
+
     echo === XFCE configuration ===
     sudo -H -u weee mkdir -p /home/weee/.config/xfce4
     sudo -H -u root rsync -a --force /weeedebian_files/xfce4 /home/weee/.config

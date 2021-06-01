@@ -1,0 +1,8 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=ssh
+Comment=Start SSH server
+Terminal=true
+Exec=/usr/sbin/s.sh
+Icon=network-transmit-receive
