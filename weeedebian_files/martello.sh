@@ -28,7 +28,7 @@ if [[ $ans == "y" ]]; then
     sudo -H -u root /bin/bash -c 'DEBIAN_FRONTEND=noninteractive apt update -y'
     sudo -H -u root /bin/bash -c 'DEBIAN_FRONTEND=noninteractive apt upgrade -y'
     # libxkbcommon-x11-0 may be not needed (see Add library to installation if needed #28)
-    sudo -H -u root /bin/bash -c 'DEBIAN_FRONTEND=noninteractive apt install -y pciutils i2c-tools lshw mesa-utils smartmontools cifs-utils dmidecode gvfs-backends gsmartcontrol git gparted openssh-server zsh libxkbcommon-x11-0 geany curl wget'
+    sudo -H -u root /bin/bash -c 'DEBIAN_FRONTEND=noninteractive apt install -y pciutils i2c-tools lshw mesa-utils smartmontools cifs-utils dmidecode gvfs-backends gsmartcontrol git gparted openssh-server zsh libxkbcommon-x11-0 geany curl wget iputils-tracepath traceroute'
     # Remove unused packages
     sudo -H -u root /bin/bash -c 'DEBIAN_FRONTEND=noninteractive apt autoremove -y'
 
