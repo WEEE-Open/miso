@@ -83,18 +83,11 @@ if [[ $ans == "y" ]]; then
     sudo -H -u weee cp /weeedebian_files/toprc /home/weee/.toprc
 
     echo === Prepare peracotta ===
-    sudo -H -u root /bin/bash -c 'apt install -y python3-pip'
+    sudo -H -u root /bin/bash -c 'DEBIAN_FRONTEND=noninteractive apt install -y python3-pip'
     # PyQt > 5.14.0 requires an EXTREMELY RECENT version of pip,
     # on the most bleeding of all bleeding edges
     sudo -H -u root pip3 install --quiet --upgrade pip
-    # PyQt 5 is currently impossible to build, due to a very simple error with a
-    # very simple fix (upgrade pip to 20.2 or above) which simply does not work at
-    # all and does not solve anything (pip is already at 20.4.2), so it's simply
-    # impossible to install requirements. That's it. The end.
-    # sudo -H -u root pip3 install -r /home/weee/peracotta/requirements.txt
-    # At least the apt package works correctly, somehow the Debian maintainers
-    # managed to build it:
-    sudo -H -u root /bin/bash -c 'apt autoremove -y python3-pyqt5'
+
     sudo -H -u root cp /weeedebian_files/peracotta_update /etc/cron.d/peracotta_update
 
     if [[ -d "/home/weee/peracotta" ]]; then
@@ -107,7 +100,18 @@ if [[ $ans == "y" ]]; then
     #fi
 
     sudo -H -u weee sh -c 'cd /home/weee/peracotta && python3 polkit.py'
-    sudo -H -u root pip3 --quiet install -r /home/weee/peracotta/requirements.txt
+
+    if [[ "x$(dpkg --print-architecture)" == "xi386" ]]; then
+      echo "===== Begin incredibile workaround for PyQt on 32 bit ====="
+      sudo -H -u root /bin/bash -c 'DEBIAN_FRONTEND=noninteractive apt install -y python3-pyqt5'
+      sudo -H -u weee /bin/bash -c 'grep -vi "pyqt" /home/weee/peracotta/requirements.txt > /home/weee/peracotta/requirements32.txt'
+      sudo -H -u root pip3 --quiet install -r /home/weee/peracotta/requirements32.txt
+      sudo -H -u root rm -f /home/weee/peracotta/requirements32.txt
+      echo "===== End incredibile workaround for PyQt on 32 bit ====="
+    else
+      sudo -H -u root /bin/bash -c 'DEBIAN_FRONTEND=noninteractive apt autoremove -y python3-pyqt5'
+      sudo -H -u root pip3 --quiet install -r /home/weee/peracotta/requirements.txt
+    fi
 
     PERACOTTA_GENERATE_FILES=$(sudo -H -u weee find /home/weee/peracotta -name "generate_files*" -print -quit)
     PERACOTTA_MAIN=$(sudo -H -u weee find /home/weee/peracotta -name "main.py" -print -quit)
