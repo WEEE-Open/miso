@@ -158,11 +158,20 @@ if [[ $ans == "y" ]]; then
     sudo -H -u root chown weee: -R /home/weee/.config
 
     echo === Desktop shortcuts ===
+    if [[ -d "/home/weee/limone" ]]; then
+      sudo -H -u weee git -C /home/weee/limone pull
+    else
+      sudo -H -u weee mkdir -p /home/weee/limone
+      sudo -H -u weee git clone https://github.com/WEEE-Open/limone.git /home/weee/limone
+    fi
+
     sudo -H -u weee mkdir -p /home/weee/Desktop
 
-    sudo -H -u weee cp /weeedebian_files/Tarallo.desktop /home/weee/Desktop
-    sudo -H -u weee cp /weeedebian_files/tarallo.png /home/weee/.config/tarallo.png
-    sudo -H -u weee chmod +x /home/weee/Desktop/Tarallo.desktop
+    for desktop_file in $(sudo -H -u weee find /home/weee/limone -name "*.desktop" -type f); do
+      sudo -H -u weee cp "/home/weee/limone/$desktop_file" "/home/weee/Desktop/$desktop_file"
+      sudo -H -u weee chmod +x "/home/weee/Desktop/$desktop_file"
+      sed -rie "s#Icon=(.*/)*([a-zA-Z0-9\-\.]+)#Icon=/home/weee/limone/\2#" "/home/weee/Desktop/$desktop_file"
+    done
 
     sudo -H -u weee cp /weeedebian_files/Peracotta.desktop /home/weee/Desktop
     sudo -H -u weee cp /weeedebian_files/peracotta.png /home/weee/.config/peracotta.png
