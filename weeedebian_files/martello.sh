@@ -3,6 +3,8 @@
 export PATH="$PATH:/usr/sbin:/usr/bin:/sbin:/bin"
 # For some reason (I checked and it's JLIVECD's fault, the F.A.L.C.E. is actually perfect asd) the script gets executed two times
 # So it's necessary to ask whether the user wants to execute the script or not
+sudo -H -u weee rm /home/weee/.bash_history  >/dev/null 2>/dev/null
+sudo -H -u root rm /root/.bash_history >/dev/null 2>/dev/null
 read -p 'Execute martello.sh? [y/n]: ' ans
 if [[ $ans == "y" ]]; then
     echo === Keymap configuration ===
@@ -167,10 +169,10 @@ if [[ $ans == "y" ]]; then
 
     sudo -H -u weee mkdir -p /home/weee/Desktop
 
-    for desktop_file in $(sudo -H -u weee find /home/weee/limone -name "*.desktop" -type f); do
+    for desktop_file in $(sudo -H -u weee find /home/weee/limone -name "*.desktop" -type f -printf "%f "); do
       sudo -H -u weee cp "/home/weee/limone/$desktop_file" "/home/weee/Desktop/$desktop_file"
       sudo -H -u weee chmod +x "/home/weee/Desktop/$desktop_file"
-      sed -rie "s#Icon=(.*/)*([a-zA-Z0-9\-\.]+)#Icon=/home/weee/limone/\2#" "/home/weee/Desktop/$desktop_file"
+      sed -ri -e "s#Icon=(.*/)*([a-zA-Z0-9\-\.]+)#Icon=/home/weee/limone/\2#" "/home/weee/Desktop/$desktop_file"
     done
 
     sudo -H -u weee cp /weeedebian_files/Peracotta.desktop /home/weee/Desktop
