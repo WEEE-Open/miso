@@ -100,37 +100,38 @@ if [[ $ans == "y" ]]; then
     #fi
 
     sudo -H -u weee sh -c 'cd /home/weee/peracotta && python3 polkit.py'
+    sudo -H -u weee cp /weeedebian_files/features.json /home/weee/peracotta/features.json
 
     if [[ "x$(dpkg --print-architecture)" == "xi386" ]]; then
-      echo "===== Begin incredibile workaround for PyQt on 32 bit ====="
+      echo "===== Begin incredible workaround for PyQt on 32 bit ====="
       sudo -H -u root /bin/bash -c 'DEBIAN_FRONTEND=noninteractive apt install -y python3-pyqt5'
       sudo -H -u weee /bin/bash -c 'grep -vi "pyqt" /home/weee/peracotta/requirements.txt > /home/weee/peracotta/requirements32.txt'
       sudo -H -u root pip3 --quiet install -r /home/weee/peracotta/requirements32.txt
       sudo -H -u root rm -f /home/weee/peracotta/requirements32.txt
-      echo "===== End incredibile workaround for PyQt on 32 bit ====="
+      echo "===== End incredible workaround for PyQt on 32 bit ====="
     else
       sudo -H -u root /bin/bash -c 'DEBIAN_FRONTEND=noninteractive apt autoremove -y python3-pyqt5'
       sudo -H -u root pip3 --quiet install -r /home/weee/peracotta/requirements.txt
     fi
 
     PERACOTTA_GENERATE_FILES=$(sudo -H -u weee find /home/weee/peracotta -name "generate_files*" -print -quit)
-    PERACOTTA_MAIN=$(sudo -H -u weee find /home/weee/peracotta -name "main.py" -print -quit)
-    PERACOTTA_MAIN_WITH_GUI=$(sudo -H -u weee find /home/weee/peracotta -name "main_with_gui.py" -print -quit)
+    PERACOTTA_MAIN=$(sudo -H -u weee find /home/weee/peracotta -name "peracruda" -print -quit)
+    PERACOTTA_MAIN_WITH_GUI=$(sudo -H -u weee find /home/weee/peracotta -name "peracotta" -print -quit)
 
     if [[ -f "$PERACOTTA_GENERATE_FILES" ]]; then
       sudo -H -u weee chmod +x "$PERACOTTA_GENERATE_FILES"
-      sudo -H -u root rm /usr/bin/generate_files.sh 2> /dev/null
-      sudo -H -u root rm /usr/bin/generate_files 2> /dev/null
+#      sudo -H -u root rm /usr/bin/generate_files.sh 2> /dev/null
+#      sudo -H -u root rm /usr/bin/generate_files 2> /dev/null
       sudo -H -u root ln -s "$PERACOTTA_GENERATE_FILES" /usr/bin/generate_files
     fi
     if [[ -f "$PERACOTTA_MAIN" ]]; then
       sudo -H -u weee chmod +x "$PERACOTTA_MAIN"
-      sudo -H -u root rm /usr/bin/peracotta 2> /dev/null
+#      sudo -H -u root rm /usr/bin/peracotta 2> /dev/null
 #      sudo -H -u root ln -s "$PERACOTTA_MAIN" /usr/bin/peracotta
     fi
     if [[ -f "$PERACOTTA_MAIN_WITH_GUI" ]]; then
       sudo -H -u weee chmod +x "$PERACOTTA_MAIN_WITH_GUI"
-      sudo -H -u root rm /usr/bin/peracotta_gui 2> /dev/null
+#      sudo -H -u root rm /usr/bin/peracotta_gui 2> /dev/null
 #      sudo -H -u root ln -s "$PERACOTTA_MAIN_WITH_GUI" /usr/bin/peracotta_gui
     fi
 

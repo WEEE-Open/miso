@@ -3,6 +3,6 @@ Version=1.0
 Type=Application
 Name=Peracotta GUI
 Comment=Start peracotta GUI
-Exec=/home/weee/peracotta/main_with_gui.py
+Exec=/home/weee/peracotta/peracotta
 Icon=/home/weee/.config/peracotta_gui.png
 Path=/home/weee/peracotta

@@ -1,9 +1,9 @@
 [Desktop Entry]
 Version=1.0
 Type=Application
-Name=Peracotta
-Comment=Start peracotta in a terminal
+Name=Peracruda
+Comment=Start peracotta (cruda) in a terminal
 Terminal=true
-Exec=/home/weee/peracotta/main.py
+Exec=/home/weee/peracotta/peracruda
 Icon=/home/weee/.config/peracotta.png
 Path=/home/weee/peracotta
