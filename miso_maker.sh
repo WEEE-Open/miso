@@ -36,17 +36,53 @@ sudo apt install \
     isolinux \
     syslinux
 
-mkdir -p weeedebian
+# TODO: uncomment
+# TODO: env var to choose 32 bit, 64 bit or both
+# TODO: make a function
+
+#mkdir -p /build/weeedebian32
+#
+#sudo debootstrap \
+#    --arch=i386 \
+#    --variant=minbase \
+#    buster \
+#    /build/weeedebian32 \
+#    http://ftp.it.debian.org/debian/
+#
+#cat << EOF | sudo chroot /build/weeedebian32
+#echo "${HOSTNAME}32" > /etc/hostname
+#export DEBIAN_FRONTEND=noninteractive
+#apt update && apt install -y --no-install-recommends \
+#    linux-image-amd64 \
+#    live-boot \
+#    systemd-sysv \
+#    network-manager net-tools wireless-tools wpagui \
+#    curl openssh-client \
+#    blackbox xorg xserver-xorg-core xserver-xorg xinit xterm \
+#    nano git\
+#    lightdm xfce4
+#apt clean
+#useradd -m $USERNAME
+#sed -i 's#root:.*#root:$ROOTPASSWD:18214:0:99999:7:::#' /etc/shadow
+#sed -i 's#$USERNAME:.*#$USERNAME:$USERPASSWD:18214:0:99999:7:::#' /etc/shadow
+#/weeedebian_files/martello.sh
+#EOF
+
+BUILD_DIR=/build/weeedebian64
+
+mkdir -p $BUILD_DIR
 
 sudo debootstrap \
     --arch=amd64 \
     --variant=minbase \
     buster \
-    weeedebian/chroot \
+    $BUILD_DIR/chroot \
     http://ftp.it.debian.org/debian/
 
-cat << EOF | sudo chroot weeedebian/chroot
-echo "weeedebian" > /etc/hostname
+# TODO: make /weeedebian_files/martello.sh a configurable path
+# TODO: can we move everything except apt install to martello? Or even that?
+cat << EOF | sudo chroot $BUILD_DIR/chroot
+echo "${HOSTNAME}32" > /etc/hostname
 export DEBIAN_FRONTEND=noninteractive
 apt update && apt install -y --no-install-recommends \
     linux-image-amd64 \
@@ -58,27 +94,25 @@ apt update && apt install -y --no-install-recommends \
     nano git\
     lightdm xfce4
 apt clean
-git pull https://github.com/WEEE-Open/falce.git
-mv falce/weeedebian_files /weeedebian_files
-/weeedebian_files/martello.sh
 useradd -m $USERNAME
 sed -i 's#root:.*#root:$ROOTPASSWD:18214:0:99999:7:::#' /etc/shadow
 sed -i 's#$USERNAME:.*#$USERNAME:$USERPASSWD:18214:0:99999:7:::#' /etc/shadow
+/weeedebian_files/martello.sh
 EOF
 
-mkdir -p weeedebian/{staging/{EFI/boot,boot/grub/x86_64-efi,isolinux,live},tmp}
+mkdir -p $BUILD_DIR/{staging/{EFI/boot,boot/grub/x86_64-efi,isolinux,live},tmp}
 
 sudo mksquashfs \
-    weeedebian/chroot \
-    weeedebian/staging/live/filesystem.squashfs \
+    $BUILD_DIR/chroot \
+    $BUILD_DIR/staging/live/filesystem.squashfs \
     -e boot
 
-cp weeedebian/chroot/boot/vmlinuz-* \
-    weeedebian/staging/live/vmlinuz && \
-cp weeedebian/chroot/boot/initrd.img-* \
-    weeedebian/staging/live/initrd
+cp $BUILD_DIR/chroot/boot/vmlinuz-* \
+    $BUILD_DIR/staging/live/vmlinuz && \
+cp $BUILD_DIR/chroot/boot/initrd.img-* \
+    $BUILD_DIR/staging/live/initrd
 
-cat <<'EOF' >weeedebian/staging/isolinux/isolinux.cfg
+cat <<'EOF' >$BUILD_DIR/staging/isolinux/isolinux.cfg
 UI vesamenu.c32
 
 MENU TITLE Boot Menu
@@ -108,7 +142,7 @@ LABEL linux
   APPEND initrd=/live/initrd boot=live nomodeset
 EOF
 
-cat <<'EOF' >weeedebian/staging/boot/grub/grub.cfg
+cat <<'EOF' >$BUILD_DIR/staging/boot/grub/grub.cfg
 search --set=root --file /DEBIAN_CUSTOM
 
 set default="0"
@@ -127,36 +161,37 @@ menuentry "WEEEDebian Live [EFI/GRUB] (nomodeset)" {
 }
 EOF
 
-cat <<'EOF' >weeedebian/tmp/grub-standalone.cfg
+cat <<'EOF' >$BUILD_DIR/tmp/grub-standalone.cfg
 search --set=root --file /DEBIAN_CUSTOM
 set prefix=($root)/boot/grub/
 configfile /boot/grub/grub.cfg
 EOF
 
-touch weeedebian/staging/DEBIAN_CUSTOM
+touch $BUILD_DIR/staging/DEBIAN_CUSTOM
 
-cp /usr/lib/ISOLINUX/isolinux.bin "weeedebian/staging/isolinux/"
-cp /usr/lib/syslinux/modules/bios/* "weeedebian/staging/isolinux/"
-cp -r /usr/lib/grub/x86_64-efi/* "weeedebian/staging/boot/grub/x86_64-efi/"
+cp /usr/lib/ISOLINUX/isolinux.bin "$BUILD_DIR/staging/isolinux/"
+cp /usr/lib/syslinux/modules/bios/* "$BUILD_DIR/staging/isolinux/"
+cp -r /usr/lib/grub/x86_64-efi/* "$BUILD_DIR/staging/boot/grub/x86_64-efi/"
 
 grub-mkstandalone \
     --format=x86_64-efi \
-    --output=weeedebian/tmp/bootx64.efi \
+    --output=$BUILD_DIR/tmp/bootx64.efi \
     --locales="" \
     --fonts="" \
-    "boot/grub/grub.cfg=weeedebian/tmp/grub-standalone.cfg"
+    "boot/grub/grub.cfg=$BUILD_DIR/tmp/grub-standalone.cfg"
 
-(cd weeedebian/staging/EFI/boot && \
+(cd $BUILD_DIR/staging/EFI/boot && \
 dd if=/dev/zero of=efiboot.img bs=1M count=20 && \
 mkfs.vfat efiboot.img && \
 mmd -i efiboot.img efi efi/boot && \
-mcopy -vi efiboot.img weeedebian/tmp/bootx64.efi ::efi/boot/
+mcopy -vi efiboot.img $BUILD_DIR/tmp/bootx64.efi ::efi/boot/
 )
 
+# TODO: -o with customized file name
 xorriso \
     -as mkisofs \
     -iso-level 3 \
-    -o "weeedebian/debian-custom.iso" \
+    -o "$BUILD_DIR/debian-custom.iso" \
     -full-iso9660-filenames \
     -volid "WEEEDEBIAN" \
     -isohybrid-mbr /usr/lib/ISOLINUX/isohdpfx.bin \
@@ -170,13 +205,14 @@ xorriso \
         -e /EFI/boot/efiboot.img \
         -no-emul-boot \
         -isohybrid-gpt-basdat \
-    -append_partition 2 0xef weeedebian/staging/EFI/boot/efiboot.img \
-    "weeedebian/staging"
+    -append_partition 2 0xef $BUILD_DIR/staging/EFI/boot/efiboot.img \
+    "$BUILD_DIR/staging"
 
+# TODO: add a way to answer N automatically from the container (use an env var?)
 while true; do
-    read -p "Do you want to remove all build dependencies? y/N" yn
+    read -p "Do you want to remove all build dependencies? [y/n]" yn
     case $yn in
-        [Yy]* ) sh ./weeedebian_remove_dep.sh; break;;
+        [Yy]* ) sh /weeedebian_files/weeedebian_remove_dep.sh; break;;
         [Nn]* ) exit;;
         * ) echo "Please answer y or n.";;
     esac
