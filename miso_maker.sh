@@ -1,27 +1,23 @@
 #!/bin/bash
-HOSTNAME=""
-ROOTPASSWD=""
-USERNAME=""
-USERPASSWD=""
 
-while [[ $HOSTNAME == "" ]]; do
-    echo "Insert hostname: "
+while [[ -z "$HOSTNAME" ]]; do
+    echo -n "Hostname: "
     read HOSTNAME
 done
 
-while [[ $ROOTPASSWD == "" ]]; do
-    echo "Insert root password: "
+while [[ -z "$ROOTPASSWD" ]]; do
+    echo -n "Root password: "
     read ROOTPASSWD
     ROOTPASSWD=$(openssl passwd -6 "$ROOTPASSWD")
 done
 
-while [[ $USERNAME == "" ]]; do
-    echo "Insert username: "
+while [[ -z "$USERNAME" ]]; do
+    echo -n "Username: "
     read USERNAME
 done
 
-while [[ $USERPASSWD == "" ]]; do
-    echo "Insert passwd: "
+while [[ -z "$USERPASSWD" ]]; do
+    echo -n "$USERNAME password: "
     read USERPASSWD
     USERPASSWD=$(openssl passwd -6 "$USERPASSWD")
 done
