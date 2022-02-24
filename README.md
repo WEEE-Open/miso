@@ -7,23 +7,22 @@ Build Debian Live images, with the maximum amount of automation
 ## Usage
 
 ```shell
-docker build -t weee-open/miso:latest
-docker run -i --name miso --mount build:/build --mount weeedebian_files:/weeedebian_files:ro
+docker build -t weee-open/miso:latest .
+docker run -i --name miso \
+ -v $(readlink -f build):/build:rw \
+ -v $(readlink -f weeedebian):/weeedebian:ro \
+ -e MISO_CHROOT_SCRIPT=/weeedebian/martello.sh \
+ -e MISO_ARCH=amd64 \
+ weee-open/miso:latest
 ```
 
 On a Ubuntu WSL machine, instead of a container, you can do:
 
 ```shell
-apt-get update
-apt-get -y install live-build
-sudo mkdir -p /miso
-ln -s /path/to/build /build
-ln -s /path/to/weeedebian_files /weeedebian_files
-ln -s /path/to/miso_maker.sh /miso
-/miso/miso_maker.sh
+./miso.sh build weeedebian/martello.sh amd64
 ```
 
-More info coming soon (still work in progress)
+This will output weeedebian-amd64.iso into build/weeedebian.
 
 ### Requirements
 

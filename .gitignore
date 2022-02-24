@@ -1,4 +1,3 @@
 .idea/
 build/
-build_*/
-weeedebian_files/env.txt
+weeedebian/env.txt
