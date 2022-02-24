@@ -7,4 +7,6 @@ sudo apt remove \
     grub-pc-bin \
     grub-efi-amd64-bin \
     mtools \
-    debian-archive-keyring
+    debian-archive-keyring \
+    isolinux \
+    syslinux

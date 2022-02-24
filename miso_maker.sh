@@ -1,28 +1,141 @@
 #!/bin/bash
 
-while [[ -z "$HOSTNAME" ]]; do
-    echo -n "Hostname: "
-    read HOSTNAME
+ORANGE='\033[0;33m'
+RED='\033[0;31m'
+BLUE='\033[0;34m'
+GREEN='\033[0;32m'
+RESET_COLOR='\033[0m'
+
+# check if argument and if argument is valid
+if [[ -z $1 ]]
+then
+  ARCH='64'
+elif [ $1 != '64' ] || [ $1 != '32']
+then
+  echo -e "${RED}Wrong arguments. Please insert only 32 or 64 for architecture selection.${RESET_COLOR}"
+  exit
+else
+  ARCH=$1
+fi
+
+# This thing is necessary for the prompts
+HOSTNAME=""
+ROOTPASSWD=""
+USERNAME=""
+USERPASSWD=""
+
+# Prompts
+while [[ $HOSTNAME == "" ]]; do
+  read -p "Hostname: " HOSTNAME
 done
 
-while [[ -z "$ROOTPASSWD" ]]; do
-    echo -n "Root password: "
-    read ROOTPASSWD
-    ROOTPASSWD=$(openssl passwd -6 "$ROOTPASSWD")
+while [[ $ROOTPASSWD == "" ]]; do
+  read -sp "Root password: " ROOTPASSWD
+  echo
+  ROOTPASSWD=$(openssl passwd -6 "$ROOTPASSWD")
 done
 
-while [[ -z "$USERNAME" ]]; do
-    echo -n "Username: "
-    read USERNAME
+while [[ $USERNAME == "" ]]; do
+  read -p "Username: " USERNAME
 done
 
-while [[ -z "$USERPASSWD" ]]; do
-    echo -n "$USERNAME password: "
-    read USERPASSWD
-    USERPASSWD=$(openssl passwd -6 "$USERPASSWD")
+while [[ $USERPASSWD == "" ]]; do
+  read -sp "$USERNAME password: " USERPASSWD
+  echo
+  USERPASSWD=$(openssl passwd -6 "$USERPASSWD")
 done
 
 
+# build the 32-bit chroot
+function build_chroot_32 {
+  BUILD_DIR='build/weeedebian32'
+
+  mkdir -p $BUILD_DIR
+
+  sudo debootstrap \
+    --arch=i386 \
+    --variant=minbase \
+    buster \
+    $BUILD_DIR/chroot \
+    http://ftp.it.debian.org/debian/
+
+  cat << EOF | sudo chroot $BUILD_DIR/chroot
+  echo "${HOSTNAME}32" > /etc/hostname
+  export DEBIAN_FRONTEND=noninteractive
+  apt update && apt install -y --no-install-recommends \
+    linux-image-amd64 \
+    live-boot \
+    systemd-sysv \
+    network-manager net-tools wireless-tools wpagui \
+    curl openssh-client \
+    blackbox xorg xserver-xorg-core xserver-xorg xinit xterm \
+    nano git\
+    lightdm xfce4
+  apt clean
+  useradd -m $USERNAME
+  sed -i 's#root:.*#root:$ROOTPASSWD:18214:0:99999:7:::#' /etc/shadow
+  sed -i 's#$USERNAME:.*#$USERNAME:$USERPASSWD:18214:0:99999:7:::#' /etc/shadow
+  update-ca-certificates
+  git clone https://github.com/WEEE-Open/falce.git
+  mv falce/weeedebian_files /weeedebian_files
+  rm -r falce
+  sh /weeedebian_files/martello.sh
+  rm -r /weeedebian_files
+  echo "[SeatDefaults]" >> /usr/share/lightdm/lightdm.conf.d/01_debian.conf
+  echo "autologin-user=<nome user>" >> /usr/share/lightdm/lightdm.conf.d/01_debian.conf
+  echo "autologin-user-timeout=0"  >> /usr/share/lightdm/lightdm.conf.d/01_debian.conf
+EOF
+}
+
+function build_chroot_64 {
+  BUILD_DIR="build/weeedebian64"
+
+  mkdir -p $BUILD_DIR
+
+  sudo debootstrap \
+    --arch=amd64 \
+    --variant=minbase \
+    buster \
+    $BUILD_DIR/chroot \
+    http://ftp.it.debian.org/debian/
+
+  # TODO: make /weeedebian_files/martello.sh a configurable path
+  # TODO: can we move everything except apt install to martello? Or even that?
+  cat << EOF | sudo chroot $BUILD_DIR/chroot
+  echo '${HOSTNAME}64' > /etc/hostname
+  export DEBIAN_FRONTEND=noninteractive
+  apt-get update && apt-get install -y \
+    linux-image-amd64 \
+    live-boot \
+    systemd-sysv \
+    network-manager net-tools wireless-tools wpagui \
+    curl openssh-client apt-transport-https ca-certificates\
+    xorg xserver-xorg-core xserver-xorg xinit '^libxcb.*-dev' libx11-xcb-dev libglu1-mesa-dev libxrender-dev libxi-dev \
+    libxkbcommon-dev libxkbcommon-x11-dev\
+    nano git sudo firefox-esr\
+    lightdm xfce4 xfce4-terminal xfce4-whiskermenu-plugin \
+    rsync
+  dpkg --configure -a
+  apt-get clean
+  useradd -m $USERNAME
+  sed -i 's#root:.*#root:$ROOTPASSWD:18214:0:99999:7:::#' /etc/shadow
+  sed -i 's#$USERNAME:.*#$USERNAME:$USERPASSWD:18214:0:99999:7:::#' /etc/shadow
+  update-ca-certificates
+  git clone https://github.com/WEEE-Open/falce.git
+  mv falce/weeedebian_files /weeedebian_files
+  rm -r falce
+  /weeedebian_files/martello.sh $BUILD_DIR
+  rm -r /weeedebian_files
+  echo "[SeatDefaults]" >> /usr/share/lightdm/lightdm.conf.d/01_debian.conf
+  echo 'autologin-user=$USERNAME' >> /usr/share/lightdm/lightdm.conf.d/01_debian.conf
+  echo "autologin-user-timeout=0"  >> /usr/share/lightdm/lightdm.conf.d/01_debian.conf
+  sudo ln -s /usr/lib/x86_64-linux-gnu/libxcb-util.so.0 /usr/lib/x86_64-linux-gnu/libxcb-util.so.1
+  cp -r /home/$USERNAME/.config/xfce4/ /home/$USERNAME/xfce4-pre-config/
+EOF
+}
+
+# Install build dependencies
+echo -e "${ORANGE}Installing build dependencies ...${BLUE}"
 sudo apt install \
     debootstrap \
     squashfs-tools \
@@ -36,72 +149,21 @@ sudo apt install \
     isolinux \
     syslinux
 
-# TODO: uncomment
-# TODO: env var to choose 32 bit, 64 bit or both
-# TODO: make a function
+# Build chroot
+if [[ $ARCH == '64' ]]
+then
+  echo -e "${ORANGE}Building chroot for 64-bit${RESET_COLOR}${BLUE}"
+  build_chroot_64
+else
+  echo -e "${ORANGE}Building chroot for 32-bit${RESET_COLOR}${BLUE}"
+  build_chroot_32
+fi
 
-#mkdir -p /build/weeedebian32
-#
-#sudo debootstrap \
-#    --arch=i386 \
-#    --variant=minbase \
-#    buster \
-#    /build/weeedebian32 \
-#    http://ftp.it.debian.org/debian/
-#
-#cat << EOF | sudo chroot /build/weeedebian32
-#echo "${HOSTNAME}32" > /etc/hostname
-#export DEBIAN_FRONTEND=noninteractive
-#apt update && apt install -y --no-install-recommends \
-#    linux-image-amd64 \
-#    live-boot \
-#    systemd-sysv \
-#    network-manager net-tools wireless-tools wpagui \
-#    curl openssh-client \
-#    blackbox xorg xserver-xorg-core xserver-xorg xinit xterm \
-#    nano git\
-#    lightdm xfce4
-#apt clean
-#useradd -m $USERNAME
-#sed -i 's#root:.*#root:$ROOTPASSWD:18214:0:99999:7:::#' /etc/shadow
-#sed -i 's#$USERNAME:.*#$USERNAME:$USERPASSWD:18214:0:99999:7:::#' /etc/shadow
-#/weeedebian_files/martello.sh
-#EOF
-
-BUILD_DIR=/build/weeedebian64
-
-mkdir -p $BUILD_DIR
-
-sudo debootstrap \
-    --arch=amd64 \
-    --variant=minbase \
-    buster \
-    $BUILD_DIR/chroot \
-    http://ftp.it.debian.org/debian/
-
-# TODO: make /weeedebian_files/martello.sh a configurable path
-# TODO: can we move everything except apt install to martello? Or even that?
-cat << EOF | sudo chroot $BUILD_DIR/chroot
-echo "${HOSTNAME}32" > /etc/hostname
-export DEBIAN_FRONTEND=noninteractive
-apt update && apt install -y --no-install-recommends \
-    linux-image-amd64 \
-    live-boot \
-    systemd-sysv \
-    network-manager net-tools wireless-tools wpagui \
-    curl openssh-client \
-    blackbox xorg xserver-xorg-core xserver-xorg xinit xterm \
-    nano git\
-    lightdm xfce4
-apt clean
-useradd -m $USERNAME
-sed -i 's#root:.*#root:$ROOTPASSWD:18214:0:99999:7:::#' /etc/shadow
-sed -i 's#$USERNAME:.*#$USERNAME:$USERPASSWD:18214:0:99999:7:::#' /etc/shadow
-/weeedebian_files/martello.sh
-EOF
-
+# Create directory tree
 mkdir -p $BUILD_DIR/{staging/{EFI/boot,boot/grub/x86_64-efi,isolinux,live},tmp}
 
+# Squash filesystem
+echo -e "${ORANGE}Squashing filesystem ...${BLUE}"
 sudo mksquashfs \
     $BUILD_DIR/chroot \
     $BUILD_DIR/staging/live/filesystem.squashfs \
@@ -112,6 +174,7 @@ cp $BUILD_DIR/chroot/boot/vmlinuz-* \
 cp $BUILD_DIR/chroot/boot/initrd.img-* \
     $BUILD_DIR/staging/live/initrd
 
+echo -e "${ORANGE}Building bootloader ...${BLUE}"
 cat <<'EOF' >$BUILD_DIR/staging/isolinux/isolinux.cfg
 UI vesamenu.c32
 
@@ -188,6 +251,7 @@ mcopy -vi efiboot.img $BUILD_DIR/tmp/bootx64.efi ::efi/boot/
 )
 
 # TODO: -o with customized file name
+echo -e "${ORANGE}Building final ISO ...${BLUE}"
 xorriso \
     -as mkisofs \
     -iso-level 3 \
@@ -210,10 +274,11 @@ xorriso \
 
 # TODO: add a way to answer N automatically from the container (use an env var?)
 while true; do
+    echo -e "${RESET_COLOR}"
     read -p "Do you want to remove all build dependencies? [y/n]" yn
     case $yn in
         [Yy]* ) sh /weeedebian_files/weeedebian_remove_dep.sh; break;;
-        [Nn]* ) exit;;
+        [Nn]* ) echo -e "${GREEN}Everything done!${RESET_COLOR}"; exit;;
         * ) echo "Please answer y or n.";;
     esac
 done
