@@ -8,11 +8,24 @@ Build Debian Live images, with the maximum amount of automation
 
 ```shell
 docker build -t weee-open/miso:latest .
-docker run -i --name miso \
+docker run --name miso \
+ -i --rm \
  -v $(readlink -f build):/build:rw \
  -v $(readlink -f weeedebian):/weeedebian:ro \
  -e MISO_CHROOT_SCRIPT=/weeedebian/martello.sh \
  -e MISO_ARCH=amd64 \
+ -e MISO_NO_SUDO=1 \
+ weee-open/miso:latest
+
+# To save some time from the 2nd run onward:
+docker run --name miso \
+ -i --rm \
+ -v $(readlink -f build):/build:rw \
+ -v $(readlink -f weeedebian):/weeedebian:ro \
+ -e MISO_CHROOT_SCRIPT=/weeedebian/martello.sh \
+ -e MISO_ARCH=amd64 \
+ -e MISO_NO_SUDO=1 \
+ -e MISO_NO_BOOSTRAP=1 \
  weee-open/miso:latest
 ```
 

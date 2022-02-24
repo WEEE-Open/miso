@@ -1,15 +1,15 @@
 #!/bin/bash
 
+echo "MISO v1.0.0"
+
 if [[ -z "$MISO_BUILD_DIR" ]]; then
     if [[ -z "$1" ]]; then
-        echo "Set the build dir as the first parameter ov via MISO_BUILD_DIR"
+        echo "Set the build dir as the first parameter or via MISO_BUILD_DIR"
         exit 1
     else
         MISO_BUILD_DIR="$1"
     fi
 fi
-
-export MISO_BUILD_DIR "$(readlink -f $MISO_BUILD_DIR)"
 
 if [[ -z "$MISO_CHROOT_SCRIPT" ]]; then
     if [[ -z "$2" ]]; then
@@ -20,6 +20,21 @@ if [[ -z "$MISO_CHROOT_SCRIPT" ]]; then
     fi
 fi
 
+if [[ -z "$MISO_NO_SUDO" ]]; then
+    _SUDO="sudo"
+else
+    _SUDO=""
+fi
+
+MISO_CHROOT_SCRIPT=$(readlink -f "$MISO_CHROOT_SCRIPT")
+_MISO_SOURCE_DIR=$(dirname "$MISO_CHROOT_SCRIPT")
+_MISO_SOURCE_SCRIPT=$(basename "$MISO_CHROOT_SCRIPT")
+_MISO_BUILD_NAME=$(basename "$_MISO_SOURCE_DIR")
+MISO_BUILD_DIR=$(readlink -f "$MISO_BUILD_DIR")
+MISO_BUILD_DIR="$MISO_BUILD_DIR/$_MISO_BUILD_NAME"
+
+export MISO_BUILD_DIR
+
 if [[ -z "$MISO_ARCH" ]]; then
     if [[ -z "$3" ]]; then
         echo "Set the architecture as the third parameter or via MISO_ARCH"
@@ -29,6 +44,31 @@ if [[ -z "$MISO_ARCH" ]]; then
     fi
 fi
 
+# These cannot be moved to the chroot, read doesn't work thru all those levels
+
+while [[ -z "$MISO_HOSTNAME" ]]; do
+  # read -p does not work from docker for some reason
+  echo -n "Hostname: "
+  read MISO_HOSTNAME
+done
+
+while [[ -z "$MISO_ROOTPASSWD" ]]; do
+  echo -n "Root password: "
+  read -s MISO_ROOTPASSWD
+  echo
+done
+
+while [[ -z "$MISO_USERNAME" ]]; do
+  echo -n "Username: "
+  read MISO_USERNAME
+done
+
+while [[ -z $MISO_USERPASSWD ]]; do
+  echo -n "$MISO_USERNAME password: "
+  read -s MISO_USERPASSWD
+  echo
+done
+
 _ORANGE='\033[0;33m'
 _RED='\033[0;31m'
 _BLUE='\033[0;34m'
@@ -37,7 +77,7 @@ _RESET_COLOR='\033[0m'
 
 # Install build dependencies
 echo -e "${_ORANGE}Installing build dependencies ...${_BLUE}"
-sudo apt install \
+DEBIAN_FRONTEND=noninteractive $MISO_SUDO apt-get install -y \
     debootstrap \
     squashfs-tools \
     xorriso \
@@ -61,77 +101,45 @@ fi
 
 mkdir -p $MISO_BUILD_DIR
 
-sudo debootstrap \
-  --arch=$_DEBOOTRSTRAP_ARCH \
-  --variant=minbase \
-  buster \
-  $MISO_BUILD_DIR/chroot \
-  http://ftp.it.debian.org/debian/
+if [[ -z "$MISO_NO_BOOSTRAP" ]]; then
+  $MISO_SUDO debootstrap \
+    --arch=$_DEBOOTRSTRAP_ARCH \
+    --variant=minbase \
+    buster \
+    $MISO_BUILD_DIR/chroot \
+    http://ftp.it.debian.org/debian/
+fi
 
-
-_MISO_CHROOT_DIR=$(readlink -f $MISO_CHROOT_SCRIPT)
-_MISO_CHROOT_DIR=$(dirname $_MISO_CHROOT_DIR)
-cat << EOF | sudo chroot $MISO_BUILD_DIR/chroot
+rm -rf "$MISO_BUILD_DIR/chroot/source" 2>/dev/null
+cp -r $_MISO_SOURCE_DIR "$MISO_BUILD_DIR/chroot/source"
+cat << EOF | $MISO_SUDO chroot $MISO_BUILD_DIR/chroot
 DEBIAN_FRONTEND=noninteractive apt-get update
-DEBIAN_FRONTEND=noninteractive apt install -y --no-install-recommends \
+DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
     linux-image-amd64 \
     live-boot \
     systemd-sysv \
-    network-manager net-tools wireless-tools wpagui \
-    curl openssh-client apt-transport-https ca-certificates\
-    xorg xserver-xorg-core xserver-xorg xinit '^libxcb.*-dev' libx11-xcb-dev libglu1-mesa-dev libxrender-dev libxi-dev \
-    libxkbcommon-dev libxkbcommon-x11-dev\
-    nano git sudo firefox-esr\
-    lightdm xfce4 xfce4-terminal xfce4-whiskermenu-plugin \
-    rsync
-apt clean
-update-ca-certificates
+    apt-utils
+DEBIAN_FRONTEND=noninteractive apt-get clean -y
 
-
-
-
-
-
-# Prompts
-while [[ -z "$MISO_HOSTNAME" ]]; do
-  read -p "Hostname: " MISO_HOSTNAME
-done
-
-while [[ -z "$MISO_ROOTPASSWD" ]]; do
-  read -sp "Root password: " MISO_ROOTPASSWD
-  echo
-  MISO_ROOTPASSWD=$(openssl passwd -6 "$MISO_ROOTPASSWD")
-done
-
-while [[ -z "$MISO_USERNAME" ]]; do
-  read -p "Username: " MISO_USERNAME
-done
-
-while [[ $MISO_USERPASSWD == "" ]]; do
-  read -sp "$MISO_USERNAME password: " MISO_USERPASSWD
-  echo
-  MISO_USERPASSWD=$(openssl passwd -6 "$MISO_USERPASSWD")
-done
-
-cp -r $_MISO_CHROOT_DIR $MISO_BUILD_DIR/chroot
-bash $MISO_CHROOT_SCRIPT
-rm -rf "$MISO_BUILD_DIR/chroot/$(basename $_MISO_CHROOT_DIR)"
-
-useradd -m $MISO_USERNAME
-sed -i 's#root:.*#root:$ROOTPASSWD:18214:0:99999:7:::#' /etc/shadow
-sed -i 's#$MISO_USERNAME:.*#$MISO_USERNAME:$MISO_USERPASSWD:18214:0:99999:7:::#' /etc/shadow
-echo "[SeatDefaults]" >> /usr/share/lightdm/lightdm.conf.d/01_debian.conf
-echo "autologin-user=<nome user>" >> /usr/share/lightdm/lightdm.conf.d/01_debian.conf
-echo "autologin-user-timeout=0"  >> /usr/share/lightdm/lightdm.conf.d/01_debian.conf
+cd /source
+# Subsitution is done outside the chroot
+export MISO_HOSTNAME "$MISO_HOSTNAME"
+export MISO_ROOTPASSWD "$MISO_ROOTPASSWD"
+export MISO_USERNAME "$MISO_USERNAME"
+export MISO_USERPASSWD "$MISO_USERPASSWD"
+bash ./$_MISO_SOURCE_SCRIPT
 EOF
-}
+rm -rf "$MISO_BUILD_DIR/chroot/source"
+
+# echo "TEST POINT"
+# exit 0
 
 # Create directory tree
 mkdir -p $MISO_BUILD_DIR/{staging/{EFI/boot,boot/grub/x86_64-efi,isolinux,live},tmp}
 
 # Squash filesystem
 echo -e "${_ORANGE}Squashing filesystem ...${_BLUE}"
-sudo mksquashfs \
+$MISO_SUDO mksquashfs \
     $MISO_BUILD_DIR/chroot \
     $MISO_BUILD_DIR/staging/live/filesystem.squashfs \
     -e boot
@@ -160,13 +168,13 @@ MENU COLOR msg07        37;40   #90ffffff #a0000000 std
 MENU COLOR tabmsg       31;40   #30ffffff #00000000 std
 
 LABEL linux
-  MENU LABEL Debian Live [BIOS/ISOLINUX]
+  MENU LABEL $_MISO_BUILD_NAME $_DEBOOTRSTRAP_ARCH [BIOS/ISOLINUX]
   MENU DEFAULT
   KERNEL /live/vmlinuz
   APPEND initrd=/live/initrd boot=live
 
 LABEL linux
-  MENU LABEL Debian Live [BIOS/ISOLINUX] (nomodeset)
+  MENU LABEL $_MISO_BUILD_NAME $_DEBOOTRSTRAP_ARCH [BIOS/ISOLINUX] (nomodeset)
   MENU DEFAULT
   KERNEL /live/vmlinuz
   APPEND initrd=/live/initrd boot=live nomodeset
@@ -180,12 +188,12 @@ set timeout=30
 
 # If X has issues finding screens, experiment with/without nomodeset.
 
-menuentry "WEEEDebian Live [EFI/GRUB]" {
+menuentry "$_MISO_BUILD_NAME $_DEBOOTRSTRAP_ARCH [EFI/GRUB]" {
     linux ($root)/live/vmlinuz boot=live
     initrd ($root)/live/initrd
 }
 
-menuentry "WEEEDebian Live [EFI/GRUB] (nomodeset)" {
+menuentry "$_MISO_BUILD_NAME $_DEBOOTRSTRAP_ARCH [EFI/GRUB] (nomodeset)" {
     linux ($root)/live/vmlinuz boot=live nomodeset
     initrd ($root)/live/initrd
 }
@@ -217,14 +225,13 @@ mmd -i efiboot.img efi efi/boot && \
 mcopy -vi efiboot.img $MISO_BUILD_DIR/tmp/bootx64.efi ::efi/boot/
 )
 
-# TODO: -o with customized file name
 echo -e "${_ORANGE}Building final ISO ...${_BLUE}"
 xorriso \
     -as mkisofs \
     -iso-level 3 \
-    -o "$MISO_BUILD_DIR/debian-custom.iso" \
+    -o "$MISO_BUILD_DIR/$_MISO_BUILD_NAME-$_DEBOOTRSTRAP_ARCH.iso" \
     -full-iso9660-filenames \
-    -volid "WEEEDEBIAN" \
+    -volid "${_MISO_BUILD_NAME^^}" \
     -isohybrid-mbr /usr/lib/ISOLINUX/isohdpfx.bin \
     -eltorito-boot \
         isolinux/isolinux.bin \
@@ -244,9 +251,8 @@ while true; do
     echo -e "${_RESET_COLOR}"
     read -p "Do you want to remove all build dependencies? [y/n]" yn
     case $yn in
-        [Yy]* ) sh /weeedebian_files/weeedebian_remove_dep.sh; break;;
+        [Yy]* ) bash miso_remove_dep.sh; break;;
         [Nn]* ) echo -e "${_GREEN}Everything done!${_RESET_COLOR}"; exit;;
         * ) echo "Please answer y or n.";;
     esac
 done
-

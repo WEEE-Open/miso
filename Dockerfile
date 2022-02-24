@@ -1,8 +1,8 @@
 # syntax=docker/dockerfile:1
 FROM debian:stable-slim
 MAINTAINER WEEE Open
-RUN apt-get update \
-    && apt-get install \
+RUN apt-get update -y \
+    && apt-get install -y \
 	    debootstrap \
 	    squashfs-tools \
 	    xorriso \
@@ -14,7 +14,7 @@ RUN apt-get update \
 	    debian-archive-keyring \
 	    isolinux \
 	    syslinux \
-    && apt-get clean
+    && apt-get clean -y
 WORKDIR /miso
 COPY miso.sh .
 ENTRYPOINT ["/miso/miso.sh", "/build"]
