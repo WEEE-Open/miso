@@ -6,15 +6,15 @@ echo "Martello is starting!"
 
 # this has to be done before sudo
 echo "=== Set hostname ==="
-export HOSTNAME $MISO_HOSTNAME
 echo "$MISO_HOSTNAME" > /etc/hostname
+# HOSTNAME is the docker one, but it cannot be changed from
+# the inside and is absolutely necessary to be set for sudo
+# to determine that localhost is localhost
 cat << EOF > /etc/hosts
-127.0.0.1       localhost
-::1             localhost ip6-localhost ip6-loopback
+127.0.0.1       localhost $MISO_HOSTNAME $HOSTNAME
+::1             localhost ip6-localhost ip6-loopback $MISO_HOSTNAME $HOSTNAME
 ff02::1         ip6-allnodes
 ff02::2         ip6-allrouters
-127.0.0.1       $MISO_HOSTNAME
-::1             $MISO_HOSTNAME
 EOF
 
 echo "=== Software installation ==="
@@ -153,7 +153,7 @@ echo "=== Prepare peracotta ==="
 apt-get -qq install -y python3-pip
 # PyQt > 5.14.0 requires an EXTREMELY RECENT version of pip,
 # on the most bleeding of all bleeding edges
-python3 -m pip install --quiet --upgrade pip
+# python3 -m pip install --quiet --upgrade pip
 
 cp ./peracotta_update /etc/cron.d/peracotta_update
 
@@ -224,7 +224,7 @@ echo "=== XFCE configuration ==="
 sudo -u $MISO_USERNAME mkdir -p /home/$MISO_USERNAME/.config/xfce4
 rsync -a --force ./xfce4 /home/$MISO_USERNAME/.config
 chown weee: -R /home/$MISO_USERNAME/.config
-sudo -u $MISO_USERNAME mkdir /home/$MISO_USERNAME/.config/xfce4/desktop /home/$MISO_USERNAME/.config/xfce4/terminal
+# sudo -u $MISO_USERNAME mkdir -p /home/$MISO_USERNAME/.config/xfce4/desktop /home/$MISO_USERNAME/.config/xfce4/terminal
 
 echo "=== Desktop shortcuts ==="
 if [[ -d "/home/$MISO_USERNAME/limone" ]]; then
