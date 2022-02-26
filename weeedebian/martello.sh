@@ -124,15 +124,12 @@ echo "=== SSH daemon configuration ==="
 cp ./sshd_config /etc/ssh/sshd_config
 
 echo "=== Modules configuration ==="
-if [[ ! -f "/etc/modules-load.d/eeprom.conf" ]]; then
-  touch /etc/modules-load.d/eeprom.conf
-fi
-if [[ -z `grep eeprom /etc/modules-load.d/eeprom.conf` ]]; then
-    printf "eeprom\n" > /etc/modules-load.d/eeprom.conf
-fi
-if [[ -z `grep at24 /etc/modules-load.d/eeprom.conf` ]]; then
-    printf "at24\n" > /etc/modules-load.d/eeprom.conf
-fi
+_MODULES=("eeprom" "at24" "ee1004" "i2c-i801")
+for i in ${!_MODULES[@]}; do
+  if [[ ! -f "/etc/modules-load.d/${_MODULES[$i]}.conf" ]]; then
+    printf "${_MODULES[$i]}\n" > /etc/modules-load.d/${_MODULES[$i]}.conf
+  fi
+done
 
 echo "=== DNS configuration ==="
 cp ./resolv.conf /etc/resolv.conf
