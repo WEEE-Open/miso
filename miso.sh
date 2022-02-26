@@ -98,13 +98,10 @@ fi
 
 rm -rf "$MISO_BUILD_DIR/chroot/source" 2>/dev/null
 cp -r $_MISO_SOURCE_DIR "$MISO_BUILD_DIR/chroot/source"
+# Get rid of some warnings: https://wiki.debian.org/chroot (does not work inside docker)
+# $SUDO mount --bind /dev/pts "$MISO_BUILD_DIR/chroot/dev/pts"
 cat << EOF | $MISO_SUDO chroot $MISO_BUILD_DIR/chroot
-DEBIAN_FRONTEND=noninteractive apt-get -qq update
-DEBIAN_FRONTEND=noninteractive apt-get -qq install -y --no-install-recommends \
-    linux-image-$MISO_ARCH \
-    live-boot \
-    systemd-sysv \
-    apt-utils
+set +m
 
 # Subsitution is done outside the chroot
 export MISO_HOSTNAME "$MISO_HOSTNAME"
@@ -116,6 +113,7 @@ cd /source
 bash ./$_MISO_SOURCE_SCRIPT
 EOF
 rm -rf "$MISO_BUILD_DIR/chroot/source" 2>/dev/null
+#$SUDO umount "$MISO_BUILD_DIR/chroot/dev/pts"
 
 #echo "TEST POINT"
 #exit 0

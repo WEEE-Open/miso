@@ -4,6 +4,15 @@
 
 echo "Martello is starting!"
 
+echo "=== Install kernel and systemd ==="
+DEBIAN_FRONTEND=noninteractive apt-get -qq update -y -o Dpkg::Use-Pty=false
+DEBIAN_FRONTEND=noninteractive apt-get -qq install -y -o Dpkg::Use-Pty=false \
+    --no-install-recommends \
+    linux-image-$MISO_ARCH \
+    live-boot \
+    systemd-sysv \
+    apt-utils
+
 # this has to be done before sudo
 echo "=== Set hostname ==="
 echo "$MISO_HOSTNAME" > /etc/hostname
@@ -20,13 +29,12 @@ EOF
 echo "=== Software installation ==="
 # Remove useless packages, courtesy of "wajig large". Cool command.
 # Do not remove mousepad, it removes xfce-goodies too
-#/bin/bash -c 'DEBIAN_FRONTEND=noninteractive apt-getpurge --auto-remove -y libreoffice libreoffice-core libreoffice-common ispell* gimp gimp-* aspell* hunspell* mythes* *sunpinyin* wpolish wnorwegian tegaki* task-thai task-thai-desktop xfonts-thai xiterm* task-khmer task-khmer-desktop fonts-khmeros khmerconverter'
+#/bin/bash -c 'DEBIAN_FRONTEND=noninteractive apt-get purge --auto-remove -y libreoffice libreoffice-core libreoffice-common ispell* gimp gimp-* aspell* hunspell* mythes* *sunpinyin* wpolish wnorwegian tegaki* task-thai task-thai-desktop xfonts-thai xiterm* task-khmer task-khmer-desktop fonts-khmeros khmerconverter'
 # Upgrade and install useful packages
 export DEBIAN_FRONTEND=noninteractive
-apt-get -qq update -y
-apt-get -qq upgrade -y
+apt-get -qq upgrade -y -o Dpkg::Use-Pty=false
 # libxkbcommon-x11-0 may be not needed (see Add library to installation if needed #28)
-apt-get -qq install -y\
+apt-get -qq install -y -o Dpkg::Use-Pty=false \
     apt-transport-https \
     ca-certificates \
     cifs-utils \
@@ -74,7 +82,6 @@ apt-get -qq install -y\
     xserver-xorg \
     xserver-xorg-core \
     zsh
-apt-get -qq install -y
 update-ca-certificates
 
 echo "=== User configuration ==="
@@ -147,7 +154,7 @@ sudo -u $MISO_USERNAME cp ./toprc /home/$MISO_USERNAME/.toprc
 
 echo "=== Prepare peracotta ==="
 # TODO: ln libxcb
-apt-get -qq install -y python3-pip
+apt-get -qq install -y python3-pip -o Dpkg::Use-Pty=false
 # PyQt > 5.14.0 requires an EXTREMELY RECENT version of pip,
 # on the most bleeding of all bleeding edges
 # python3 -m pip install --quiet --upgrade pip
@@ -168,13 +175,13 @@ sudo -u $MISO_USERNAME cp ./features.json /home/$MISO_USERNAME/peracotta/feature
 
 if [[ "$MISO_ARCH" == "i386" ]]; then
   echo ""===== Begin incredible workaround for PyQt on 32 bit =====""
-  apt-get -qq install -y python3-pyqt5
+  apt-get -qq install -y python3-pyqt5 -o Dpkg::Use-Pty=false
   sudo -u $MISO_USERNAME /bin/bash -c "grep -vi pyqt /home/$MISO_USERNAME/peracotta/requirements.txt > /home/$MISO_USERNAME/peracotta/requirements32.txt"
   pip3 --quiet install -r /home/$MISO_USERNAME/peracotta/requirements32.txt
   rm -f /home/$MISO_USERNAME/peracotta/requirements32.txt
   echo ""===== End incredible workaround for PyQt on 32 bit =====""
 else
-  apt-get -qq autoremove -y python3-pyqt5
+  apt-get -qq autoremove -y python3-pyqt5 -o Dpkg::Use-Pty=false
   pip3 --quiet install -r /home/$MISO_USERNAME/peracotta/requirements.txt
 fi
 
@@ -266,9 +273,9 @@ printf "ExecStart=-/sbin/agetty --noissue --autologin weee %%I $TERM" >> /etc/sy
 
 echo "=== Final cleanup ==="
 # Remove unused packages
-apt-get -qq autoremove -y
+apt-get -qq autoremove -y -o Dpkg::Use-Pty=false
 # Clean the cache
-apt-get -qq clean -y
+apt-get -qq clean -y -o Dpkg::Use-Pty=false
 
 echo "=== Automatic configuration done ==="
 #  read -p 'Open a shell in the chroot environment? [y/n] ' ans
