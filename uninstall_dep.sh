@@ -10,3 +10,4 @@ sudo apt remove \
     debian-archive-keyring \
     isolinux \
     syslinux
+sudo apt clean
