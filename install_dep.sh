@@ -1,6 +1,7 @@
 sudo apt install \
     debootstrap \
     squashfs-tools \
+    dosfstools \
     xorriso \
     isolinux \
     syslinux-efi \
