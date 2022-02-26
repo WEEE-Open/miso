@@ -104,7 +104,7 @@ cp ./$MISO_USERNAME /etc/sudoers.d/$MISO_USERNAME
 
 echo "=== Shell and home configuration ==="
 sudo -u $MISO_USERNAME mkdir -p /home/$MISO_USERNAME/Desktop
-sudo -u $MISO_USERNAME ln -s ./Desktop /home/$MISO_USERNAME/Scrivania
+sudo -u $MISO_USERNAME ln -sf ./Desktop /home/$MISO_USERNAME/Scrivania
 chsh -s /bin/zsh root
 # chsh -s /bin/zsh weee
 sudo -u $MISO_USERNAME curl -L -o /home/$MISO_USERNAME/.zshrc https://git.grml.org/f/grml-etc-core/etc/zsh/zshrc
@@ -124,8 +124,11 @@ echo "=== Locale configuration ==="
 cp ./locale.gen /etc/locale.gen
 cp ./locale.conf /etc/locale.conf
 locale-gen
+unset LANG
 . /etc/locale.conf
-locale
+# Prints POSIX everywhere despite different variables have just been sourced.
+# Whatever, it is correct once boot.
+# locale
 
 echo "=== SSH daemon configuration ==="
 cp ./sshd_config /etc/ssh/sshd_config
