@@ -117,8 +117,8 @@ bash ./$_MISO_SOURCE_SCRIPT
 EOF
 rm -rf "$MISO_BUILD_DIR/chroot/source" 2>/dev/null
 
-echo "TEST POINT"
-exit 0
+#echo "TEST POINT"
+#exit 0
 
 # Create directory tree
 mkdir -p $MISO_BUILD_DIR/{staging/{EFI/boot,boot/grub/x86_64-efi,isolinux,live},tmp}
