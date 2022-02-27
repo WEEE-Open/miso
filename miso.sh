@@ -135,7 +135,14 @@ echo -e "${_BLUE}Squashing filesystem ...${_RESET_COLOR}"
 $MISO_SUDO mksquashfs \
     $MISO_BUILD_DIR/chroot \
     $MISO_BUILD_DIR/staging/live/filesystem.squashfs \
-    -e boot $MISO_MKSQUASHFS_MEM \
+    -e boot $MISO_MKSQUASHFS_MEM
+if [[ $? -ne 0 ]]; then
+  $MISO_SUDO rm -f "$MISO_BUILD_DIR/staging/live/filesystem.squashfs"
+  $MISO_SUDO mksquashfs \
+    $MISO_BUILD_DIR/chroot \
+    $MISO_BUILD_DIR/staging/live/filesystem.squashfs \
+    -e boot $MISO_MKSQUASHFS_MEM
+fi
 
 cp $MISO_BUILD_DIR/chroot/boot/vmlinuz-* \
     $MISO_BUILD_DIR/staging/live/vmlinuz && \
