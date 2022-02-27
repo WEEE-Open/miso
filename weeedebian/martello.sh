@@ -58,6 +58,7 @@ apt-get -qq install -y -o Dpkg::Use-Pty=false \
     libxkbcommon-x11-dev \
     libxrender-dev \
     lightdm \
+    lm-sensors \
     locales \
     lshw \
     mesa-utils \
@@ -70,6 +71,7 @@ apt-get -qq install -y -o Dpkg::Use-Pty=false \
     pciutils \
     rsync \
     smartmontools \
+    strace \
     sudo \
     traceroute \
     wget \
@@ -105,7 +107,7 @@ cp ./$MISO_USERNAME /etc/sudoers.d/$MISO_USERNAME
 
 echo "=== Shell and home configuration ==="
 sudo -u $MISO_USERNAME mkdir -p /home/$MISO_USERNAME/Desktop
-sudo -u $MISO_USERNAME ln -sf ./Desktop /home/$MISO_USERNAME/Scrivania
+# sudo -u $MISO_USERNAME ln -sf ./Desktop /home/$MISO_USERNAME/Scrivania
 chsh -s /bin/zsh root
 # chsh -s /bin/zsh weee
 sudo -u $MISO_USERNAME curl -L -o /home/$MISO_USERNAME/.zshrc https://git.grml.org/f/grml-etc-core/etc/zsh/zshrc
@@ -240,7 +242,7 @@ chown weee: -R /home/$MISO_USERNAME/.config
 
 echo "=== Desktop shortcuts ==="
 if [[ -d "/home/$MISO_USERNAME/limone" ]]; then
-  sudo -u $MISO_USERNAME git -C /home/$MISO_USERNAME/limone pull
+  sudo -u $MISO_USERNAME git -C /home/$MISO_USERNAME/limone pull --ff-only
 else
   sudo -u $MISO_USERNAME mkdir -p /home/$MISO_USERNAME/limone
   sudo -u $MISO_USERNAME git clone https://github.com/WEEE-Open/limone.git /home/$MISO_USERNAME/limone
