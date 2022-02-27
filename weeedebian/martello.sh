@@ -41,6 +41,7 @@ apt-get -qq install -y -o Dpkg::Use-Pty=false \
     curl \
     curl \
     dmidecode \
+    fbxkb \
     firefox-esr \
     geany \
     git \
@@ -113,12 +114,16 @@ sudo -u $MISO_USERNAME rm /home/$MISO_USERNAME/.bash_history  >/dev/null 2>/dev/
 rm /root/.bash_history >/dev/null 2>/dev/null
 
 echo "=== Keymap configuration ==="
-echo "KEYMAP=it" > /etc/vconsole.conf
-# Probably not needed:
-# echo "LANG=it_IT.UTF-8" > /etc/locale.conf
+# Needed for sure on Debian 11:
+cp ./keyboard /etc/default/keyboard
+# Keyboard layout switcher:
+sudo -u $MISO_USERNAME mkdir -p /home/$MISO_USERNAME/.config/autostart
+sudo -u $MISO_USERNAME cp ./fbxkb.desktop /home/$MISO_USERNAME/.config/autostart/fbxkb.desktop
 # 00-keyboard.conf can be managed by localectl. In fact, this is one of such files produced by localectl.
+# May not be needed in Debian 11:
 mkdir -p /etc/X11/xorg.conf.d
 cp ./00-keyboard.conf /etc/X11/xorg.conf.d/00-keyboard.conf
+echo "KEYMAP=it" > /etc/vconsole.conf
 
 echo "=== Locale configuration ==="
 cp ./locale.gen /etc/locale.gen
