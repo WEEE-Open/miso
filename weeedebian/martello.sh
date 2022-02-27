@@ -39,8 +39,8 @@ apt-get -qq install -y -o Dpkg::Use-Pty=false \
     ca-certificates \
     cifs-utils \
     curl \
-    curl \
     dmidecode \
+    dnsutils \
     fbxkb \
     firefox-esr \
     geany \
@@ -49,6 +49,8 @@ apt-get -qq install -y -o Dpkg::Use-Pty=false \
     gsmartcontrol \
     gvfs-backends \
     i2c-tools \
+    iputils-arping \
+    iputils-ping \
     iputils-tracepath \
     libglu1-mesa-dev \
     libx11-xcb-dev \

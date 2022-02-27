@@ -31,7 +31,6 @@ On a Debian/Ubuntu machine, you can run the script without any container:
 ```shell
 # Install dependencies
 ./install_dep.sh
-mkdir build
 ./miso.sh build weeedebian/martello.sh amd64
 # Uninstall dependencies if you want to save space
 ./uninstall_dep.sh
