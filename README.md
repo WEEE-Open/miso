@@ -20,23 +20,9 @@ docker run --name miso \
   -e MISO_ARCH=amd64 \
   -e MISO_NO_SUDO=1 \
   weee-open/miso:latest
-
-# To save some time if you need to re-run to update the image,
-# add MISO_NO_BOOSTRAP to save some time:
-docker run --name miso \
-  -i --rm \
-  -v $(readlink -f build):/build:rw \
-  -v $(readlink -f weeedebian):/weeedebian:ro \
-  -e MISO_CHROOT_SCRIPT=/weeedebian/martello.sh \
-  -e MISO_HOSTNAME=weeedebian \
-  -e MISO_ROOTPASSWD=asd \
-  -e MISO_USERNAME=weee \
-  -e MISO_USERPASSWD=asd \
-  -e MISO_ARCH=amd64 \
-  -e MISO_NO_SUDO=1 \
-  -e MISO_NO_BOOSTRAP=1 \
-  weee-open/miso:latest
 ```
+
+Also useful if you don't have an endless amount of RAM: `-e MISO_MKSQUASHFS_MEM=500m \`
 
 This will output weeedebian-amd64.iso into build/weeedebian.
 
@@ -71,3 +57,22 @@ export TARALLO_TOKEN=yoLeCHmEhNNseN0BlG0s3A:ksfPYziGg7ebj0goT0Zc7pbmQEIYvZpRTIkw
 
 Substitute the URL and token with actual values, that's just an example token which will not work in production.  
 This will be used by the Peracotta.
+
+# Known issues
+
+The red warning about missing apt-utils in container build can be ignored, installing apt-utils causes even more warnings which do not affect anything.
+
+This one inside the bootstrap process can be ignored, too:
+
+```
+W: Failure trying to run: chroot "/build/weeedebian-amd64/chroot" mount -t proc proc /proc
+W: See /build/weeedebian-amd64/chroot/debootstrap/debootstrap.log for details
+W: Failure trying to run: chroot "/build/weeedebian-amd64/chroot" mount -t sysfs sysfs /sys
+W: See /build/weeedebian-amd64/chroot/debootstrap/debootstrap.log for details
+```
+
+That stuff doesn't work with the combination of a container and a chroot, unless you want to elevate your container privileges.
+
+
+
+

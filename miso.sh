@@ -87,11 +87,15 @@ MISO_BUILD_DIR="$MISO_BUILD_DIR/$_MISO_BUILD_NAME-$MISO_ARCH"
 
 mkdir -p $MISO_BUILD_DIR
 
-if [[ -z "$MISO_NO_BOOSTRAP" ]]; then
+if [[ -d "$MISO_BUILD_DIR/chroot" ]]; then
+  echo -e "${_ORANGE}Chroot directory exists, skipping bootstrap!${_RESET_COLOR}"
+  echo -e "${_ORANGE}To bootstrap again, delete $MISO_BUILD_DIR/chroot${_RESET_COLOR}"
+else
+  echo -e "${_BLUE}Bootstrapping${_RESET_COLOR}"
   $MISO_SUDO debootstrap \
     --arch=$MISO_ARCH \
     --variant=minbase \
-    bullseye \
+    stable \
     $MISO_BUILD_DIR/chroot \
     http://ftp.it.debian.org/debian/
 fi
@@ -118,23 +122,28 @@ rm -rf "$MISO_BUILD_DIR/chroot/source" 2>/dev/null
 #echo "TEST POINT"
 #exit 0
 
+if [[ -z "$MISO_MKSQUASHFS_MEM" ]]; then
+    echo "Limiting mksquashfs memory to: $MISO_MKSQUASHFS_MEM"
+    MISO_MKSQUASHFS_MEM="-mem $MISO_MKSQUASHFS_MEM"
+fi
+
 # Create directory tree
 mkdir -p $MISO_BUILD_DIR/{staging/{EFI/boot,boot/grub/x86_64-efi,isolinux,live},tmp}
 
 # Squash filesystem
-echo -e "${_ORANGE}Squashing filesystem ...${_RESET_COLOR}"
+echo -e "${_BLUE}Squashing filesystem ...${_RESET_COLOR}"
 $MISO_SUDO mksquashfs \
     $MISO_BUILD_DIR/chroot \
     $MISO_BUILD_DIR/staging/live/filesystem.squashfs \
-    -e boot
+    -e boot $MISO_MKSQUASHFS_MEM \
 
 cp $MISO_BUILD_DIR/chroot/boot/vmlinuz-* \
     $MISO_BUILD_DIR/staging/live/vmlinuz && \
 cp $MISO_BUILD_DIR/chroot/boot/initrd.img-* \
     $MISO_BUILD_DIR/staging/live/initrd
 
-echo -e "${_ORANGE}Building bootloader ...${_RESET_COLOR}"
-cat <<'EOF' >$MISO_BUILD_DIR/staging/isolinux/isolinux.cfg
+echo -e "${_BLUE}Building bootloader ...${_RESET_COLOR}"
+cat << EOF > $MISO_BUILD_DIR/staging/isolinux/isolinux.cfg
 UI vesamenu.c32
 
 MENU TITLE Boot Menu
@@ -164,7 +173,7 @@ LABEL linux
   APPEND initrd=/live/initrd boot=live nomodeset
 EOF
 
-cat <<'EOF' >$MISO_BUILD_DIR/staging/boot/grub/grub.cfg
+cat << EOF > $MISO_BUILD_DIR/staging/boot/grub/grub.cfg
 search --set=root --file /DEBIAN_CUSTOM
 
 set default="0"
@@ -173,19 +182,19 @@ set timeout=30
 # If X has issues finding screens, experiment with/without nomodeset.
 
 menuentry "$_MISO_BUILD_NAME $MISO_ARCH [EFI/GRUB]" {
-    linux ($root)/live/vmlinuz boot=live
-    initrd ($root)/live/initrd
+    linux (\$root)/live/vmlinuz boot=live
+    initrd (\$root)/live/initrd
 }
 
 menuentry "$_MISO_BUILD_NAME $MISO_ARCH [EFI/GRUB] (nomodeset)" {
-    linux ($root)/live/vmlinuz boot=live nomodeset
-    initrd ($root)/live/initrd
+    linux (\$root)/live/vmlinuz boot=live nomodeset
+    initrd (\$root)/live/initrd
 }
 EOF
 
-cat <<'EOF' >$MISO_BUILD_DIR/tmp/grub-standalone.cfg
+cat << EOF > $MISO_BUILD_DIR/tmp/grub-standalone.cfg
 search --set=root --file /DEBIAN_CUSTOM
-set prefix=($root)/boot/grub/
+set prefix=(\$root)/boot/grub/
 configfile /boot/grub/grub.cfg
 EOF
 
@@ -209,7 +218,7 @@ mmd -i efiboot.img efi efi/boot && \
 mcopy -vi efiboot.img $MISO_BUILD_DIR/tmp/bootx64.efi ::efi/boot/
 )
 
-echo -e "${_ORANGE}Building final ISO ...${_RESET_COLOR}"
+echo -e "${_BLUE}Building final ISO ...${_RESET_COLOR}"
 xorriso \
     -as mkisofs \
     -iso-level 3 \
