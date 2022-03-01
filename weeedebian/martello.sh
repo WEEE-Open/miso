@@ -290,6 +290,7 @@ echo "=== Final cleanup ==="
 apt-get -qq autoremove -y -o Dpkg::Use-Pty=false
 # Clean the cache
 apt-get -qq clean -y -o Dpkg::Use-Pty=false
+rm -rf /var/lib/apt/lists/*
 
 echo "=== Automatic configuration done ==="
 #  read -p 'Open a shell in the chroot environment? [y/n] ' ans
