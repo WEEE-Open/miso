@@ -48,7 +48,9 @@ apt-get -qq install -y -o Dpkg::Use-Pty=false \
     gparted \
     gsmartcontrol \
     gvfs-backends \
+    hdparm \
     i2c-tools \
+    iproute2 \
     iputils-arping \
     iputils-ping \
     iputils-tracepath \
@@ -71,6 +73,8 @@ apt-get -qq install -y -o Dpkg::Use-Pty=false \
     openssh-server \
     openssl \
     pciutils \
+    python3 \
+    python-is-python3 \
     rsync \
     smartmontools \
     strace \
@@ -165,7 +169,6 @@ cp ./toprc /root/.toprc
 sudo -u $MISO_USERNAME cp ./toprc /home/$MISO_USERNAME/.toprc
 
 echo "=== Prepare peracotta ==="
-# TODO: ln libxcb
 apt-get -qq install -y python3-pip -o Dpkg::Use-Pty=false
 # PyQt > 5.14.0 requires an EXTREMELY RECENT version of pip,
 # on the most bleeding of all bleeding edges
@@ -174,26 +177,24 @@ apt-get -qq install -y python3-pip -o Dpkg::Use-Pty=false
 cp ./peracotta_update /etc/cron.d/peracotta_update
 
 if [[ -d "/home/$MISO_USERNAME/peracotta" ]]; then
-  rm -rf "/home/$MISO_USERNAME/peracotta"
-  #sudo -u $MISO_USERNAME git -C /home/$MISO_USERNAME/peracotta pull
+  sudo -u $MISO_USERNAME git -C /home/$MISO_USERNAME/peracotta pull --ff-only
+else
+  sudo -u $MISO_USERNAME mkdir -p /home/$MISO_USERNAME/peracotta
+  sudo -u $MISO_USERNAME git clone https://github.com/WEEE-Open/peracotta.git /home/$MISO_USERNAME/peracotta
 fi
-#else
-sudo -u $MISO_USERNAME mkdir -p /home/$MISO_USERNAME/peracotta
-sudo -u $MISO_USERNAME git clone https://github.com/WEEE-Open/peracotta.git /home/$MISO_USERNAME/peracotta
-#fi
 
 #sudo -u $MISO_USERNAME sh -c 'cd /home/$MISO_USERNAME/peracotta && python3 polkit.py'
 sudo -u $MISO_USERNAME cp ./features.json /home/$MISO_USERNAME/peracotta/features.json
 
 if [[ "$MISO_ARCH" == "i386" ]]; then
-  echo ""===== Begin incredible workaround for PyQt on 32 bit =====""
+  echo "===== Begin incredible workaround for PyQt on 32 bit ====="
   apt-get -qq install -y python3-pyqt5 -o Dpkg::Use-Pty=false
   sudo -u $MISO_USERNAME /bin/bash -c "grep -vi pyqt /home/$MISO_USERNAME/peracotta/requirements.txt > /home/$MISO_USERNAME/peracotta/requirements32.txt"
   pip3 --quiet install -r /home/$MISO_USERNAME/peracotta/requirements32.txt
   rm -f /home/$MISO_USERNAME/peracotta/requirements32.txt
-  echo ""===== End incredible workaround for PyQt on 32 bit =====""
+  echo "===== End incredible workaround for PyQt on 32 bit ====="
 else
-  apt-get -qq autoremove -y python3-pyqt5 -o Dpkg::Use-Pty=false
+  # apt-get -qq autoremove -y python3-pyqt5 -o Dpkg::Use-Pty=false
   pip3 --quiet install -r /home/$MISO_USERNAME/peracotta/requirements.txt
 fi
 
@@ -240,6 +241,7 @@ echo "=== XFCE configuration ==="
 sudo -u $MISO_USERNAME mkdir -p /home/$MISO_USERNAME/.config/xfce4
 rsync -a --force ./xfce4 /home/$MISO_USERNAME/.config
 chown weee: -R /home/$MISO_USERNAME/.config
+sudo -u $MISO_USERNAME cp ./light-locker.desktop /home/$MISO_USERNAME/.config/autostart/light-locker.desktop
 # sudo -u $MISO_USERNAME mkdir -p /home/$MISO_USERNAME/.config/xfce4/desktop /home/$MISO_USERNAME/.config/xfce4/terminal
 
 echo "=== Desktop shortcuts ==="
