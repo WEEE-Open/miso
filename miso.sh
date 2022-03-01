@@ -145,9 +145,9 @@ if [[ $? -ne 0 ]]; then
 fi
 
 cp $MISO_BUILD_DIR/chroot/boot/vmlinuz-* \
-    $MISO_BUILD_DIR/staging/live/vmlinuz && \
+    $MISO_BUILD_DIR/staging/live/vmlinuz-live && \
 cp $MISO_BUILD_DIR/chroot/boot/initrd.img-* \
-    $MISO_BUILD_DIR/staging/live/initrd
+    $MISO_BUILD_DIR/staging/live/initrd.img
 
 echo -e "${_BLUE}Building bootloader ...${_RESET_COLOR}"
 cat << EOF > $MISO_BUILD_DIR/staging/isolinux/isolinux.cfg
@@ -155,7 +155,7 @@ UI vesamenu.c32
 
 MENU TITLE Boot Menu
 DEFAULT linux
-TIMEOUT 600
+TIMEOUT 300
 MENU RESOLUTION 640 480
 MENU COLOR border       30;44   #40ffffff #a0000000 std
 MENU COLOR title        1;36;44 #9033ccff #a0000000 std
@@ -170,14 +170,14 @@ MENU COLOR tabmsg       31;40   #30ffffff #00000000 std
 LABEL linux
   MENU LABEL $_MISO_BUILD_NAME $MISO_ARCH [BIOS/ISOLINUX]
   MENU DEFAULT
-  KERNEL /live/vmlinuz
-  APPEND initrd=/live/initrd boot=live
+  KERNEL /live/vmlinuz-live
+  APPEND initrd=/live/initrd.img boot=live
 
 LABEL linux
   MENU LABEL $_MISO_BUILD_NAME $MISO_ARCH [BIOS/ISOLINUX] (nomodeset)
   MENU DEFAULT
-  KERNEL /live/vmlinuz
-  APPEND initrd=/live/initrd boot=live nomodeset
+  KERNEL /live/vmlinuz-live
+  APPEND initrd=/live/initrd.img boot=live nomodeset
 EOF
 
 cat << EOF > $MISO_BUILD_DIR/staging/boot/grub/grub.cfg
@@ -189,13 +189,13 @@ set timeout=30
 # If X has issues finding screens, experiment with/without nomodeset.
 
 menuentry "$_MISO_BUILD_NAME $MISO_ARCH [EFI/GRUB]" {
-    linux (\$root)/live/vmlinuz boot=live
-    initrd (\$root)/live/initrd
+    linux (\$root)/live/vmlinuz-live boot=live
+    initrd (\$root)/live/initrd.img
 }
 
 menuentry "$_MISO_BUILD_NAME $MISO_ARCH [EFI/GRUB] (nomodeset)" {
-    linux (\$root)/live/vmlinuz boot=live nomodeset
-    initrd (\$root)/live/initrd
+    linux (\$root)/live/vmlinuz-live boot=live nomodeset
+    initrd (\$root)/live/initrd.img
 }
 EOF
 
