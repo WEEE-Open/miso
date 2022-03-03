@@ -5,13 +5,15 @@
 echo "Martello is starting!"
 
 echo "=== Install kernel and systemd ==="
-DEBIAN_FRONTEND=noninteractive apt-get -qq update -y -o Dpkg::Use-Pty=false
-DEBIAN_FRONTEND=noninteractive apt-get -qq install -y -o Dpkg::Use-Pty=false \
+export DEBIAN_FRONTEND=noninteractive
+apt-get -qq update -y -o Dpkg::Use-Pty=false
+apt-get -qq install -y -o Dpkg::Use-Pty=false \
     --no-install-recommends \
     linux-image-$MISO_ARCH \
     live-boot \
     systemd-sysv \
-    apt-utils
+    apt-utils \
+    software-properties-common
 
 # this has to be done before sudo
 echo "=== Set hostname ==="
@@ -27,11 +29,16 @@ ff02::2         ip6-allrouters
 EOF
 
 echo "=== Software installation ==="
+# Add non-free repo and update to pull in all the good firmware
+_RESULT="$(apt-add-repository non-free 2>&1)"
+echo $_RESULT
+if [[ ! $_RESULT =~ "is already enabled" ]]; then
+apt-get -qq update -y -o Dpkg::Use-Pty=false
+fi
 # Remove useless packages, courtesy of "wajig large". Cool command.
 # Do not remove mousepad, it removes xfce-goodies too
 #/bin/bash -c 'DEBIAN_FRONTEND=noninteractive apt-get purge --auto-remove -y libreoffice libreoffice-core libreoffice-common ispell* gimp gimp-* aspell* hunspell* mythes* *sunpinyin* wpolish wnorwegian tegaki* task-thai task-thai-desktop xfonts-thai xiterm* task-khmer task-khmer-desktop fonts-khmeros khmerconverter'
 # Upgrade and install useful packages
-export DEBIAN_FRONTEND=noninteractive
 apt-get -qq upgrade -y -o Dpkg::Use-Pty=false
 # libxkbcommon-x11-0 may be not needed (see Add library to installation if needed #28)
 apt-get -qq install -y -o Dpkg::Use-Pty=false \
@@ -43,6 +50,12 @@ apt-get -qq install -y -o Dpkg::Use-Pty=false \
     dnsutils \
     fbxkb \
     firefox-esr \
+    firmware-amd-graphics \
+    firmware-ath9k-htc \
+    firmware-atheros \
+    firmware-iwlwifi \
+    firmware-linux \
+    firmware-ti-connectivity \
     geany \
     git \
     gparted \
