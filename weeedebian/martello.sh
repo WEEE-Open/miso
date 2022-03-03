@@ -22,10 +22,14 @@ echo "$MISO_HOSTNAME" > /etc/hostname
 # the inside and is absolutely necessary to be set for sudo
 # to determine that localhost is localhost
 cat << EOF > /etc/hosts
-127.0.0.1       localhost $MISO_HOSTNAME $HOSTNAME
-::1             localhost ip6-localhost ip6-loopback $MISO_HOSTNAME $HOSTNAME
+127.0.0.1       localhost $HOSTNAME
+::1             localhost ip6-localhost ip6-loopback $HOSTNAME
 ff02::1         ip6-allnodes
 ff02::2         ip6-allrouters
+
+# Hey systemd-resolved, don't delete this part for no reason, please
+127.0.0.1       $MISO_HOSTNAME
+::1             $MISO_HOSTNAME
 EOF
 
 echo "=== Software installation ==="
@@ -102,9 +106,9 @@ apt-get -qq install -y -o Dpkg::Use-Pty=false \
     xinit \
     xorg \
     xserver-xorg \
-    xserver-xorg-core \
     zsh
 update-ca-certificates
+systemctl disable --now smartd.service
 
 echo "=== User configuration ==="
 # openssl has been installed, so this can be done now
@@ -150,8 +154,8 @@ echo "=== Locale configuration ==="
 cp ./locale.gen /etc/locale.gen
 cp ./locale.conf /etc/locale.conf
 locale-gen
-unset LANG
-. /etc/locale.conf
+update-locale
+# . /etc/locale.conf
 # Prints POSIX everywhere despite different variables have just been sourced.
 # Whatever, it is correct once boot.
 # locale
