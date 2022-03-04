@@ -18,6 +18,7 @@ apt-get -qq install -y -o Dpkg::Use-Pty=false \
 # this has to be done before sudo
 echo "=== Set hostname ==="
 echo "$MISO_HOSTNAME" > /etc/hostname
+cp ./NetworkManager.conf /etc/NetworkManager/NetworkManager.conf
 # HOSTNAME is the docker one, but it cannot be changed from
 # the inside and is absolutely necessary to be set for sudo
 # to determine that localhost is localhost
@@ -26,10 +27,6 @@ cat << EOF > /etc/hosts
 ::1             localhost ip6-localhost ip6-loopback $HOSTNAME
 ff02::1         ip6-allnodes
 ff02::2         ip6-allrouters
-
-# Hey systemd-resolved, don't delete this part for no reason, please
-127.0.0.1       $MISO_HOSTNAME
-::1             $MISO_HOSTNAME
 EOF
 
 echo "=== Software installation ==="
@@ -86,6 +83,7 @@ apt-get -qq install -y -o Dpkg::Use-Pty=false \
     nano \
     net-tools \
     network-manager \
+    network-manager-gnome \
     openssh-client \
     openssh-server \
     openssl \
@@ -108,7 +106,7 @@ apt-get -qq install -y -o Dpkg::Use-Pty=false \
     xserver-xorg \
     zsh
 update-ca-certificates
-systemctl disable --now smartd.service
+systemctl disable smartd
 
 echo "=== User configuration ==="
 # openssl has been installed, so this can be done now
@@ -308,6 +306,19 @@ apt-get -qq autoremove -y -o Dpkg::Use-Pty=false
 # Clean the cache
 apt-get -qq clean -y -o Dpkg::Use-Pty=false
 rm -rf /var/lib/apt/lists/*
+
+echo "=== Set hostname part 2 ==="
+# Something is overwriting /etc/hosts on each boot. What? Who knows!
+# Here's a bug from 2010, but disabling NetworkManager does absolutely nothing:
+# https://bugs.launchpad.net/ubuntu/+source/network-manager/+bug/659872
+# Here's a solution with chattr, which does absolutely nothing (the attribute is not squashed probably):
+# https://askubuntu.com/a/84526
+cat << EOF > /etc/hosts
+127.0.0.1       localhost $MISO_HOSTNAME
+::1             localhost ip6-localhost ip6-loopback $MISO_HOSTNAME
+ff02::1         ip6-allnodes
+ff02::2         ip6-allrouters
+EOF
 
 echo "=== Automatic configuration done ==="
 #  read -p 'Open a shell in the chroot environment? [y/n] ' ans
