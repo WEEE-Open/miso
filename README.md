@@ -57,7 +57,7 @@ export TARALLO_TOKEN=yoLeCHmEhNNseN0BlG0s3A:ksfPYziGg7ebj0goT0Zc7pbmQEIYvZpRTIkw
 Substitute the URL and token with actual values, that's just an example token which will not work in production.  
 This will be used by the Peracotta.
 
-# Known issues
+## Known issues
 
 The red warning about missing apt-utils in container build can be ignored, installing apt-utils causes even more warnings which do not affect anything.
 
