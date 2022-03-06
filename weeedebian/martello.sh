@@ -23,11 +23,27 @@ cp ./NetworkManager.conf /etc/NetworkManager/NetworkManager.conf
 # the inside and is absolutely necessary to be set for sudo
 # to determine that localhost is localhost
 cat << EOF > /etc/hosts
-127.0.0.1       localhost $HOSTNAME
-::1             localhost ip6-localhost ip6-loopback $HOSTNAME
+127.0.0.1       localhost $HOSTNAME $MISO_HOSTNAME
+::1             localhost ip6-localhost ip6-loopback $HOSTNAME $MISO_HOSTNAME
 ff02::1         ip6-allnodes
 ff02::2         ip6-allrouters
 EOF
+# Something is overwriting /etc/hosts on each boot. What? Who knows!
+# Here's a bug from 2010, but disabling NetworkManager does absolutely nothing:
+# https://bugs.launchpad.net/ubuntu/+source/network-manager/+bug/659872
+# Here's a solution with chattr, which does absolutely nothing (the attribute is not squashed probably):
+# https://askubuntu.com/a/84526
+# It seems to happen with PXE only. Since there's no way around it...
+cat << EOF > /etc/hosts_fixed
+# This file was kindly placed here by /etc/cron.d/fix_etc_hosts
+# to work around whatever is overwriting it on boot.
+
+127.0.0.1       localhost $MISO_HOSTNAME
+::1             localhost ip6-localhost ip6-loopback $MISO_HOSTNAME
+ff02::1         ip6-allnodes
+ff02::2         ip6-allrouters
+EOF
+cp ./fix_etc_hosts /etc/cron.d/fix_etc_hosts
 
 echo "=== Software installation ==="
 # Add non-free repo and update to pull in all the good firmware
@@ -107,6 +123,7 @@ apt-get -qq install -y -o Dpkg::Use-Pty=false \
     zsh
 update-ca-certificates
 systemctl disable smartd
+systemctl enable NetworkManager
 
 echo "=== User configuration ==="
 # openssl has been installed, so this can be done now
@@ -308,11 +325,6 @@ apt-get -qq clean -y -o Dpkg::Use-Pty=false
 rm -rf /var/lib/apt/lists/*
 
 echo "=== Set hostname part 2 ==="
-# Something is overwriting /etc/hosts on each boot. What? Who knows!
-# Here's a bug from 2010, but disabling NetworkManager does absolutely nothing:
-# https://bugs.launchpad.net/ubuntu/+source/network-manager/+bug/659872
-# Here's a solution with chattr, which does absolutely nothing (the attribute is not squashed probably):
-# https://askubuntu.com/a/84526
 cat << EOF > /etc/hosts
 127.0.0.1       localhost $MISO_HOSTNAME
 ::1             localhost ip6-localhost ip6-loopback $MISO_HOSTNAME
