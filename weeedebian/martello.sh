@@ -290,13 +290,16 @@ for desktop_file in $(sudo -u $MISO_USERNAME find /home/$MISO_USERNAME/limone -n
   sed -ri -e "s#Icon=(.*/)*([a-zA-Z0-9\-\.]+)#Icon=/home/$MISO_USERNAME/limone/\2#" "/home/$MISO_USERNAME/Desktop/$desktop_file"
 done
 
+if [[ -f "/home/$MISO_USERNAME/Desktop/PeracottaGUI.desktop" ]]; then
+  rm -f "/home/$MISO_USERNAME/Desktop/PeracottaGUI.desktop"
+fi
 sudo -u $MISO_USERNAME cp ./Peracotta.desktop /home/$MISO_USERNAME/Desktop
 sudo -u $MISO_USERNAME cp ./peracotta.png /home/$MISO_USERNAME/.config/peracotta.png
 sudo -u $MISO_USERNAME chmod +x /home/$MISO_USERNAME/Desktop/Peracotta.desktop
 
-sudo -u $MISO_USERNAME cp ./PeracottaGUI.desktop /home/$MISO_USERNAME/Desktop
-sudo -u $MISO_USERNAME cp ./peracotta_gui.png /home/$MISO_USERNAME/.config/peracotta_gui.png
-sudo -u $MISO_USERNAME chmod +x /home/$MISO_USERNAME/Desktop/PeracottaGUI.desktop
+sudo -u $MISO_USERNAME cp ./Peracruda.desktop /home/$MISO_USERNAME/Desktop
+sudo -u $MISO_USERNAME cp ./peracruda.png /home/$MISO_USERNAME/.config/peracruda.png
+sudo -u $MISO_USERNAME chmod +x /home/$MISO_USERNAME/Desktop/Peracruda.desktop
 
 echo "=== Pointerkeys thing ==="
 sudo -u $MISO_USERNAME mkdir -p /home/$MISO_USERNAME/.config/autostart

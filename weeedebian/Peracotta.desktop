@@ -1,9 +1,8 @@
 [Desktop Entry]
 Version=1.0
 Type=Application
-Name=Peracruda
-Comment=Start peracotta (cruda) in a terminal
-Terminal=true
-Exec=sh -c '/home/weee/peracotta/peracruda; echo "Press enter to exit"; read FOO'
+Name=Peracotta GUI
+Comment=Start peracotta GUI
+Exec=/home/weee/peracotta/peracotta
 Icon=/home/weee/.config/peracotta.png
 Path=/home/weee/peracotta
