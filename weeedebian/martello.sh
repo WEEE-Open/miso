@@ -7,9 +7,15 @@ echo "Martello is starting!"
 echo "=== Install kernel and systemd ==="
 export DEBIAN_FRONTEND=noninteractive
 apt-get -qq update -y -o Dpkg::Use-Pty=false
+if [[ "$MISO_ARCH" == "i386" ]]; then
+	# There's also 686-pae
+	LINUX_IMAGE_ARCH="686"
+else
+	LINUX_IMAGE_ARCH=$MISO_ARCH
+fi
 apt-get -qq install -y -o Dpkg::Use-Pty=false \
     --no-install-recommends \
-    linux-image-$MISO_ARCH \
+    linux-image-$LINUX_IMAGE_ARCH \
     live-boot \
     systemd-sysv \
     apt-utils \
