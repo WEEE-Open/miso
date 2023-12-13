@@ -6,6 +6,7 @@ echo "Martello is starting!"
 set -xe
 echo "=== Install kernel and systemd ==="
 export DEBIAN_FRONTEND=noninteractive
+apt-get clean -y
 apt-get update -y
 if [[ "$MISO_ARCH" == "i386" ]]; then
 	# There's also 686-pae
@@ -13,6 +14,8 @@ if [[ "$MISO_ARCH" == "i386" ]]; then
 else
 	LINUX_IMAGE_ARCH=$MISO_ARCH
 fi
+
+echo $LINUX_IMAGE_ARCH
 apt-get install -y  \
     --no-install-recommends \
     linux-image-$LINUX_IMAGE_ARCH \

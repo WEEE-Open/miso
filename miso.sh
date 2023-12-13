@@ -54,6 +54,7 @@ done
 while [[ -z "$MISO_USERNAME" ]]; do
   echo -n "Username: "
   read MISO_USERNAME
+  stty echo
 done
 
 while [[ -z $MISO_USERPASSWD ]]; do
