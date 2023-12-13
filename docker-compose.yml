@@ -1,8 +1,10 @@
-name: miso
+version: "3"
+
 services:
     miso:
         container_name: miso
         stdin_open: true
+        tty: true
         volumes:
             - ./build:/build:rw
             - ./weeedebian:/weeedebian:ro
@@ -13,5 +15,4 @@ services:
             - MISO_USERNAME=weee
             - MISO_USERPASSWD=asd
             - MISO_ARCH=amd64
-            - MISO_NO_SUDO=1
         build: .
