@@ -15,7 +15,6 @@ else
 	LINUX_IMAGE_ARCH=$MISO_ARCH
 fi
 
-echo $LINUX_IMAGE_ARCH
 apt-get install -y  \
     --no-install-recommends \
     linux-image-$LINUX_IMAGE_ARCH \
@@ -27,6 +26,7 @@ apt-get install -y  \
 # this has to be done before sudo
 echo "=== Set hostname ==="
 echo "$MISO_HOSTNAME" > /etc/hostname
+mkdir -p /etc/NetworkManager
 cp ./NetworkManager.conf /etc/NetworkManager/NetworkManager.conf
 # HOSTNAME is the docker one, but it cannot be changed from
 # the inside and is absolutely necessary to be set for sudo
