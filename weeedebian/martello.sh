@@ -5,7 +5,7 @@
 echo "Martello is starting!"
 
 echo "=== Install kernel and systemd ==="
-#export DEBIAN_FRONTEND=noninteractive
+export DEBIAN_FRONTEND=noninteractive
 apt-get update -y
 if [[ "$MISO_ARCH" == "i386" ]]; then
 	# There's also 686-pae
