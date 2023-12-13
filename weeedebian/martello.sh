@@ -85,8 +85,6 @@ apt-get  install -y  \
     firmware-brcm80211 \
     firmware-cavium \
     firmware-intel-sound \
-    firmware-ipw2x00 \
-    firmware-ivtv \
     firmware-iwlwifi \
     firmware-libertas \
     firmware-linux \
