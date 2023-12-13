@@ -100,8 +100,8 @@ else
     http://ftp.it.debian.org/debian/
 fi
 
-rm -rf "$MISO_BUILD_DIR/chroot/source" 2>/dev/null
-cp -r $_MISO_SOURCE_DIR "$MISO_BUILD_DIR/chroot/source"
+$MISO_SUDO rm -rf "$MISO_BUILD_DIR/chroot/source" 2>/dev/null
+$MISO_SUDO cp -r $_MISO_SOURCE_DIR "$MISO_BUILD_DIR/chroot/source"
 # Get rid of some warnings: https://wiki.debian.org/chroot (does not work inside docker)
 # $SUDO mount --bind /dev/pts "$MISO_BUILD_DIR/chroot/dev/pts"
 cat << EOF | $MISO_SUDO chroot $MISO_BUILD_DIR/chroot
@@ -116,7 +116,7 @@ export MISO_ARCH "$MISO_ARCH"
 cd /source
 bash ./$_MISO_SOURCE_SCRIPT
 EOF
-rm -rf "$MISO_BUILD_DIR/chroot/source" 2>/dev/null
+$MISO_SUDO rm -rf "$MISO_BUILD_DIR/chroot/source" 2>/dev/null
 #$SUDO umount "$MISO_BUILD_DIR/chroot/dev/pts"
 
 #echo "TEST POINT"
@@ -144,9 +144,9 @@ if [[ $? -ne 0 ]]; then
     -e boot $MISO_MKSQUASHFS_MEM
 fi
 
-cp $MISO_BUILD_DIR/chroot/boot/vmlinuz-* \
+$MISO_SUDO cp $MISO_BUILD_DIR/chroot/boot/vmlinuz-* \
     $MISO_BUILD_DIR/staging/live/vmlinuz-live && \
-cp $MISO_BUILD_DIR/chroot/boot/initrd.img-* \
+$MISO_SUDO cp $MISO_BUILD_DIR/chroot/boot/initrd.img-* \
     $MISO_BUILD_DIR/staging/live/initrd.img
 
 echo -e "${_BLUE}Building bootloader ...${_RESET_COLOR}"
@@ -207,9 +207,9 @@ EOF
 
 touch $MISO_BUILD_DIR/staging/DEBIAN_CUSTOM
 
-cp /usr/lib/ISOLINUX/isolinux.bin "$MISO_BUILD_DIR/staging/isolinux/"
-cp /usr/lib/syslinux/modules/bios/* "$MISO_BUILD_DIR/staging/isolinux/"
-cp -r /usr/lib/grub/x86_64-efi/* "$MISO_BUILD_DIR/staging/boot/grub/x86_64-efi/"
+$MISO_SUDO cp /usr/lib/ISOLINUX/isolinux.bin "$MISO_BUILD_DIR/staging/isolinux/"
+$MISO_SUDO cp /usr/lib/syslinux/modules/bios/* "$MISO_BUILD_DIR/staging/isolinux/"
+$MISO_SUDO cp -r /usr/lib/grub/x86_64-efi/* "$MISO_BUILD_DIR/staging/boot/grub/x86_64-efi/"
 
 grub-mkstandalone \
     --format=x86_64-efi \
