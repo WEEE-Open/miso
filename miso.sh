@@ -21,9 +21,9 @@ if [[ -z "$MISO_CHROOT_SCRIPT" ]]; then
 fi
 
 if [[ -z "$MISO_NO_SUDO" ]]; then
-    _SUDO="sudo"
+    MISO_SUDO="sudo"
 else
-    _SUDO=""
+    MISO_SUDO=""
 fi
 
 if [[ -z "$MISO_ARCH" ]]; then
