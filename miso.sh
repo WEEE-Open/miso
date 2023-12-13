@@ -104,7 +104,9 @@ fi
 $MISO_SUDO rm -rf "$MISO_BUILD_DIR/chroot/source" 2>/dev/null
 $MISO_SUDO cp -r $_MISO_SOURCE_DIR "$MISO_BUILD_DIR/chroot/source"
 # Get rid of some warnings: https://wiki.debian.org/chroot (does not work inside docker)
-# $SUDO mount --bind /dev/pts "$MISO_BUILD_DIR/chroot/dev/pts"
+$MISO_SUDO mount --bind /dev/pts "$MISO_BUILD_DIR/chroot/dev/pts"
+$MISO_SUDO mount -o bind /proc "$MISO_BUILD_DIR/chroot/proc"
+
 cat << EOF | $MISO_SUDO chroot $MISO_BUILD_DIR/chroot
 set +m
 
