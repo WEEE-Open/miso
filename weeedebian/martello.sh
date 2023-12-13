@@ -26,8 +26,6 @@ apt-get install -y  \
 # this has to be done before sudo
 echo "=== Set hostname ==="
 echo "$MISO_HOSTNAME" > /etc/hostname
-mkdir -p /etc/NetworkManager
-cp ./NetworkManager.conf /etc/NetworkManager/NetworkManager.conf
 # HOSTNAME is the docker one, but it cannot be changed from
 # the inside and is absolutely necessary to be set for sudo
 # to determine that localhost is localhost
@@ -149,7 +147,10 @@ apt-get  install -y  \
     xserver-xorg \
     zsh
 update-ca-certificates
+
 systemctl disable smartd
+
+$MISO_SUDO cp ./NetworkManager.conf /etc/NetworkManager/NetworkManager.conf
 systemctl enable NetworkManager
 
 echo "=== User configuration ==="
