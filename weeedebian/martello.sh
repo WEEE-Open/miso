@@ -5,15 +5,15 @@
 echo "Martello is starting!"
 
 echo "=== Install kernel and systemd ==="
-export DEBIAN_FRONTEND=noninteractive
-apt-get -qq update -y -o Dpkg::Use-Pty=false
+#export DEBIAN_FRONTEND=noninteractive
+apt-get update -y
 if [[ "$MISO_ARCH" == "i386" ]]; then
 	# There's also 686-pae
 	LINUX_IMAGE_ARCH="686"
 else
 	LINUX_IMAGE_ARCH=$MISO_ARCH
 fi
-apt-get -qq install -y -o Dpkg::Use-Pty=false \
+apt-get install -y  \
     --no-install-recommends \
     linux-image-$LINUX_IMAGE_ARCH \
     live-boot \
@@ -56,15 +56,15 @@ echo "=== Software installation ==="
 _RESULT="$(apt-add-repository non-free 2>&1)"
 echo $_RESULT
 if [[ ! $_RESULT =~ "is already enabled" ]]; then
-apt-get -qq update -y -o Dpkg::Use-Pty=false
+apt-get  update -y
 fi
 # Remove useless packages, courtesy of "wajig large". Cool command.
 # Do not remove mousepad, it removes xfce-goodies too
 #/bin/bash -c 'DEBIAN_FRONTEND=noninteractive apt-get purge --auto-remove -y libreoffice libreoffice-core libreoffice-common ispell* gimp gimp-* aspell* hunspell* mythes* *sunpinyin* wpolish wnorwegian tegaki* task-thai task-thai-desktop xfonts-thai xiterm* task-khmer task-khmer-desktop fonts-khmeros khmerconverter'
 # Upgrade and install useful packages
-apt-get -qq upgrade -y -o Dpkg::Use-Pty=false
+apt-get  upgrade -y
 # libxkbcommon-x11-0 may be not needed (see Add library to installation if needed #28)
-apt-get -qq install -y -o Dpkg::Use-Pty=false \
+apt-get  install -y  \
     apt-transport-https \
     ca-certificates \
     cifs-utils \
@@ -207,49 +207,15 @@ cp ./toprc /root/.toprc
 sudo -u $MISO_USERNAME cp ./toprc /home/$MISO_USERNAME/.toprc
 
 echo "=== Prepare peracotta ==="
-apt-get -qq install -y python3-pip -o Dpkg::Use-Pty=false
-# PyQt > 5.14.0 requires an EXTREMELY RECENT version of pip,
-# on the most bleeding of all bleeding edges
-# python3 -m pip install --quiet --upgrade pip
+apt-get  install -y python3-pip
 
 cp ./peracotta_update /etc/cron.d/peracotta_update
-
-if [[ -d "/home/$MISO_USERNAME/peracotta" ]]; then
-  sudo -u $MISO_USERNAME git -C /home/$MISO_USERNAME/peracotta pull --ff-only
-else
-  sudo -u $MISO_USERNAME mkdir -p /home/$MISO_USERNAME/peracotta
-  sudo -u $MISO_USERNAME git clone https://github.com/WEEE-Open/peracotta.git /home/$MISO_USERNAME/peracotta
-fi
+pip install peracotta
 
 #sudo -u $MISO_USERNAME sh -c 'cd /home/$MISO_USERNAME/peracotta && python3 polkit.py'
+mkdir -p /home/$MISO_USERNAME/peracotta # Ensure the dir exists
 sudo -u $MISO_USERNAME cp ./features.json /home/$MISO_USERNAME/peracotta/features.json
 
-if [[ "$MISO_ARCH" == "i386" ]]; then
-  echo "===== Begin incredible workaround for PyQt on 32 bit ====="
-  apt-get -qq install -y python3-pyqt5 -o Dpkg::Use-Pty=false
-  sudo -u $MISO_USERNAME /bin/bash -c "grep -vi pyqt /home/$MISO_USERNAME/peracotta/requirements.txt > /home/$MISO_USERNAME/peracotta/requirements32.txt"
-  pip3 --quiet install -r /home/$MISO_USERNAME/peracotta/requirements32.txt
-  rm -f /home/$MISO_USERNAME/peracotta/requirements32.txt
-  echo "===== End incredible workaround for PyQt on 32 bit ====="
-else
-  # apt-get -qq autoremove -y python3-pyqt5 -o Dpkg::Use-Pty=false
-  pip3 --quiet install -r /home/$MISO_USERNAME/peracotta/requirements.txt
-fi
-
-PERACOTTA_GENERATE_FILES=$(sudo -u $MISO_USERNAME find /home/$MISO_USERNAME/peracotta -name generate_files.sh -print -quit)
-PERACOTTA_CLI=/home/$MISO_USERNAME/peracotta/peracruda
-PERACOTTA_GUI=/home/$MISO_USERNAME/peracotta/peracotta
-
-if [[ -f "$PERACOTTA_GENERATE_FILES" ]]; then
-  sudo -u $MISO_USERNAME chmod +x "$PERACOTTA_GENERATE_FILES"
-  ln -sf "$PERACOTTA_GENERATE_FILES" /usr/bin/generate_files
-fi
-if [[ -f "$PERACOTTA_CLI" ]]; then
-  sudo -u $MISO_USERNAME chmod +x "$PERACOTTA_CLI"
-fi
-if [[ -f "$PERACOTTA_GUI" ]]; then
-  sudo -u $MISO_USERNAME chmod +x "$PERACOTTA_GUI"
-fi
 
 echo "=== Add env to peracotta ==="
 if [[ -f "./env.txt" ]]; then
@@ -328,9 +294,9 @@ printf "ExecStart=-/sbin/agetty --noissue --autologin weee %%I $TERM" >> /etc/sy
 
 echo "=== Final cleanup ==="
 # Remove unused packages
-apt-get -qq autoremove -y -o Dpkg::Use-Pty=false
+apt-get  autoremove -y
 # Clean the cache
-apt-get -qq clean -y -o Dpkg::Use-Pty=false
+apt-get  clean -y
 rm -rf /var/lib/apt/lists/*
 
 echo "=== Set hostname part 2 ==="
