@@ -109,11 +109,11 @@ cat << EOF | $MISO_SUDO chroot $MISO_BUILD_DIR/chroot
 set +m
 
 # Subsitution is done outside the chroot
-export MISO_HOSTNAME "$MISO_HOSTNAME"
-export MISO_ROOTPASSWD "$MISO_ROOTPASSWD"
-export MISO_USERNAME "$MISO_USERNAME"
-export MISO_USERPASSWD "$MISO_USERPASSWD"
-export MISO_ARCH "$MISO_ARCH"
+export MISO_HOSTNAME
+export MISO_ROOTPASSWD
+export MISO_USERNAME
+export MISO_USERPASSWD
+export MISO_ARCH
 cd /source
 bash ./$_MISO_SOURCE_SCRIPT
 EOF
