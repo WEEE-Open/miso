@@ -1,1 +1,1 @@
-@reboot weee git -C /home/weee/peracotta pull &>/dev/null
+@reboot weee pip install --upgrade peracotta
