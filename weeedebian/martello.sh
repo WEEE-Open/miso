@@ -76,11 +76,29 @@ apt-get  install -y  \
     dnsutils \
     fbxkb \
     firefox-esr \
-    firmware-nonfree \
     firmware-amd-graphics \
-    firmware-ath9k-htc \
+    firmware-atheros \
+    firmware-bnx2 \
+    firmware-bnx2x \
+    firmware-brcm80211 \
+    firmware-cavium \
+    firmware-intel-sound \
+    firmware-ipw2x00 \
+    firmware-ivtv \
     firmware-iwlwifi \
+    firmware-libertas \
     firmware-linux \
+    firmware-linux-nonfree \
+    firmware-misc-nonfree \
+    firmware-myricom \
+    firmware-netronome \
+    firmware-netxen \
+    firmware-qcom-media \
+    firmware-qcom-soc \
+    firmware-qlogic \
+    firmware-realtek \
+    firmware-samsung \
+    firmware-siano \
     firmware-ti-connectivity \
     geany \
     git \
