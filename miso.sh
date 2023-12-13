@@ -109,13 +109,14 @@ cat << EOF | $MISO_SUDO chroot $MISO_BUILD_DIR/chroot
 set +m
 
 # Subsitution is done outside the chroot
-export MISO_HOSTNAME
-export MISO_ROOTPASSWD
-export MISO_USERNAME
-export MISO_USERPASSWD
-export MISO_ARCH
+# export MISO_HOSTNAME
+# export MISO_ROOTPASSWD
+# export MISO_USERNAME
+# export MISO_USERPASSWD
+# export MISO_ARCH
+# For some reason export doesn't work in GH CI?
 cd /source
-bash ./$_MISO_SOURCE_SCRIPT
+MISO_ARCH=$MISO_ARCH MISO_USERPASSWD=$MISO_USERPASSWD MISO_USERNAME=$MISO_USERNAME MISO_ROOTPASSWD=$MISO_ROOTPASSWD MISO_HOSTNAME=$MISO_HOSTNAME bash ./$_MISO_SOURCE_SCRIPT
 EOF
 $MISO_SUDO rm -rf "$MISO_BUILD_DIR/chroot/source" 2>/dev/null
 #$SUDO umount "$MISO_BUILD_DIR/chroot/dev/pts"
