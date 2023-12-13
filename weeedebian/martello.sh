@@ -3,7 +3,7 @@
 # export PATH="$PATH:/usr/sbin:/usr/bin:/sbin:/bin"
 
 echo "Martello is starting!"
-set -xe
+set -x
 echo "=== Install kernel and systemd ==="
 export DEBIAN_FRONTEND=noninteractive
 apt-get clean -y
