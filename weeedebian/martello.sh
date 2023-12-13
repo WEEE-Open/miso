@@ -56,11 +56,11 @@ cp ./fix_etc_hosts /etc/cron.d/fix_etc_hosts
 
 echo "=== Software installation ==="
 # Add non-free repo and update to pull in all the good firmware
-_RESULT="$(apt-add-repository non-free non-free-firmware 2>&1)"
-echo $_RESULT
-if [[ ! $_RESULT =~ "is already enabled" ]]; then
+apt-add-repository non-free 2>&1
+apt-add-repository non-free-firmware 2>&1
+
 apt-get  update -y
-fi
+
 # Remove useless packages, courtesy of "wajig large". Cool command.
 # Do not remove mousepad, it removes xfce-goodies too
 #/bin/bash -c 'DEBIAN_FRONTEND=noninteractive apt-get purge --auto-remove -y libreoffice libreoffice-core libreoffice-common ispell* gimp gimp-* aspell* hunspell* mythes* *sunpinyin* wpolish wnorwegian tegaki* task-thai task-thai-desktop xfonts-thai xiterm* task-khmer task-khmer-desktop fonts-khmeros khmerconverter'
