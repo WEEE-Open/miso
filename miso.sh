@@ -96,7 +96,7 @@ else
   $MISO_SUDO debootstrap \
     --arch=$MISO_ARCH \
     --variant=minbase \
-    stable \
+    oldstable \
     $MISO_BUILD_DIR/chroot \
     http://ftp.it.debian.org/debian/
 fi
@@ -114,7 +114,9 @@ set +m
 # export MISO_USERNAME
 # export MISO_USERPASSWD
 # export MISO_ARCH
+
 # For some reason export doesn't work in GH CI?
+
 cd /source
 MISO_ARCH=$MISO_ARCH MISO_USERPASSWD=$MISO_USERPASSWD MISO_USERNAME=$MISO_USERNAME MISO_ROOTPASSWD=$MISO_ROOTPASSWD MISO_HOSTNAME=$MISO_HOSTNAME bash ./$_MISO_SOURCE_SCRIPT
 EOF
