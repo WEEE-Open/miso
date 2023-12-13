@@ -56,7 +56,7 @@ cp ./fix_etc_hosts /etc/cron.d/fix_etc_hosts
 
 echo "=== Software installation ==="
 # Add non-free repo and update to pull in all the good firmware
-_RESULT="$(apt-add-repository non-free 2>&1)"
+_RESULT="$(apt-add-repository non-free non-free-firmware 2>&1)"
 echo $_RESULT
 if [[ ! $_RESULT =~ "is already enabled" ]]; then
 apt-get  update -y
@@ -76,9 +76,9 @@ apt-get  install -y  \
     dnsutils \
     fbxkb \
     firefox-esr \
+    firmware-nonfree \
     firmware-amd-graphics \
     firmware-ath9k-htc \
-    firmware-atheros \
     firmware-iwlwifi \
     firmware-linux \
     firmware-ti-connectivity \
