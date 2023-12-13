@@ -57,7 +57,9 @@ cp ./fix_etc_hosts /etc/cron.d/fix_etc_hosts
 echo "=== Software installation ==="
 # Add non-free repo and update to pull in all the good firmware
 apt-add-repository non-free 2>&1
-apt-add-repository non-free-firmware 2>&1
+
+# will be needed when upgrading to new versions
+# apt-add-repository non-free-firmware 2>&1
 
 apt-get  update -y
 
