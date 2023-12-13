@@ -13,7 +13,7 @@ jobs:
         - name: Install dependencies
           run: sudo apt-get update && sudo apt-get install -y debootstrap squashfs-tools dosfstools xorriso isolinux syslinux-efi grub-pc-bin grub-efi-amd64-bin mtools debian-archive-keyring isolinux syslinux
         - name: Run M.I.S.O.
-          run: bash ./miso.sh build weeedebian/martello.sh amd64
+          run: ./miso.sh build weeedebian/martello.sh amd64
         - uses: actions/upload-artifact@v3
           with:
             name: weeedebian-amd64
