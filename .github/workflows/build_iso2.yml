@@ -1,0 +1,31 @@
+on: push
+name: build iso
+defaults:
+  run:
+    shell: bash
+    working-directory: .
+jobs:
+  build_iso:
+    name: Build weeedebian ISO
+    runs-on: ubuntu-22.04
+    steps:
+        - uses: actions/checkout@v4
+        - name: Install dependencies
+          run: sudo apt-get update && sudo apt-get install -y debootstrap squashfs-tools dosfstools xorriso isolinux syslinux-efi grub-pc-bin grub-efi-amd64-bin mtools debian-archive-keyring isolinux syslinux
+        - name: Run M.I.S.O.
+          env:
+            MISO_HOSTNAME: weeedebian
+            MISO_ROOTPASSWD: asd
+            MISO_USERNAME: weee
+            MISO_USERPASSWD: asd
+            MISO_ARCH: amd64
+            MISO_CHROOT_SCRIPT: weeedebian/martello.sh
+            MISO_BUILD_DIR: build
+          run: ./miso.sh
+          shell: bash
+
+        - uses: actions/upload-artifact@v3
+          with:
+            name: weeedebian-amd64
+            path: build/weeedebian/weeedebian-amd64.iso
+            if-no-files-found: error # 'warn' or 'ignore' are also available, defaults to `warn`
