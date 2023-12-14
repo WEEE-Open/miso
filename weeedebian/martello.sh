@@ -180,8 +180,6 @@ chsh -s /bin/zsh root
 # chsh -s /bin/zsh weee
 sudo -u $MISO_USERNAME curl -L -o /home/$MISO_USERNAME/.zshrc https://git.grml.org/f/grml-etc-core/etc/zsh/zshrc
 cp /home/$MISO_USERNAME/.zshrc /root/.zshrc
-echo "path+=('$HOME/.local/bin')" >> /root/.zshrc.local
-echo "export PATH=$PATH:$HOME/.local/bin" >> /root/.bashrc
 
 sudo -u $MISO_USERNAME rm /home/$MISO_USERNAME/.bash_history  >/dev/null 2>/dev/null
 rm /root/.bash_history >/dev/null 2>/dev/null
@@ -236,12 +234,12 @@ sudo -u $MISO_USERNAME cp ./toprc /home/$MISO_USERNAME/.toprc
 echo "=== Prepare peracotta ==="
 apt-get  install -y python3-pip
 pip install pipx
-
+pipx ensurepath
 cp ./peracotta_update /etc/cron.d/peracotta_update
 pipx install peracotta
 
 #sudo -u $MISO_USERNAME sh -c 'cd /home/$MISO_USERNAME/peracotta && python3 polkit.py'
-mkdir -p /home/$MISO_USERNAME/peracotta # Ensure the dir exists
+mkdir -p /home/$MISO_USERNAME/.config/peracotta # Ensure the dir exists
 sudo -u $MISO_USERNAME cp ./features.json /home/$MISO_USERNAME/.config/peracotta/features.json
 
 
@@ -294,11 +292,11 @@ if [[ -f "/home/$MISO_USERNAME/Desktop/PeracottaGUI.desktop" ]]; then
   rm -f "/home/$MISO_USERNAME/Desktop/PeracottaGUI.desktop"
 fi
 sudo -u $MISO_USERNAME cp ./Peracotta.desktop /home/$MISO_USERNAME/Desktop
-sudo -u $MISO_USERNAME cp ./peracotta.png /home/$MISO_USERNAME/.config/peracotta.png
+sudo -u $MISO_USERNAME cp ./peracotta.png /home/$MISO_USERNAME/.config/peracotta/peracotta.png
 sudo -u $MISO_USERNAME chmod +x /home/$MISO_USERNAME/Desktop/Peracotta.desktop
 
 sudo -u $MISO_USERNAME cp ./Peracruda.desktop /home/$MISO_USERNAME/Desktop
-sudo -u $MISO_USERNAME cp ./peracruda.png /home/$MISO_USERNAME/.config/peracruda.png
+sudo -u $MISO_USERNAME cp ./peracruda.png /home/$MISO_USERNAME/.config/peracotta/peracruda.png
 sudo -u $MISO_USERNAME chmod +x /home/$MISO_USERNAME/Desktop/Peracruda.desktop
 
 echo "=== Pointerkeys thing ==="
