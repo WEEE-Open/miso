@@ -123,10 +123,11 @@ set +m
 cd /source
 MISO_ARCH=$MISO_ARCH MISO_USERPASSWD=$MISO_USERPASSWD MISO_USERNAME=$MISO_USERNAME MISO_ROOTPASSWD=$MISO_ROOTPASSWD MISO_HOSTNAME=$MISO_HOSTNAME bash ./$_MISO_SOURCE_SCRIPT
 EOF
+
 $MISO_SUDO rm -rf "$MISO_BUILD_DIR/chroot/source" 2>/dev/null
-$MISO_SUDO umount "$MISO_BUILD_DIR/chroot/dev/pts"
-$MISO_SUDO umount "$MISO_BUILD_DIR/chroot/proc"
-$MISO_SUDO umount "$MISO_BUILD_DIR/chroot/run"
+#$MISO_SUDO umount "$MISO_BUILD_DIR/chroot/dev/pts"
+#$MISO_SUDO umount "$MISO_BUILD_DIR/chroot/proc"
+#$MISO_SUDO umount "$MISO_BUILD_DIR/chroot/run"
 #echo "TEST POINT"
 #exit 0
 
