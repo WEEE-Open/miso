@@ -131,8 +131,8 @@ apt-get  install -y  \
     pciutils \
     python3 \
     python3-venv \
-    pipx \
     python-is-python3 \
+    libxcb-cursor0 \
     rsync \
     smartmontools \
     strace \
@@ -235,18 +235,19 @@ sudo -u $MISO_USERNAME cp ./toprc /home/$MISO_USERNAME/.toprc
 
 echo "=== Prepare peracotta ==="
 apt-get  install -y python3-pip
+pip install pipx
 
 cp ./peracotta_update /etc/cron.d/peracotta_update
 pipx install peracotta
 
 #sudo -u $MISO_USERNAME sh -c 'cd /home/$MISO_USERNAME/peracotta && python3 polkit.py'
 mkdir -p /home/$MISO_USERNAME/peracotta # Ensure the dir exists
-sudo -u $MISO_USERNAME cp ./features.json /home/$MISO_USERNAME/peracotta/features.json
+sudo -u $MISO_USERNAME cp ./features.json /home/$MISO_USERNAME/.config/peracotta/features.json
 
 
 echo "=== Add env to peracotta ==="
 if [[ -f "./env.txt" ]]; then
-  sudo -u $MISO_USERNAME cp ./env.txt /home/$MISO_USERNAME/peracotta/.env
+  sudo -u $MISO_USERNAME cp ./env.txt /home/$MISO_USERNAME/.config/peracotta/.env
 else
   echo "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
   echo "@                                                          @"
