@@ -4,6 +4,6 @@ Type=Application
 Name=Peracruda
 Comment=Start peracruda (peracotta CLI)
 Terminal=true
-Exec=sh -c '/home/weee/peracotta/peracruda; echo "Press enter to exit"; read FOO'
+Exec=peracruda; echo "Press enter to exit"; read FOO'
 Icon=/home/weee/.config/peracotta/peracruda.png
 Path=/home/weee/peracotta
