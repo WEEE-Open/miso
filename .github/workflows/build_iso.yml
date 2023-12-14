@@ -26,6 +26,6 @@ jobs:
 
         - uses: actions/upload-artifact@v3
           with:
-            name: weeedebian_amd64.iso
+            name: weeedebian_amd64
             path: build/weeedebian-amd64/weeedebian-amd64.iso
             if-no-files-found: error # 'warn' or 'ignore' are also available, defaults to `warn`
