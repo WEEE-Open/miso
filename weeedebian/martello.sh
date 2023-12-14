@@ -241,7 +241,7 @@ sudo -u $MISO_USERNAME pipx install peracotta
 cp ./peracotta_update /etc/cron.d/peracotta_update
 
 #sudo -u $MISO_USERNAME sh -c 'cd /home/$MISO_USERNAME/peracotta && python3 polkit.py'
-mkdir -p /home/$MISO_USERNAME/.config/peracotta # Ensure the dir exists
+sudo -u $MISO_USERNAME mkdir -p /home/$MISO_USERNAME/.config/peracotta # Ensure the dir exists
 sudo -u $MISO_USERNAME cp ./features.json /home/$MISO_USERNAME/.config/peracotta/features.json
 
 
