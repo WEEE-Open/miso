@@ -1,1 +1,1 @@
-@reboot weee pip install --upgrade peracotta
+@reboot weee pipx upgrade peracotta

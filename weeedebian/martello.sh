@@ -130,6 +130,8 @@ apt-get  install -y  \
     openssl \
     pciutils \
     python3 \
+    python3-venv \
+    pipx \
     python-is-python3 \
     rsync \
     smartmontools \
@@ -178,6 +180,9 @@ chsh -s /bin/zsh root
 # chsh -s /bin/zsh weee
 sudo -u $MISO_USERNAME curl -L -o /home/$MISO_USERNAME/.zshrc https://git.grml.org/f/grml-etc-core/etc/zsh/zshrc
 cp /home/$MISO_USERNAME/.zshrc /root/.zshrc
+echo "path+=('$HOME/.local/bin')" >> /root/.zshrc.local
+echo "export PATH=$PATH:$HOME/.local/bin" >> /root/.bashrc
+
 sudo -u $MISO_USERNAME rm /home/$MISO_USERNAME/.bash_history  >/dev/null 2>/dev/null
 rm /root/.bash_history >/dev/null 2>/dev/null
 
@@ -232,7 +237,7 @@ echo "=== Prepare peracotta ==="
 apt-get  install -y python3-pip
 
 cp ./peracotta_update /etc/cron.d/peracotta_update
-pip install peracotta
+pipx install peracotta
 
 #sudo -u $MISO_USERNAME sh -c 'cd /home/$MISO_USERNAME/peracotta && python3 polkit.py'
 mkdir -p /home/$MISO_USERNAME/peracotta # Ensure the dir exists
