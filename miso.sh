@@ -104,9 +104,10 @@ fi
 $MISO_SUDO rm -rf "$MISO_BUILD_DIR/chroot/source" 2>/dev/null
 $MISO_SUDO cp -r $_MISO_SOURCE_DIR "$MISO_BUILD_DIR/chroot/source"
 # Get rid of some warnings: https://wiki.debian.org/chroot (does not work inside docker)
-$MISO_SUDO mount --rbind /dev/pts "$MISO_BUILD_DIR/chroot/dev/pts"
-$MISO_SUDO mount --rbind /proc "$MISO_BUILD_DIR/chroot/proc"
-$MISO_SUDO mount --rbind /run "$MISO_BUILD_DIR/chroot/run"
+
+$MISO_SUDO mount -t proc none $MISO_BUILD_DIR/chroot/proc
+$MISO_SUDO mount -o bind /dev $MISO_BUILD_DIR/chroot/dev
+$MISO_SUDO mount -o bind /sys $MISO_BUILD_DIR/chroot/sys
 
 cat << EOF | $MISO_SUDO chroot $MISO_BUILD_DIR/chroot
 set +m
@@ -125,16 +126,16 @@ MISO_ARCH=$MISO_ARCH MISO_USERPASSWD=$MISO_USERPASSWD MISO_USERNAME=$MISO_USERNA
 EOF
 
 $MISO_SUDO rm -rf "$MISO_BUILD_DIR/chroot/source" 2>/dev/null
-#$MISO_SUDO umount "$MISO_BUILD_DIR/chroot/dev/pts"
-#$MISO_SUDO umount "$MISO_BUILD_DIR/chroot/proc"
-#$MISO_SUDO umount "$MISO_BUILD_DIR/chroot/run"
+$MISO_SUDO umount $MISO_BUILD_DIR/chroot/dev
+$MISO_SUDO umount $MISO_BUILD_DIR/chroot/proc
+$MISO_SUDO umount $MISO_BUILD_DIR/chroot/run
 #echo "TEST POINT"
 #exit 0
 
-if [[ -z "$MISO_MKSQUASHFS_MEM" ]]; then
-    echo "Limiting mksquashfs memory to: $MISO_MKSQUASHFS_MEM"
-    MISO_MKSQUASHFS_MEM="-mem $MISO_MKSQUASHFS_MEM"
-fi
+#if [[ -z "$MISO_MKSQUASHFS_MEM" ]]; then
+#    echo "Limiting mksquashfs memory to: $MISO_MKSQUASHFS_MEM"
+#    MISO_MKSQUASHFS_MEM="-mem $MISO_MKSQUASHFS_MEM"
+#fi
 
 # Create directory tree
 mkdir -p $MISO_BUILD_DIR/{staging/{EFI/boot,boot/grub/x86_64-efi,isolinux,live},tmp}
@@ -145,13 +146,13 @@ $MISO_SUDO mksquashfs \
     $MISO_BUILD_DIR/chroot \
     $MISO_BUILD_DIR/staging/live/filesystem.squashfs \
     -e boot $MISO_MKSQUASHFS_MEM
-if [[ $? -ne 0 ]]; then
-  $MISO_SUDO rm -f "$MISO_BUILD_DIR/staging/live/filesystem.squashfs"
-  $MISO_SUDO mksquashfs \
-    $MISO_BUILD_DIR/chroot \
-    $MISO_BUILD_DIR/staging/live/filesystem.squashfs \
-    -e boot $MISO_MKSQUASHFS_MEM
-fi
+#if [[ $? -ne 0 ]]; then
+#  $MISO_SUDO rm -f "$MISO_BUILD_DIR/staging/live/filesystem.squashfs"
+#  $MISO_SUDO mksquashfs \
+#    $MISO_BUILD_DIR/chroot \
+#    $MISO_BUILD_DIR/staging/live/filesystem.squashfs \
+#    -e boot $MISO_MKSQUASHFS_MEM
+#fi
 
 $MISO_SUDO cp $MISO_BUILD_DIR/chroot/boot/vmlinuz-* \
     $MISO_BUILD_DIR/staging/live/vmlinuz-live && \
