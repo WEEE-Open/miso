@@ -234,9 +234,11 @@ sudo -u $MISO_USERNAME cp ./toprc /home/$MISO_USERNAME/.toprc
 echo "=== Prepare peracotta ==="
 apt-get  install -y python3-pip
 pip install pipx
-pipx ensurepath
+
+sudo -u $MISO_USERNAME pipx ensurepath
+sudo -u $MISO_USERNAME pipx install peracotta
+
 cp ./peracotta_update /etc/cron.d/peracotta_update
-pipx install peracotta
 
 #sudo -u $MISO_USERNAME sh -c 'cd /home/$MISO_USERNAME/peracotta && python3 polkit.py'
 mkdir -p /home/$MISO_USERNAME/.config/peracotta # Ensure the dir exists
