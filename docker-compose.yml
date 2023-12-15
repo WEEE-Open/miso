@@ -1,0 +1,19 @@
+version: "3"
+
+services:
+    miso:
+        hostname: weeedebian
+        container_name: miso
+        tty: true
+        volumes:
+            - ./build:/build:rw
+            - ./weeedebian:/weeedebian:ro
+        environment:
+            - MISO_CHROOT_SCRIPT=/weeedebian/martello.sh
+            - MISO_HOSTNAME=weeedebian
+            - MISO_ROOTPASSWD=asd
+            - MISO_USERNAME=weee
+            - MISO_USERPASSWD=asd
+            - MISO_ARCH=amd64
+            - MISO_BUILD_DIR=/build
+        build: .
