@@ -137,6 +137,7 @@ apt-get  install -y  \
     smartmontools \
     strace \
     sudo \
+    systemd-timesyncd \
     traceroute \
     wget \
     wireless-tools \
