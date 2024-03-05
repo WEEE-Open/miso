@@ -34,8 +34,6 @@ jobs:
             draft: true
             prerelease: false
             automatic_release_tag: v${{ steps.dotenv.outputs.version }}
-            tag_name: ${{ github.ref }}
-            # body_path: CHANGELOG.md:
             repo_token: ${{ github.token }}
             files: |
               ./build/weeedebian-amd64/weeedebian-amd64.iso
