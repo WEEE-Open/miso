@@ -27,14 +27,8 @@ jobs:
             MISO_ARCH: i386
           run: ./miso.sh
           shell: bash
-        - name: release
-          uses: "marvinpinto/action-automatic-releases@latest"
-          id: create_release
+        - uses: ncipollo/release-action@v1
           with:
-            draft: true
-            prerelease: false
-            automatic_release_tag: v${{ steps.dotenv.outputs.version }}
-            repo_token: ${{ github.token }}
-            files: |
-              ./build/weeedebian-amd64/weeedebian-amd64.iso
-              ./build/weeedebian-i386/weeedebian-i386.iso
+            artifacts: "./build/*/*.iso"
+            prerelease: true
+            tag: v${{ steps.dotenv.outputs.version }}
