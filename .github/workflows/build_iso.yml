@@ -28,31 +28,15 @@ jobs:
           run: ./miso.sh
           shell: bash
         - name: release
-          uses: actions/create-release@v1
+          uses: "marvinpinto/action-automatic-releases@latest"
           id: create_release
           with:
             draft: true
             prerelease: false
-            release_name: v${{ steps.dotenv.outputs.version }}
+            automatic_release_tag: v${{ steps.dotenv.outputs.version }}
             tag_name: ${{ github.ref }}
-            # body_path: CHANGELOG.md
-          env:
-            GITHUB_TOKEN: ${{ github.token }}
-        - name: upload am64 artifact
-          uses: actions/upload-release-asset@v1
-          env:
-            GITHUB_TOKEN: ${{ github.token }}
-          with:
-            upload_url: ${{ steps.create_release.outputs.upload_url }}
-            asset_path: ./build/weeedebian-amd64/weeedebian-amd64.iso
-            asset_name: weeedebian-amd64.iso
-            asset_content_type: application/gzip
-        - name: upload i386 artifact
-          uses: actions/upload-release-asset@v1
-          env:
-            GITHUB_TOKEN: ${{ github.token }}
-          with:
-            upload_url: ${{ steps.create_release.outputs.upload_url }}
-            asset_path: ./build/weeedebian-i386/weeedebian-i386.iso
-            asset_name: weeedebian-i386.iso
-            asset_content_type: application/gzip
+            # body_path: CHANGELOG.md:
+            repo_token: ${{ github.token }}
+            files: |
+              ./build/weeedebian-amd64/weeedebian-amd64.iso
+              ./build/weeedebian-i386/weeedebian-i386.iso
