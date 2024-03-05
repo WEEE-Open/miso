@@ -12,20 +12,23 @@ jobs:
         - uses: actions/checkout@v4
         - name: Install dependencies
           run: sudo apt-get update && sudo apt-get install -y debootstrap squashfs-tools dosfstools xorriso isolinux syslinux-efi grub-pc-bin grub-efi-amd64-bin mtools debian-archive-keyring isolinux syslinux
-        - name: Run M.I.S.O.
+        - name: Dotenv Action
+          uses: falti/dotenv-action@v1.1
+          id: dotenv
+          with:
+            export-variables: true
+        - name: build amd64
           env:
-            MISO_HOSTNAME: weeedebian
-            MISO_ROOTPASSWD: asd
-            MISO_USERNAME: weee
-            MISO_USERPASSWD: asd
             MISO_ARCH: amd64
-            MISO_CHROOT_SCRIPT: weeedebian/martello.sh
-            MISO_BUILD_DIR: build
           run: ./miso.sh
           shell: bash
-
-        - uses: actions/upload-artifact@v3
+        - name: build i386
+          env:
+            MISO_ARCH: i386
+          run: ./miso.sh
+          shell: bash
+        - uses: ncipollo/release-action@v1
           with:
-            name: weeedebian-amd64
-            path: build/weeedebian/weeedebian-amd64.iso
-            if-no-files-found: error # 'warn' or 'ignore' are also available, defaults to `warn`
+            artifacts: "./build/*/*.iso"
+            prerelease: true
+            tag: v${{ steps.dotenv.outputs.version }}

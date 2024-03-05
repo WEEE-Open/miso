@@ -3,9 +3,10 @@
 # export PATH="$PATH:/usr/sbin:/usr/bin:/sbin:/bin"
 
 echo "Martello is starting!"
-
+set -x
 echo "=== Install kernel and systemd ==="
 export DEBIAN_FRONTEND=noninteractive
+apt-get clean -y
 apt-get update -y
 if [[ "$MISO_ARCH" == "i386" ]]; then
 	# There's also 686-pae
@@ -13,6 +14,7 @@ if [[ "$MISO_ARCH" == "i386" ]]; then
 else
 	LINUX_IMAGE_ARCH=$MISO_ARCH
 fi
+
 apt-get install -y  \
     --no-install-recommends \
     linux-image-$LINUX_IMAGE_ARCH \
@@ -24,7 +26,6 @@ apt-get install -y  \
 # this has to be done before sudo
 echo "=== Set hostname ==="
 echo "$MISO_HOSTNAME" > /etc/hostname
-cp ./NetworkManager.conf /etc/NetworkManager/NetworkManager.conf
 # HOSTNAME is the docker one, but it cannot be changed from
 # the inside and is absolutely necessary to be set for sudo
 # to determine that localhost is localhost
@@ -53,11 +54,13 @@ cp ./fix_etc_hosts /etc/cron.d/fix_etc_hosts
 
 echo "=== Software installation ==="
 # Add non-free repo and update to pull in all the good firmware
-_RESULT="$(apt-add-repository non-free 2>&1)"
-echo $_RESULT
-if [[ ! $_RESULT =~ "is already enabled" ]]; then
+apt-add-repository non-free 2>&1
+
+# will be needed when upgrading to new versions
+# apt-add-repository non-free-firmware 2>&1
+
 apt-get  update -y
-fi
+
 # Remove useless packages, courtesy of "wajig large". Cool command.
 # Do not remove mousepad, it removes xfce-goodies too
 #/bin/bash -c 'DEBIAN_FRONTEND=noninteractive apt-get purge --auto-remove -y libreoffice libreoffice-core libreoffice-common ispell* gimp gimp-* aspell* hunspell* mythes* *sunpinyin* wpolish wnorwegian tegaki* task-thai task-thai-desktop xfonts-thai xiterm* task-khmer task-khmer-desktop fonts-khmeros khmerconverter'
@@ -74,10 +77,26 @@ apt-get  install -y  \
     fbxkb \
     firefox-esr \
     firmware-amd-graphics \
-    firmware-ath9k-htc \
     firmware-atheros \
+    firmware-bnx2 \
+    firmware-bnx2x \
+    firmware-brcm80211 \
+    firmware-cavium \
+    firmware-intel-sound \
     firmware-iwlwifi \
+    firmware-libertas \
     firmware-linux \
+    firmware-linux-nonfree \
+    firmware-misc-nonfree \
+    firmware-myricom \
+    firmware-netronome \
+    firmware-netxen \
+    firmware-qcom-media \
+    firmware-qcom-soc \
+    firmware-qlogic \
+    firmware-realtek \
+    firmware-samsung \
+    firmware-siano \
     firmware-ti-connectivity \
     geany \
     git \
@@ -111,11 +130,14 @@ apt-get  install -y  \
     openssl \
     pciutils \
     python3 \
+    python3-venv \
     python-is-python3 \
+    libxcb-cursor0 \
     rsync \
     smartmontools \
     strace \
     sudo \
+    systemd-timesyncd \
     traceroute \
     wget \
     wireless-tools \
@@ -128,7 +150,10 @@ apt-get  install -y  \
     xserver-xorg \
     zsh
 update-ca-certificates
+
 systemctl disable smartd
+
+$MISO_SUDO cp ./NetworkManager.conf /etc/NetworkManager/NetworkManager.conf
 systemctl enable NetworkManager
 
 echo "=== User configuration ==="
@@ -156,6 +181,7 @@ chsh -s /bin/zsh root
 # chsh -s /bin/zsh weee
 sudo -u $MISO_USERNAME curl -L -o /home/$MISO_USERNAME/.zshrc https://git.grml.org/f/grml-etc-core/etc/zsh/zshrc
 cp /home/$MISO_USERNAME/.zshrc /root/.zshrc
+
 sudo -u $MISO_USERNAME rm /home/$MISO_USERNAME/.bash_history  >/dev/null 2>/dev/null
 rm /root/.bash_history >/dev/null 2>/dev/null
 
@@ -208,18 +234,21 @@ sudo -u $MISO_USERNAME cp ./toprc /home/$MISO_USERNAME/.toprc
 
 echo "=== Prepare peracotta ==="
 apt-get  install -y python3-pip
+pip install pipx
+
+sudo -u $MISO_USERNAME pipx ensurepath
+sudo -u $MISO_USERNAME pipx install peracotta
 
 cp ./peracotta_update /etc/cron.d/peracotta_update
-pip install peracotta
 
 #sudo -u $MISO_USERNAME sh -c 'cd /home/$MISO_USERNAME/peracotta && python3 polkit.py'
-mkdir -p /home/$MISO_USERNAME/peracotta # Ensure the dir exists
-sudo -u $MISO_USERNAME cp ./features.json /home/$MISO_USERNAME/peracotta/features.json
+sudo -u $MISO_USERNAME mkdir -p /home/$MISO_USERNAME/.config/peracotta # Ensure the dir exists
+sudo -u $MISO_USERNAME cp ./features.json /home/$MISO_USERNAME/.config/peracotta/features.json
 
 
 echo "=== Add env to peracotta ==="
 if [[ -f "./env.txt" ]]; then
-  sudo -u $MISO_USERNAME cp ./env.txt /home/$MISO_USERNAME/peracotta/.env
+  sudo -u $MISO_USERNAME cp ./env.txt /home/$MISO_USERNAME/.config/peracotta/.env
 else
   echo "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
   echo "@                                                          @"
@@ -266,11 +295,11 @@ if [[ -f "/home/$MISO_USERNAME/Desktop/PeracottaGUI.desktop" ]]; then
   rm -f "/home/$MISO_USERNAME/Desktop/PeracottaGUI.desktop"
 fi
 sudo -u $MISO_USERNAME cp ./Peracotta.desktop /home/$MISO_USERNAME/Desktop
-sudo -u $MISO_USERNAME cp ./peracotta.png /home/$MISO_USERNAME/.config/peracotta.png
+sudo -u $MISO_USERNAME cp ./peracotta.png /home/$MISO_USERNAME/.config/peracotta/peracotta.png
 sudo -u $MISO_USERNAME chmod +x /home/$MISO_USERNAME/Desktop/Peracotta.desktop
 
 sudo -u $MISO_USERNAME cp ./Peracruda.desktop /home/$MISO_USERNAME/Desktop
-sudo -u $MISO_USERNAME cp ./peracruda.png /home/$MISO_USERNAME/.config/peracruda.png
+sudo -u $MISO_USERNAME cp ./peracruda.png /home/$MISO_USERNAME/.config/peracotta/peracruda.png
 sudo -u $MISO_USERNAME chmod +x /home/$MISO_USERNAME/Desktop/Peracruda.desktop
 
 echo "=== Pointerkeys thing ==="

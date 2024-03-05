@@ -47,7 +47,7 @@ Checklist:
 * A [Tarallo](https://github.com/WEEE-Open/tarallo) token (optional)
 * A bit of asd
 
-Get the Tarallo token and create a file named `env.txt` inside `weeedebian_files` with this content:
+Get the Tarallo token and create a file named `env.txt` inside `weeedebian` with this content:
 
 ```text
 export TARALLO_URL=http://127.0.0.1:8080
@@ -71,7 +71,3 @@ W: See /build/weeedebian-amd64/chroot/debootstrap/debootstrap.log for details
 ```
 
 That stuff doesn't work with the combination of a container and a chroot, unless you want to elevate your container privileges.
-
-
-
-

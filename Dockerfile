@@ -1,6 +1,5 @@
-# syntax=docker/dockerfile:1
+
 FROM debian:stable-slim
-MAINTAINER WEEE Open
 # Do not install apt-utils, you just get even more errors
 RUN apt-get update -y \
     && apt-get install -y \
