@@ -1,6 +1,6 @@
 #!/bin/bash
-
-echo "MISO v1.0.0"
+. .env
+echo "MISO v$VERSION"
 set -x
 if [[ -z "$MISO_BUILD_DIR" ]]; then
     if [[ -z "$1" ]]; then
