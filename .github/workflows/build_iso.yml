@@ -17,6 +17,12 @@ jobs:
           id: dotenv
           with:
             export-variables: true
+        - name: Set T.A.R.A.L.L.O. Token
+          uses: "DamianReeves/write-file-action@master"
+          with:
+            path: weeedebian/env.txt
+            write-mode: append
+            contents: ${{ secrets.TARALLO_TOKEN }}
         - name: build amd64
           env:
             MISO_ARCH: amd64
