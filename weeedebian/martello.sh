@@ -243,7 +243,7 @@ git clone git://code.qt.io/qt/qt5.git qt6 # I know this says qt5, but it's the s
 cd qt6
 git switch 6.6
 
-perl init-repository.pl --module-subset=essential
+perl init-repository --module-subset=essential
 mkdir qt6-build
 cd qt6-build
 # default prefix is /usr/local/Qt-6.6.2
