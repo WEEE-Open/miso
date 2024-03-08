@@ -237,7 +237,7 @@ if [ "$HOSTTYPE" = "i686" ]; then
 echo "=== Compile Qt from source ==="
 # Both Qt5 and Qt6 don't have precomiled binaries for 32bit architectures on modern versions
 # https://wiki.qt.io/Building_Qt_6_from_Git
-sudo apt install cmake ninja-build libfontconfig1-dev libgl-dev libegl-dev libfontconfig1-dev libfreetype6-dev libx11-dev libx11-xcb-dev libxext-dev libxfixes-dev libxi-dev libxrender-dev libxcb1-dev libxcb-cursor-dev libxcb-glx0-dev libxcb-keysyms1-dev libxcb-image0-dev libxcb-shm0-dev libxcb-icccm4-dev libxcb-sync-dev libxcb-xfixes0-dev libxcb-shape0-dev libxcb-randr0-dev libxcb-render-util0-dev libxcb-util-dev libxcb-xinerama0-dev libxcb-xkb-dev libxkbcommon-dev libxkbcommon-x11-dev
+apt-get install -y cmake ninja-build libfontconfig1-dev libgl-dev libegl-dev libfontconfig1-dev libfreetype6-dev libx11-dev libx11-xcb-dev libxext-dev libxfixes-dev libxi-dev libxrender-dev libxcb1-dev libxcb-cursor-dev libxcb-glx0-dev libxcb-keysyms1-dev libxcb-image0-dev libxcb-shm0-dev libxcb-icccm4-dev libxcb-sync-dev libxcb-xfixes0-dev libxcb-shape0-dev libxcb-randr0-dev libxcb-render-util0-dev libxcb-util-dev libxcb-xinerama0-dev libxcb-xkb-dev libxkbcommon-dev libxkbcommon-x11-dev
 
 git clone git://code.qt.io/qt/qt5.git qt6 # I know this says qt5, but it's the same repo used for Qt6 I swear
 cd qt6
