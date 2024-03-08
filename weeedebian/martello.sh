@@ -246,7 +246,7 @@ git switch 6.6
 perl init-repository
 mkdir qt6-build
 cd qt6-build
-../qt6/configure -prefix ~/Qt6 # Is this path ok?
+../configure -prefix ~/Qt6 # Is this path ok?
 cmake --build . --parallel
 cmake --install .
 # ctest -V -R qlocale # if you want to run tests
