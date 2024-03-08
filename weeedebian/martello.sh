@@ -251,7 +251,6 @@ cd qt6-build
 -skip qt3d \
 -skip  qtmultimedia \
 -skip qtactiveqt \
-# -skip qtcanvas3d \
 -skip qtcharts \
 -skip qtgamepad \
 -skip qtgraphs \
