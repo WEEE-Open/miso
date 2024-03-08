@@ -12,6 +12,7 @@ docker run --name miso \
   -i --rm \
   -v $(readlink -f build):/build:rw \
   -v $(readlink -f weeedebian):/weeedebian:ro \
+  -e MISO_BUILD_DIR=/build \
   -e MISO_CHROOT_SCRIPT=/weeedebian/martello.sh \
   -e MISO_HOSTNAME=weeedebian \
   -e MISO_ROOTPASSWD=asd \
