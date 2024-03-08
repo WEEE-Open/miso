@@ -153,7 +153,7 @@ update-ca-certificates
 
 systemctl disable smartd
 
-$MISO_SUDO cp ./NetworkManager.conf /etc/NetworkManager/NetworkManager.conf
+sudo cp ./NetworkManager.conf /etc/NetworkManager/NetworkManager.conf
 systemctl enable NetworkManager
 
 echo "=== User configuration ==="
@@ -248,7 +248,7 @@ mkdir qt6-build
 cd qt6-build
 ../configure # default prefix is /usr/local/Qt-6.6.2
 cmake --build . --parallel
-cmake --install .
+sudo cmake --install .
 # ctest -V -R qlocale # if you want to run tests
 fi
 
