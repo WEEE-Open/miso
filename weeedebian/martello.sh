@@ -246,7 +246,43 @@ git switch 6.6
 perl init-repository
 mkdir qt6-build
 cd qt6-build
-../configure # default prefix is /usr/local/Qt-6.6.2
+# default prefix is /usr/local/Qt-6.6.2
+../configure -release \
+-skip qt3d \
+-skip  qtmultimedia \
+-skip qtactiveqt \
+# -skip qtcanvas3d \
+-skip qtcharts \
+-skip qtgamepad \
+-skip qtgraphs \
+-skip qtgrpc \
+-skip qthttpserver \
+-skip qtimageformats \
+-skip qtlocation \
+-skip qtlottie \
+-skip qtmultimedia \
+-skip qtnetworkauth \
+-skip qtopcua \
+-skip qtpositioning \
+-skip qtquick3d \
+-skip qtquick3dphysics \
+-skip qtquickeffectmaker \
+-skip qtquicktimeline \
+-skip qtremoteobjects \
+-skip qtscxml \
+-skip qtsensors \
+-skip qtserialbus \
+-skip qtserialport \
+-skip qtshadertools \
+-skip qtspeech \
+-skip qtvirtualkeyboard \
+-skip qtwebchannel \
+-skip qtwebengine \
+-skip qtwebglplugin \
+-skip qtwebsockets \
+-skip qtwebview \
+-skip qtsql \
+
 cmake --build . --parallel
 sudo cmake --install .
 # ctest -V -R qlocale # if you want to run tests
