@@ -284,6 +284,7 @@ cd qt6-build
 
 cmake --build . --parallel
 sudo cmake --install .
+cd ../..
 # ctest -V -R qlocale # if you want to run tests
 fi
 
