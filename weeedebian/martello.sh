@@ -57,7 +57,7 @@ echo "=== Software installation ==="
 apt-add-repository non-free 2>&1
 
 # will be needed when upgrading to new versions
-# apt-add-repository non-free-firmware 2>&1
+apt-add-repository non-free-firmware 2>&1
 
 apt-get update -y
 
@@ -75,11 +75,7 @@ apt-get install -y  \
     dmidecode \
     dnsutils \
     firefox-esr \
-    firmware-linux-free \
-    firmware-amd-graphics \
-    firmware-misc-nonfree \
-    amd64-microcode \
-    intel-microcode \
+    firmware-linux \
     geany \
     git \
     gparted \
@@ -215,62 +211,6 @@ cp ./toprc /root/.toprc
 sudo -u $MISO_USERNAME cp ./toprc /home/$MISO_USERNAME/.toprc
 
 echo "=== Prepare peracotta ==="
-if [ "$HOSTTYPE" = "i686" ]; then
-echo "=== Compile Qt from source ==="
-# cmake complains
-export CXX=/usr/bin/g++
-
-# Both Qt5 and Qt6 don't have precomiled binaries for 32bit architectures on modern versions
-# https://wiki.qt.io/Building_Qt_6_from_Git
-apt-get install -y cmake ninja-build libfontconfig1-dev libgl-dev libegl-dev libfontconfig1-dev libfreetype6-dev libx11-dev libx11-xcb-dev libxext-dev libxfixes-dev libxi-dev libxrender-dev libxcb1-dev libxcb-cursor-dev libxcb-glx0-dev libxcb-keysyms1-dev libxcb-image0-dev libxcb-shm0-dev libxcb-icccm4-dev libxcb-sync-dev libxcb-xfixes0-dev libxcb-shape0-dev libxcb-randr0-dev libxcb-render-util0-dev libxcb-util-dev libxcb-xinerama0-dev libxcb-xkb-dev libxkbcommon-dev libxkbcommon-x11-dev
-
-git clone git://code.qt.io/qt/qt5.git qt6 # I know this says qt5, but it's the same repo used for Qt6 I swear
-cd qt6
-git switch 6.6
-
-perl init-repository --module-subset=essential
-mkdir qt6-build
-cd qt6-build
-# default prefix is /usr/local/Qt-6.6.2
-../configure -release \
--skip qt3d \
--skip qtmultimedia \
--skip qtactiveqt \
--skip qtcharts \
--skip qtgamepad \
--skip qtgraphs \
--skip qtgrpc \
--skip qthttpserver \
--skip qtimageformats \
--skip qtlocation \
--skip qtlottie \
--skip qtnetworkauth \
--skip qtopcua \
--skip qtpositioning \
--skip qtquick3d \
--skip qtquick3dphysics \
--skip qtquickeffectmaker \
--skip qtquicktimeline \
--skip qtremoteobjects \
--skip qtscxml \
--skip qtsensors \
--skip qtserialbus \
--skip qtserialport \
--skip qtshadertools \
--skip qtspeech \
--skip qtvirtualkeyboard \
--skip qtwebchannel \
--skip qtwebengine \
--skip qtwebglplugin \
--skip qtwebsockets \
--skip qtwebview \
--skip qtsql \
-
-cmake --build . --parallel
-sudo cmake --install .
-cd ../..
-# ctest -V -R qlocale # if you want to run tests
-fi
 
 apt-get  install -y python3-pip
 pip install pipx
