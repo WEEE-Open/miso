@@ -59,15 +59,15 @@ apt-add-repository non-free 2>&1
 # will be needed when upgrading to new versions
 # apt-add-repository non-free-firmware 2>&1
 
-apt-get  update -y
+apt-get update -y
 
 # Remove useless packages, courtesy of "wajig large". Cool command.
 # Do not remove mousepad, it removes xfce-goodies too
-#/bin/bash -c 'DEBIAN_FRONTEND=noninteractive apt-get purge --auto-remove -y libreoffice libreoffice-core libreoffice-common ispell* gimp gimp-* aspell* hunspell* mythes* *sunpinyin* wpolish wnorwegian tegaki* task-thai task-thai-desktop xfonts-thai xiterm* task-khmer task-khmer-desktop fonts-khmeros khmerconverter'
+/bin/bash -c 'DEBIAN_FRONTEND=noninteractive apt-get purge --auto-remove -y libreoffice libreoffice-core libreoffice-common ispell* gimp gimp-* aspell* hunspell* mythes* *sunpinyin* wpolish wnorwegian tegaki* task-thai task-thai-desktop xfonts-thai xiterm* task-khmer task-khmer-desktop fonts-khmeros khmerconverter'
 # Upgrade and install useful packages
-apt-get  upgrade -y
+apt-get upgrade -y
 # libxkbcommon-x11-0 may be not needed (see Add library to installation if needed #28)
-apt-get  install -y  \
+apt-get install -y  \
     apt-transport-https \
     ca-certificates \
     cifs-utils \
@@ -75,7 +75,8 @@ apt-get  install -y  \
     dmidecode \
     dnsutils \
     firefox-esr \
-    firmware-linux \
+    firmware-linux-free \
+    firmware-linux-nonfree \
     geany \
     git \
     gparted \
