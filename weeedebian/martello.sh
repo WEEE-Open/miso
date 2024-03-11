@@ -74,7 +74,6 @@ apt-get  install -y  \
     curl \
     dmidecode \
     dnsutils \
-    fbxkb \
     firefox-esr \
     firmware-free \
     firmware-nonfree \
