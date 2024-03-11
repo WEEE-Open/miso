@@ -233,8 +233,8 @@ cp ./toprc /root/.toprc
 sudo -u $MISO_USERNAME cp ./toprc /home/$MISO_USERNAME/.toprc
 
 echo "=== Prepare peracotta ==="
-if [ "$HOSTTYPE" = "i686" ]; then
 echo "=== Compile Qt from source ==="
+if [ "$HOSTTYPE" = "i686" ]; then
 # cmake complains
 export CXX=/usr/bin/g++
 
@@ -252,7 +252,7 @@ cd qt6-build
 # default prefix is /usr/local/Qt-6.6.2
 ../configure -release \
 -skip qt3d \
--skip  qtmultimedia \
+-skip qtmultimedia \
 -skip qtactiveqt \
 -skip qtcharts \
 -skip qtgamepad \
@@ -262,7 +262,6 @@ cd qt6-build
 -skip qtimageformats \
 -skip qtlocation \
 -skip qtlottie \
--skip qtmultimedia \
 -skip qtnetworkauth \
 -skip qtopcua \
 -skip qtpositioning \
