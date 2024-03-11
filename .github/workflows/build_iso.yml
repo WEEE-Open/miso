@@ -37,4 +37,5 @@ jobs:
           with:
             artifacts: "./build/*/*.iso"
             prerelease: true
+            draft: true
             tag: v${{ steps.dotenv.outputs.version }}
