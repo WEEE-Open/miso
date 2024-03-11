@@ -75,10 +75,7 @@ apt-get  install -y  \
     dmidecode \
     dnsutils \
     firefox-esr \
-    firmware-free \
-    firmware-nonfree \
-    open-ath9k-htc-firmware \
-    atmel-firmware \
+    firmware-linux \
     geany \
     git \
     gparted \
