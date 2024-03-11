@@ -76,28 +76,10 @@ apt-get  install -y  \
     dnsutils \
     fbxkb \
     firefox-esr \
-    firmware-amd-graphics \
-    firmware-atheros \
-    firmware-bnx2 \
-    firmware-bnx2x \
-    firmware-brcm80211 \
-    firmware-cavium \
-    firmware-intel-sound \
-    firmware-iwlwifi \
-    firmware-libertas \
-    firmware-linux \
-    firmware-linux-nonfree \
-    firmware-misc-nonfree \
-    firmware-myricom \
-    firmware-netronome \
-    firmware-netxen \
-    firmware-qcom-media \
-    firmware-qcom-soc \
-    firmware-qlogic \
-    firmware-realtek \
-    firmware-samsung \
-    firmware-siano \
-    firmware-ti-connectivity \
+    firmware-free \
+    firmware-nonfree \
+    open-ath9k-htc-firmware \
+    atmel-firmware \
     geany \
     git \
     gparted \
@@ -233,8 +215,8 @@ cp ./toprc /root/.toprc
 sudo -u $MISO_USERNAME cp ./toprc /home/$MISO_USERNAME/.toprc
 
 echo "=== Prepare peracotta ==="
-echo "=== Compile Qt from source ==="
 if [ "$HOSTTYPE" = "i686" ]; then
+echo "=== Compile Qt from source ==="
 # cmake complains
 export CXX=/usr/bin/g++
 
