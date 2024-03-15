@@ -212,8 +212,7 @@ sudo -u $MISO_USERNAME cp ./toprc /home/$MISO_USERNAME/.toprc
 
 echo "=== Prepare peracotta ==="
 
-apt-get  install -y python3-pip
-pip install pipx
+apt-get  install -y python3-pip pipx
 
 sudo -u $MISO_USERNAME pipx ensurepath
 sudo -u $MISO_USERNAME pipx install peracotta
