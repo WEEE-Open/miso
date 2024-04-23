@@ -127,11 +127,33 @@ apt-get install -y  \
     xorg \
     xserver-xorg \
     zsh
+    # firmware-amd-graphics \
+    # firmware-atheros \
+    # firmware-bnx2 \
+    # firmware-bnx2x \
+    # firmware-brcm80211 \
+    # firmware-cavium \
+    # firmware-intel-sound \
+    # firmware-iwlwifi \
+    # firmware-libertas \
+    # firmware-linux \
+    # firmware-linux-nonfree \
+    # firmware-misc-nonfree \
+    # firmware-myricom \
+    # firmware-netronome \
+    # firmware-netxen \
+    # firmware-qcom-media \
+    # firmware-qcom-soc \
+    # firmware-qlogic \
+    # firmware-realtek \
+    # firmware-samsung \
+    # firmware-siano \
+    # firmware-ti-connectivity \
 update-ca-certificates
 
 systemctl disable smartd
 
-sudo cp ./NetworkManager.conf /etc/NetworkManager/NetworkManager.conf
+$MISO_SUDO cp ./NetworkManager.conf /etc/NetworkManager/NetworkManager.conf
 systemctl enable NetworkManager
 
 echo "=== User configuration ==="
@@ -211,7 +233,6 @@ cp ./toprc /root/.toprc
 sudo -u $MISO_USERNAME cp ./toprc /home/$MISO_USERNAME/.toprc
 
 echo "=== Prepare peracotta ==="
-
 apt-get  install -y python3-pip pipx
 
 sudo -u $MISO_USERNAME pipx ensurepath
