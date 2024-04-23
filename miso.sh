@@ -96,7 +96,7 @@ else
   $MISO_SUDO debootstrap \
     --arch=$MISO_ARCH \
     --variant=minbase \
-    oldstable \
+    stable \
     $MISO_BUILD_DIR/chroot \
     http://ftp.it.debian.org/debian/
 fi
