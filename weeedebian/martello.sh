@@ -68,7 +68,10 @@ apt-get update -y
 apt-get upgrade -y
 # libxkbcommon-x11-0 may be not needed (see Add library to installation if needed #28)
 apt-get install -y  \
+    alsa-firmware-loaders \
     apt-transport-https \
+    atmel-firmware \
+    bluez-firmware \
     ca-certificates \
     cifs-utils \
     curl \
@@ -76,6 +79,27 @@ apt-get install -y  \
     dnsutils \
     firefox-esr \
     firmware-linux \
+    firmware-atheros \
+    firmware-b43-installer \
+    firmware-bnx2 \
+    firmware-bnx2x \
+    firmware-brcm80211 \
+    firmware-cavium \
+    firmware-intel-sound \
+    firmware-ipw2x00 \
+    firmware-iwlwifi \
+    firmware-libertas \
+    firmware-myricom \
+    firmware-netronome \
+    firmware-netxen \
+    firmware-qcom-media \
+    firmware-qcom-soc \
+    firmware-qlogic \
+    firmware-realtek \
+    firmware-samsung \
+    firmware-siano \
+    firmware-ti-connectivity \
+    firmware-zd1211 \
     geany \
     git \
     gparted \
@@ -127,28 +151,6 @@ apt-get install -y  \
     xorg \
     xserver-xorg \
     zsh
-    # firmware-amd-graphics \
-    # firmware-atheros \
-    # firmware-bnx2 \
-    # firmware-bnx2x \
-    # firmware-brcm80211 \
-    # firmware-cavium \
-    # firmware-intel-sound \
-    # firmware-iwlwifi \
-    # firmware-libertas \
-    # firmware-linux \
-    # firmware-linux-nonfree \
-    # firmware-misc-nonfree \
-    # firmware-myricom \
-    # firmware-netronome \
-    # firmware-netxen \
-    # firmware-qcom-media \
-    # firmware-qcom-soc \
-    # firmware-qlogic \
-    # firmware-realtek \
-    # firmware-samsung \
-    # firmware-siano \
-    # firmware-ti-connectivity \
 update-ca-certificates
 
 systemctl disable smartd
