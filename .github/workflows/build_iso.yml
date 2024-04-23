@@ -41,4 +41,8 @@ jobs:
             prerelease: true
             draft: true
             tag: v${{ steps.dotenv.outputs.version }}
-            body: "WARNING: do NOT publish this release. It is only to be used internally as the T.A.R.A.L.L.O. secret token is visible in the built iso."
+            body: |
+              > [!CAUTION]
+              > Do NOT publish this draft.
+              > It is only to be used internally as the T.A.R.A.L.L.O. secret token is visible in the built iso.
+
