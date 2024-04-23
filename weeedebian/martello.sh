@@ -57,47 +57,25 @@ echo "=== Software installation ==="
 apt-add-repository non-free 2>&1
 
 # will be needed when upgrading to new versions
-# apt-add-repository non-free-firmware 2>&1
+apt-add-repository non-free-firmware 2>&1
 
-apt-get  update -y
+apt-get update -y
 
 # Remove useless packages, courtesy of "wajig large". Cool command.
 # Do not remove mousepad, it removes xfce-goodies too
-#/bin/bash -c 'DEBIAN_FRONTEND=noninteractive apt-get purge --auto-remove -y libreoffice libreoffice-core libreoffice-common ispell* gimp gimp-* aspell* hunspell* mythes* *sunpinyin* wpolish wnorwegian tegaki* task-thai task-thai-desktop xfonts-thai xiterm* task-khmer task-khmer-desktop fonts-khmeros khmerconverter'
+# /bin/bash -c 'DEBIAN_FRONTEND=noninteractive apt-get purge --auto-remove -y libreoffice libreoffice-core libreoffice-common ispell* gimp gimp-* aspell* hunspell* mythes* *sunpinyin* wpolish wnorwegian tegaki* task-thai task-thai-desktop xfonts-thai xiterm* task-khmer task-khmer-desktop fonts-khmeros khmerconverter'
 # Upgrade and install useful packages
-apt-get  upgrade -y
+apt-get upgrade -y
 # libxkbcommon-x11-0 may be not needed (see Add library to installation if needed #28)
-apt-get  install -y  \
+apt-get install -y  \
     apt-transport-https \
     ca-certificates \
     cifs-utils \
     curl \
     dmidecode \
     dnsutils \
-    fbxkb \
     firefox-esr \
-    firmware-amd-graphics \
-    firmware-atheros \
-    firmware-bnx2 \
-    firmware-bnx2x \
-    firmware-brcm80211 \
-    firmware-cavium \
-    firmware-intel-sound \
-    firmware-iwlwifi \
-    firmware-libertas \
     firmware-linux \
-    firmware-linux-nonfree \
-    firmware-misc-nonfree \
-    firmware-myricom \
-    firmware-netronome \
-    firmware-netxen \
-    firmware-qcom-media \
-    firmware-qcom-soc \
-    firmware-qlogic \
-    firmware-realtek \
-    firmware-samsung \
-    firmware-siano \
-    firmware-ti-connectivity \
     geany \
     git \
     gparted \
@@ -149,6 +127,28 @@ apt-get  install -y  \
     xorg \
     xserver-xorg \
     zsh
+    # firmware-amd-graphics \
+    # firmware-atheros \
+    # firmware-bnx2 \
+    # firmware-bnx2x \
+    # firmware-brcm80211 \
+    # firmware-cavium \
+    # firmware-intel-sound \
+    # firmware-iwlwifi \
+    # firmware-libertas \
+    # firmware-linux \
+    # firmware-linux-nonfree \
+    # firmware-misc-nonfree \
+    # firmware-myricom \
+    # firmware-netronome \
+    # firmware-netxen \
+    # firmware-qcom-media \
+    # firmware-qcom-soc \
+    # firmware-qlogic \
+    # firmware-realtek \
+    # firmware-samsung \
+    # firmware-siano \
+    # firmware-ti-connectivity \
 update-ca-certificates
 
 systemctl disable smartd
@@ -233,8 +233,7 @@ cp ./toprc /root/.toprc
 sudo -u $MISO_USERNAME cp ./toprc /home/$MISO_USERNAME/.toprc
 
 echo "=== Prepare peracotta ==="
-apt-get  install -y python3-pip
-pip install pipx
+apt-get  install -y python3-pip pipx
 
 sudo -u $MISO_USERNAME pipx ensurepath
 sudo -u $MISO_USERNAME pipx install peracotta

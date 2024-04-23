@@ -28,13 +28,20 @@ jobs:
             MISO_ARCH: amd64
           run: ./miso.sh
           shell: bash
-        - name: build i386
-          env:
-            MISO_ARCH: i386
-          run: ./miso.sh
-          shell: bash
+        # i386 CI is disabled for now because I couldn't get QT (either 5 or 6)to work on a modern 32bit release of debian
+        #- name: build i386
+        #  env:
+        #    MISO_ARCH: i386
+        #  run: ./miso.sh
+        #  shell: bash
         - uses: ncipollo/release-action@v1
           with:
             artifacts: "./build/*/*.iso"
+            allowUpdates: true
             prerelease: true
+            draft: true
             tag: v${{ steps.dotenv.outputs.version }}
+            body: |
+              > [!CAUTION]
+              > Do NOT publish this draft.
+              > It is only to be used internally as the T.A.R.A.L.L.O. secret token is visible in the built iso.
