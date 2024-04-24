@@ -244,13 +244,13 @@ sudo -u $MISO_USERNAME pipx install peracotta
 cp ./peracotta_update /etc/cron.d/peracotta_update
 
 #sudo -u $MISO_USERNAME sh -c 'cd /home/$MISO_USERNAME/peracotta && python3 polkit.py'
-sudo -u $MISO_USERNAME mkdir -p /home/$MISO_USERNAME/.config/peracotta # Ensure the dir exists
-sudo -u $MISO_USERNAME cp ./features.json /home/$MISO_USERNAME/.config/peracotta/features.json
+sudo -u $MISO_USERNAME mkdir -p /home/$MISO_USERNAME/.config/WEEE\ Open/peracotta # Ensure the dir exists
+sudo -u $MISO_USERNAME cp ./features.json /home/$MISO_USERNAME/.config/WEEE\ Open/peracotta/features.json
 
 
 echo "=== Add env to peracotta ==="
 if [[ -f "./env.txt" ]]; then
-  sudo -u $MISO_USERNAME cp ./env.txt /home/$MISO_USERNAME/.config/peracotta/.env
+  sudo -u $MISO_USERNAME cp ./env.txt /home/$MISO_USERNAME/.config/WEEE\ Open/peracotta/.env
 else
   echo "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
   echo "@                                                          @"
@@ -258,7 +258,7 @@ else
   echo "@                                                          @"
   echo "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
   echo "@                                                          @"
-  echo "@   env.txt not found in weeedebian_files.                 @"
+  echo "@   env.txt not found in weeedebian/.                      @"
   echo "@   You're missing out many great peracotta features!      @"
   echo "@   Check README for more info if you want to create the   @"
   echo "@   file and automate your life!                           @"
