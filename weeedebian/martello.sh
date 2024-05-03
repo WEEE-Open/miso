@@ -297,11 +297,11 @@ if [[ -f "/home/$MISO_USERNAME/Desktop/PeracottaGUI.desktop" ]]; then
   rm -f "/home/$MISO_USERNAME/Desktop/PeracottaGUI.desktop"
 fi
 sudo -u $MISO_USERNAME cp ./Peracotta.desktop /home/$MISO_USERNAME/Desktop
-sudo -u $MISO_USERNAME cp ./peracotta.png /home/$MISO_USERNAME/.config/peracotta/peracotta.png
+sudo -u $MISO_USERNAME cp ./peracotta.png /home/$MISO_USERNAME/.config/WEEE\ Open/peracotta/peracotta.png
 sudo -u $MISO_USERNAME chmod +x /home/$MISO_USERNAME/Desktop/Peracotta.desktop
 
 sudo -u $MISO_USERNAME cp ./Peracruda.desktop /home/$MISO_USERNAME/Desktop
-sudo -u $MISO_USERNAME cp ./peracruda.png /home/$MISO_USERNAME/.config/peracotta/peracruda.png
+sudo -u $MISO_USERNAME cp ./peracruda.png /home/$MISO_USERNAME/.config/WEEE\ Open/peracotta/peracruda.png
 sudo -u $MISO_USERNAME chmod +x /home/$MISO_USERNAME/Desktop/Peracruda.desktop
 
 echo "=== Pointerkeys thing ==="
