@@ -3,17 +3,19 @@
 # export PATH="$PATH:/usr/sbin:/usr/bin:/sbin:/bin"
 
 echo "Martello is starting!"
-
+set -x
 echo "=== Install kernel and systemd ==="
 export DEBIAN_FRONTEND=noninteractive
-apt-get -qq update -y -o Dpkg::Use-Pty=false
+apt-get clean -y
+apt-get update -y
 if [[ "$MISO_ARCH" == "i386" ]]; then
 	# There's also 686-pae
 	LINUX_IMAGE_ARCH="686"
 else
 	LINUX_IMAGE_ARCH=$MISO_ARCH
 fi
-apt-get -qq install -y -o Dpkg::Use-Pty=false \
+
+apt-get install -y  \
     --no-install-recommends \
     linux-image-$LINUX_IMAGE_ARCH \
     live-boot \
@@ -24,7 +26,6 @@ apt-get -qq install -y -o Dpkg::Use-Pty=false \
 # this has to be done before sudo
 echo "=== Set hostname ==="
 echo "$MISO_HOSTNAME" > /etc/hostname
-cp ./NetworkManager.conf /etc/NetworkManager/NetworkManager.conf
 # HOSTNAME is the docker one, but it cannot be changed from
 # the inside and is absolutely necessary to be set for sudo
 # to determine that localhost is localhost
@@ -53,32 +54,53 @@ cp ./fix_etc_hosts /etc/cron.d/fix_etc_hosts
 
 echo "=== Software installation ==="
 # Add non-free repo and update to pull in all the good firmware
-_RESULT="$(apt-add-repository non-free 2>&1)"
-echo $_RESULT
-if [[ ! $_RESULT =~ "is already enabled" ]]; then
-apt-get -qq update -y -o Dpkg::Use-Pty=false
-fi
+apt-add-repository non-free 2>&1
+
+
+apt-add-repository non-free-firmware 2>&1
+
+apt-add-repository contrib 2>&1
+
+apt-get update -y
+
 # Remove useless packages, courtesy of "wajig large". Cool command.
 # Do not remove mousepad, it removes xfce-goodies too
-#/bin/bash -c 'DEBIAN_FRONTEND=noninteractive apt-get purge --auto-remove -y libreoffice libreoffice-core libreoffice-common ispell* gimp gimp-* aspell* hunspell* mythes* *sunpinyin* wpolish wnorwegian tegaki* task-thai task-thai-desktop xfonts-thai xiterm* task-khmer task-khmer-desktop fonts-khmeros khmerconverter'
+# /bin/bash -c 'DEBIAN_FRONTEND=noninteractive apt-get purge --auto-remove -y libreoffice libreoffice-core libreoffice-common ispell* gimp gimp-* aspell* hunspell* mythes* *sunpinyin* wpolish wnorwegian tegaki* task-thai task-thai-desktop xfonts-thai xiterm* task-khmer task-khmer-desktop fonts-khmeros khmerconverter'
 # Upgrade and install useful packages
-apt-get -qq upgrade -y -o Dpkg::Use-Pty=false
+apt-get upgrade -y
 # libxkbcommon-x11-0 may be not needed (see Add library to installation if needed #28)
-apt-get -qq install -y -o Dpkg::Use-Pty=false \
+apt-get install -y  \
+    alsa-firmware-loaders \
     apt-transport-https \
+    atmel-firmware \
+    bluez-firmware \
     ca-certificates \
     cifs-utils \
     curl \
     dmidecode \
     dnsutils \
-    fbxkb \
     firefox-esr \
-    firmware-amd-graphics \
-    firmware-ath9k-htc \
-    firmware-atheros \
-    firmware-iwlwifi \
     firmware-linux \
+    firmware-atheros \
+    firmware-b43-installer \
+    firmware-bnx2 \
+    firmware-bnx2x \
+    firmware-brcm80211 \
+    firmware-cavium \
+    firmware-intel-sound \
+    firmware-iwlwifi \
+    firmware-libertas \
+    firmware-myricom \
+    firmware-netronome \
+    firmware-netxen \
+    firmware-qcom-media \
+    firmware-qcom-soc \
+    firmware-qlogic \
+    firmware-realtek \
+    firmware-samsung \
+    firmware-siano \
     firmware-ti-connectivity \
+    firmware-zd1211 \
     geany \
     git \
     gparted \
@@ -111,11 +133,14 @@ apt-get -qq install -y -o Dpkg::Use-Pty=false \
     openssl \
     pciutils \
     python3 \
+    python3-venv \
     python-is-python3 \
+    libxcb-cursor0 \
     rsync \
     smartmontools \
     strace \
     sudo \
+    systemd-timesyncd \
     traceroute \
     wget \
     wireless-tools \
@@ -128,7 +153,10 @@ apt-get -qq install -y -o Dpkg::Use-Pty=false \
     xserver-xorg \
     zsh
 update-ca-certificates
+
 systemctl disable smartd
+
+$MISO_SUDO cp ./NetworkManager.conf /etc/NetworkManager/NetworkManager.conf
 systemctl enable NetworkManager
 
 echo "=== User configuration ==="
@@ -156,6 +184,7 @@ chsh -s /bin/zsh root
 # chsh -s /bin/zsh weee
 sudo -u $MISO_USERNAME curl -L -o /home/$MISO_USERNAME/.zshrc https://git.grml.org/f/grml-etc-core/etc/zsh/zshrc
 cp /home/$MISO_USERNAME/.zshrc /root/.zshrc
+
 sudo -u $MISO_USERNAME rm /home/$MISO_USERNAME/.bash_history  >/dev/null 2>/dev/null
 rm /root/.bash_history >/dev/null 2>/dev/null
 
@@ -207,53 +236,21 @@ cp ./toprc /root/.toprc
 sudo -u $MISO_USERNAME cp ./toprc /home/$MISO_USERNAME/.toprc
 
 echo "=== Prepare peracotta ==="
-apt-get -qq install -y python3-pip -o Dpkg::Use-Pty=false
-# PyQt > 5.14.0 requires an EXTREMELY RECENT version of pip,
-# on the most bleeding of all bleeding edges
-# python3 -m pip install --quiet --upgrade pip
+apt-get  install -y python3-pip pipx
+
+sudo -u $MISO_USERNAME pipx ensurepath
+sudo -u $MISO_USERNAME pipx install peracotta
 
 cp ./peracotta_update /etc/cron.d/peracotta_update
 
-if [[ -d "/home/$MISO_USERNAME/peracotta" ]]; then
-  sudo -u $MISO_USERNAME git -C /home/$MISO_USERNAME/peracotta pull --ff-only
-else
-  sudo -u $MISO_USERNAME mkdir -p /home/$MISO_USERNAME/peracotta
-  sudo -u $MISO_USERNAME git clone https://github.com/WEEE-Open/peracotta.git /home/$MISO_USERNAME/peracotta
-fi
-
 #sudo -u $MISO_USERNAME sh -c 'cd /home/$MISO_USERNAME/peracotta && python3 polkit.py'
-sudo -u $MISO_USERNAME cp ./features.json /home/$MISO_USERNAME/peracotta/features.json
+sudo -u $MISO_USERNAME mkdir -p /home/$MISO_USERNAME/.config/WEEE\ Open/peracotta # Ensure the dir exists
+sudo -u $MISO_USERNAME cp ./features.json /home/$MISO_USERNAME/.config/WEEE\ Open/peracotta/features.json
 
-if [[ "$MISO_ARCH" == "i386" ]]; then
-  echo "===== Begin incredible workaround for PyQt on 32 bit ====="
-  apt-get -qq install -y python3-pyqt5 -o Dpkg::Use-Pty=false
-  sudo -u $MISO_USERNAME /bin/bash -c "grep -vi pyqt /home/$MISO_USERNAME/peracotta/requirements.txt > /home/$MISO_USERNAME/peracotta/requirements32.txt"
-  pip3 --quiet install -r /home/$MISO_USERNAME/peracotta/requirements32.txt
-  rm -f /home/$MISO_USERNAME/peracotta/requirements32.txt
-  echo "===== End incredible workaround for PyQt on 32 bit ====="
-else
-  # apt-get -qq autoremove -y python3-pyqt5 -o Dpkg::Use-Pty=false
-  pip3 --quiet install -r /home/$MISO_USERNAME/peracotta/requirements.txt
-fi
-
-PERACOTTA_GENERATE_FILES=$(sudo -u $MISO_USERNAME find /home/$MISO_USERNAME/peracotta -name generate_files.sh -print -quit)
-PERACOTTA_CLI=/home/$MISO_USERNAME/peracotta/peracruda
-PERACOTTA_GUI=/home/$MISO_USERNAME/peracotta/peracotta
-
-if [[ -f "$PERACOTTA_GENERATE_FILES" ]]; then
-  sudo -u $MISO_USERNAME chmod +x "$PERACOTTA_GENERATE_FILES"
-  ln -sf "$PERACOTTA_GENERATE_FILES" /usr/bin/generate_files
-fi
-if [[ -f "$PERACOTTA_CLI" ]]; then
-  sudo -u $MISO_USERNAME chmod +x "$PERACOTTA_CLI"
-fi
-if [[ -f "$PERACOTTA_GUI" ]]; then
-  sudo -u $MISO_USERNAME chmod +x "$PERACOTTA_GUI"
-fi
 
 echo "=== Add env to peracotta ==="
 if [[ -f "./env.txt" ]]; then
-  sudo -u $MISO_USERNAME cp ./env.txt /home/$MISO_USERNAME/peracotta/.env
+  sudo -u $MISO_USERNAME cp ./env.txt /home/$MISO_USERNAME/.config/WEEE\ Open/peracotta/.env
 else
   echo "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
   echo "@                                                          @"
@@ -261,7 +258,7 @@ else
   echo "@                                                          @"
   echo "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
   echo "@                                                          @"
-  echo "@   env.txt not found in weeedebian_files.                 @"
+  echo "@   env.txt not found in weeedebian/.                      @"
   echo "@   You're missing out many great peracotta features!      @"
   echo "@   Check README for more info if you want to create the   @"
   echo "@   file and automate your life!                           @"
@@ -300,11 +297,11 @@ if [[ -f "/home/$MISO_USERNAME/Desktop/PeracottaGUI.desktop" ]]; then
   rm -f "/home/$MISO_USERNAME/Desktop/PeracottaGUI.desktop"
 fi
 sudo -u $MISO_USERNAME cp ./Peracotta.desktop /home/$MISO_USERNAME/Desktop
-sudo -u $MISO_USERNAME cp ./peracotta.png /home/$MISO_USERNAME/.config/peracotta.png
+sudo -u $MISO_USERNAME cp ./peracotta.png /home/$MISO_USERNAME/.config/peracotta/peracotta.png
 sudo -u $MISO_USERNAME chmod +x /home/$MISO_USERNAME/Desktop/Peracotta.desktop
 
 sudo -u $MISO_USERNAME cp ./Peracruda.desktop /home/$MISO_USERNAME/Desktop
-sudo -u $MISO_USERNAME cp ./peracruda.png /home/$MISO_USERNAME/.config/peracruda.png
+sudo -u $MISO_USERNAME cp ./peracruda.png /home/$MISO_USERNAME/.config/peracotta/peracruda.png
 sudo -u $MISO_USERNAME chmod +x /home/$MISO_USERNAME/Desktop/Peracruda.desktop
 
 echo "=== Pointerkeys thing ==="
@@ -328,9 +325,9 @@ printf "ExecStart=-/sbin/agetty --noissue --autologin weee %%I $TERM" >> /etc/sy
 
 echo "=== Final cleanup ==="
 # Remove unused packages
-apt-get -qq autoremove -y -o Dpkg::Use-Pty=false
+apt-get  autoremove -y
 # Clean the cache
-apt-get -qq clean -y -o Dpkg::Use-Pty=false
+apt-get  clean -y
 rm -rf /var/lib/apt/lists/*
 
 echo "=== Set hostname part 2 ==="

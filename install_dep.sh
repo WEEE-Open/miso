@@ -4,10 +4,9 @@ sudo apt install \
     dosfstools \
     xorriso \
     isolinux \
+    syslinux \
     syslinux-efi \
     grub-pc-bin \
     grub-efi-amd64-bin \
     mtools \
     debian-archive-keyring \
-    isolinux \
-    syslinux

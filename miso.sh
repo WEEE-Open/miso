@@ -1,7 +1,7 @@
 #!/bin/bash
-
-echo "MISO v1.0.0"
-
+. .env
+echo "MISO v$VERSION"
+set -x
 if [[ -z "$MISO_BUILD_DIR" ]]; then
     if [[ -z "$1" ]]; then
         echo "Set the build dir as the first parameter or via MISO_BUILD_DIR"
@@ -21,9 +21,9 @@ if [[ -z "$MISO_CHROOT_SCRIPT" ]]; then
 fi
 
 if [[ -z "$MISO_NO_SUDO" ]]; then
-    _SUDO="sudo"
+    MISO_SUDO="sudo"
 else
-    _SUDO=""
+    MISO_SUDO=""
 fi
 
 if [[ -z "$MISO_ARCH" ]]; then
@@ -54,6 +54,7 @@ done
 while [[ -z "$MISO_USERNAME" ]]; do
   echo -n "Username: "
   read MISO_USERNAME
+  stty echo
 done
 
 while [[ -z $MISO_USERPASSWD ]]; do
@@ -95,37 +96,46 @@ else
   $MISO_SUDO debootstrap \
     --arch=$MISO_ARCH \
     --variant=minbase \
-    stable \
+    bookworm \
     $MISO_BUILD_DIR/chroot \
     http://ftp.it.debian.org/debian/
 fi
 
-rm -rf "$MISO_BUILD_DIR/chroot/source" 2>/dev/null
-cp -r $_MISO_SOURCE_DIR "$MISO_BUILD_DIR/chroot/source"
+$MISO_SUDO rm -rf "$MISO_BUILD_DIR/chroot/source" 2>/dev/null
+$MISO_SUDO cp -r $_MISO_SOURCE_DIR "$MISO_BUILD_DIR/chroot/source"
 # Get rid of some warnings: https://wiki.debian.org/chroot (does not work inside docker)
-# $SUDO mount --bind /dev/pts "$MISO_BUILD_DIR/chroot/dev/pts"
+
+$MISO_SUDO mount -t proc none $MISO_BUILD_DIR/chroot/proc
+$MISO_SUDO mount -o bind /dev $MISO_BUILD_DIR/chroot/dev
+$MISO_SUDO mount -o bind /sys $MISO_BUILD_DIR/chroot/sys
+
 cat << EOF | $MISO_SUDO chroot $MISO_BUILD_DIR/chroot
 set +m
 
 # Subsitution is done outside the chroot
-export MISO_HOSTNAME "$MISO_HOSTNAME"
-export MISO_ROOTPASSWD "$MISO_ROOTPASSWD"
-export MISO_USERNAME "$MISO_USERNAME"
-export MISO_USERPASSWD "$MISO_USERPASSWD"
-export MISO_ARCH "$MISO_ARCH"
-cd /source
-bash ./$_MISO_SOURCE_SCRIPT
-EOF
-rm -rf "$MISO_BUILD_DIR/chroot/source" 2>/dev/null
-#$SUDO umount "$MISO_BUILD_DIR/chroot/dev/pts"
+# export MISO_HOSTNAME
+# export MISO_ROOTPASSWD
+# export MISO_USERNAME
+# export MISO_USERPASSWD
+# export MISO_ARCH
 
+# For some reason export doesn't work in GH CI?
+
+cd /source
+MISO_ARCH=$MISO_ARCH MISO_USERPASSWD=$MISO_USERPASSWD MISO_USERNAME=$MISO_USERNAME MISO_ROOTPASSWD=$MISO_ROOTPASSWD MISO_HOSTNAME=$MISO_HOSTNAME bash ./$_MISO_SOURCE_SCRIPT
+EOF
+
+$MISO_SUDO rm -rf "$MISO_BUILD_DIR/chroot/source" 2>/dev/null
+$MISO_SUDO umount $MISO_BUILD_DIR/chroot/dev
+$MISO_SUDO umount $MISO_BUILD_DIR/chroot/proc
+$MISO_SUDO umount $MISO_BUILD_DIR/chroot/run
 #echo "TEST POINT"
 #exit 0
 
-if [[ -z "$MISO_MKSQUASHFS_MEM" ]]; then
-    echo "Limiting mksquashfs memory to: $MISO_MKSQUASHFS_MEM"
-    MISO_MKSQUASHFS_MEM="-mem $MISO_MKSQUASHFS_MEM"
-fi
+#if [[ -z "$MISO_MKSQUASHFS_MEM" ]]; then
+#    echo "Limiting mksquashfs memory to: $MISO_MKSQUASHFS_MEM"
+#    MISO_MKSQUASHFS_MEM="-mem $MISO_MKSQUASHFS_MEM"
+#fi
 
 # Create directory tree
 mkdir -p $MISO_BUILD_DIR/{staging/{EFI/boot,boot/grub/x86_64-efi,isolinux,live},tmp}
@@ -136,17 +146,17 @@ $MISO_SUDO mksquashfs \
     $MISO_BUILD_DIR/chroot \
     $MISO_BUILD_DIR/staging/live/filesystem.squashfs \
     -e boot $MISO_MKSQUASHFS_MEM
-if [[ $? -ne 0 ]]; then
-  $MISO_SUDO rm -f "$MISO_BUILD_DIR/staging/live/filesystem.squashfs"
-  $MISO_SUDO mksquashfs \
-    $MISO_BUILD_DIR/chroot \
-    $MISO_BUILD_DIR/staging/live/filesystem.squashfs \
-    -e boot $MISO_MKSQUASHFS_MEM
-fi
+#if [[ $? -ne 0 ]]; then
+#  $MISO_SUDO rm -f "$MISO_BUILD_DIR/staging/live/filesystem.squashfs"
+#  $MISO_SUDO mksquashfs \
+#    $MISO_BUILD_DIR/chroot \
+#    $MISO_BUILD_DIR/staging/live/filesystem.squashfs \
+#    -e boot $MISO_MKSQUASHFS_MEM
+#fi
 
-cp $MISO_BUILD_DIR/chroot/boot/vmlinuz-* \
+$MISO_SUDO cp $MISO_BUILD_DIR/chroot/boot/vmlinuz-* \
     $MISO_BUILD_DIR/staging/live/vmlinuz-live && \
-cp $MISO_BUILD_DIR/chroot/boot/initrd.img-* \
+$MISO_SUDO cp $MISO_BUILD_DIR/chroot/boot/initrd.img-* \
     $MISO_BUILD_DIR/staging/live/initrd.img
 
 echo -e "${_BLUE}Building bootloader ...${_RESET_COLOR}"
@@ -207,9 +217,9 @@ EOF
 
 touch $MISO_BUILD_DIR/staging/DEBIAN_CUSTOM
 
-cp /usr/lib/ISOLINUX/isolinux.bin "$MISO_BUILD_DIR/staging/isolinux/"
-cp /usr/lib/syslinux/modules/bios/* "$MISO_BUILD_DIR/staging/isolinux/"
-cp -r /usr/lib/grub/x86_64-efi/* "$MISO_BUILD_DIR/staging/boot/grub/x86_64-efi/"
+$MISO_SUDO cp /usr/lib/ISOLINUX/isolinux.bin "$MISO_BUILD_DIR/staging/isolinux/"
+$MISO_SUDO cp /usr/lib/syslinux/modules/bios/* "$MISO_BUILD_DIR/staging/isolinux/"
+$MISO_SUDO cp -r /usr/lib/grub/x86_64-efi/* "$MISO_BUILD_DIR/staging/boot/grub/x86_64-efi/"
 
 grub-mkstandalone \
     --format=x86_64-efi \
