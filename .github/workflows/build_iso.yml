@@ -21,8 +21,10 @@ jobs:
           uses: "DamianReeves/write-file-action@master"
           with:
             path: weeedebian/env.txt
-            write-mode: append
-            contents: ${{ secrets.TARALLO_TOKEN }}
+            write-mode: overwrite
+            contents: |
+              export TARALLO_URL=${{ secrets.TARALLO_URL }}
+              export TARALLO_TOKEN=${{ secrets.TARALLO_TOKEN }}
         - name: build amd64
           env:
             MISO_ARCH: amd64
