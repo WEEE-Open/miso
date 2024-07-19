@@ -296,12 +296,14 @@ echo "=== Desktop shortcuts ==="
 #  sed -ri -e "s#Icon=(.*/)*([a-zA-Z0-9\-\.]+)#Icon=/home/$MISO_USERNAME/limone/\2#" "/home/$MISO_USERNAME/Desktop/$desktop_file"
 #done
 
+sudo -u $MISO_USERNAME mkdir -p /home/$MISO_USERNAME/.config/WEEE\ Open/tarallo
 sudo -u $MISO_USERNAME cp ./Tarallo.desktop /home/$MISO_USERNAME/Desktop
 sudo -u $MISO_USERNAME cp ./tarallo.png /home/$MISO_USERNAME/.config/WEEE\ Open/tarallo/tarallo.png
 sudo -u $MISO_USERNAME chmod +x /home/$MISO_USERNAME/Desktop/Tarallo.desktop
 
+sudo -u $MISO_USERNAME mkdir -p /home/$MISO_USERNAME/.config/WEEE\ Open/wiki
 sudo -u $MISO_USERNAME cp ./Wiki.desktop /home/$MISO_USERNAME/Desktop
-sudo -u $MISO_USERNAME cp ./wiki.png /home/$MISO_USERNAME/.config/WEEE\ Open/wiki/wiki.png
+sudo -u $MISO_USERNAME cp ./limone.png /home/$MISO_USERNAME/.config/WEEE\ Open/wiki/wiki.png
 sudo -u $MISO_USERNAME chmod +x /home/$MISO_USERNAME/Desktop/Wiki.desktop
 
 
