@@ -134,12 +134,15 @@ apt-get install -y  \
     pciutils \
     python3 \
     python3-venv \
+    python3-venv \
     python-is-python3 \
+    libxcb-cursor0 \
     libxcb-cursor0 \
     rsync \
     smartmontools \
     strace \
     sudo \
+    systemd-timesyncd \
     systemd-timesyncd \
     traceroute \
     wget \
