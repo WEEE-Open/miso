@@ -280,22 +280,32 @@ sudo -u $MISO_USERNAME cp ./light-locker.desktop /home/$MISO_USERNAME/.config/au
 # sudo -u $MISO_USERNAME mkdir -p /home/$MISO_USERNAME/.config/xfce4/desktop /home/$MISO_USERNAME/.config/xfce4/terminal
 
 echo "=== Desktop shortcuts ==="
-if [[ -d "/home/$MISO_USERNAME/limone" ]]; then
-  sudo -u $MISO_USERNAME git -C /home/$MISO_USERNAME/limone pull --ff-only
-else
-  sudo -u $MISO_USERNAME mkdir -p /home/$MISO_USERNAME/limone
-  sudo -u $MISO_USERNAME git clone https://github.com/WEEE-Open/limone.git /home/$MISO_USERNAME/limone
-fi
+#if [[ -d "/home/$MISO_USERNAME/limone" ]]; then
+#  sudo -u $MISO_USERNAME git -C /home/$MISO_USERNAME/limone pull --ff-only
+#else
+#  sudo -u $MISO_USERNAME mkdir -p /home/$MISO_USERNAME/limone
+#  sudo -u $MISO_USERNAME git clone https://github.com/WEEE-Open/limone.git /home/$MISO_USERNAME/limone
+#fi
+#
+#for desktop_file in $(sudo -u $MISO_USERNAME find /home/$MISO_USERNAME/limone -name "*.desktop" -type f -printf "%f "); do
+#  sudo -u $MISO_USERNAME cp "/home/$MISO_USERNAME/limone/$desktop_file" "/home/$MISO_USERNAME/Desktop/$desktop_file"
+#  sudo -u $MISO_USERNAME chmod +x "/home/$MISO_USERNAME/Desktop/$desktop_file"
+#  sed -ri -e "s#Icon=(.*/)*([a-zA-Z0-9\-\.]+)#Icon=/home/$MISO_USERNAME/limone/\2#" "/home/$MISO_USERNAME/Desktop/$desktop_file"
+#done
 
-for desktop_file in $(sudo -u $MISO_USERNAME find /home/$MISO_USERNAME/limone -name "*.desktop" -type f -printf "%f "); do
-  sudo -u $MISO_USERNAME cp "/home/$MISO_USERNAME/limone/$desktop_file" "/home/$MISO_USERNAME/Desktop/$desktop_file"
-  sudo -u $MISO_USERNAME chmod +x "/home/$MISO_USERNAME/Desktop/$desktop_file"
-  sed -ri -e "s#Icon=(.*/)*([a-zA-Z0-9\-\.]+)#Icon=/home/$MISO_USERNAME/limone/\2#" "/home/$MISO_USERNAME/Desktop/$desktop_file"
-done
+sudo -u $MISO_USERNAME cp ./Tarallo.desktop /home/$MISO_USERNAME/Desktop
+sudo -u $MISO_USERNAME cp ./tarallo.png /home/$MISO_USERNAME/.config/WEEE\ Open/tarallo/tarallo.png
+sudo -u $MISO_USERNAME chmod +x /home/$MISO_USERNAME/Desktop/Tarallo.desktop
 
-if [[ -f "/home/$MISO_USERNAME/Desktop/PeracottaGUI.desktop" ]]; then
-  rm -f "/home/$MISO_USERNAME/Desktop/PeracottaGUI.desktop"
-fi
+sudo -u $MISO_USERNAME cp ./Wiki.desktop /home/$MISO_USERNAME/Desktop
+sudo -u $MISO_USERNAME cp ./wiki.png /home/$MISO_USERNAME/.config/WEEE\ Open/wiki/wiki.png
+sudo -u $MISO_USERNAME chmod +x /home/$MISO_USERNAME/Desktop/Wiki.desktop
+
+
+
+#if [[ -f "/home/$MISO_USERNAME/Desktop/PeracottaGUI.desktop" ]]; then
+#  rm -f "/home/$MISO_USERNAME/Desktop/PeracottaGUI.desktop"
+#fi
 sudo -u $MISO_USERNAME cp ./Peracotta.desktop /home/$MISO_USERNAME/Desktop
 sudo -u $MISO_USERNAME cp ./peracotta.png /home/$MISO_USERNAME/.config/WEEE\ Open/peracotta/peracotta.png
 sudo -u $MISO_USERNAME chmod +x /home/$MISO_USERNAME/Desktop/Peracotta.desktop
