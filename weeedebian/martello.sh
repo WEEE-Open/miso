@@ -56,28 +56,33 @@ echo "=== Software installation ==="
 # Add non-free repo and update to pull in all the good firmware
 apt-add-repository non-free 2>&1
 
-# will be needed when upgrading to new versions
-# apt-add-repository non-free-firmware 2>&1
 
-apt-get  update -y
+apt-add-repository non-free-firmware 2>&1
+
+apt-add-repository contrib 2>&1
+
+apt-get update -y
 
 # Remove useless packages, courtesy of "wajig large". Cool command.
 # Do not remove mousepad, it removes xfce-goodies too
-#/bin/bash -c 'DEBIAN_FRONTEND=noninteractive apt-get purge --auto-remove -y libreoffice libreoffice-core libreoffice-common ispell* gimp gimp-* aspell* hunspell* mythes* *sunpinyin* wpolish wnorwegian tegaki* task-thai task-thai-desktop xfonts-thai xiterm* task-khmer task-khmer-desktop fonts-khmeros khmerconverter'
+# /bin/bash -c 'DEBIAN_FRONTEND=noninteractive apt-get purge --auto-remove -y libreoffice libreoffice-core libreoffice-common ispell* gimp gimp-* aspell* hunspell* mythes* *sunpinyin* wpolish wnorwegian tegaki* task-thai task-thai-desktop xfonts-thai xiterm* task-khmer task-khmer-desktop fonts-khmeros khmerconverter'
 # Upgrade and install useful packages
-apt-get  upgrade -y
+apt-get upgrade -y
 # libxkbcommon-x11-0 may be not needed (see Add library to installation if needed #28)
-apt-get  install -y  \
+apt-get install -y  \
+    alsa-firmware-loaders \
     apt-transport-https \
+    atmel-firmware \
+    bluez-firmware \
     ca-certificates \
     cifs-utils \
     curl \
     dmidecode \
     dnsutils \
-    fbxkb \
     firefox-esr \
-    firmware-amd-graphics \
+    firmware-linux \
     firmware-atheros \
+    firmware-b43-installer \
     firmware-bnx2 \
     firmware-bnx2x \
     firmware-brcm80211 \
@@ -85,9 +90,6 @@ apt-get  install -y  \
     firmware-intel-sound \
     firmware-iwlwifi \
     firmware-libertas \
-    firmware-linux \
-    firmware-linux-nonfree \
-    firmware-misc-nonfree \
     firmware-myricom \
     firmware-netronome \
     firmware-netxen \
@@ -98,6 +100,7 @@ apt-get  install -y  \
     firmware-samsung \
     firmware-siano \
     firmware-ti-connectivity \
+    firmware-zd1211 \
     geany \
     git \
     gparted \
@@ -131,12 +134,15 @@ apt-get  install -y  \
     pciutils \
     python3 \
     python3-venv \
+    python3-venv \
     python-is-python3 \
+    libxcb-cursor0 \
     libxcb-cursor0 \
     rsync \
     smartmontools \
     strace \
     sudo \
+    systemd-timesyncd \
     systemd-timesyncd \
     traceroute \
     wget \
@@ -153,7 +159,7 @@ update-ca-certificates
 
 systemctl disable smartd
 
-sudo cp ./NetworkManager.conf /etc/NetworkManager/NetworkManager.conf
+$MISO_SUDO cp ./NetworkManager.conf /etc/NetworkManager/NetworkManager.conf
 systemctl enable NetworkManager
 
 echo "=== User configuration ==="
@@ -233,66 +239,7 @@ cp ./toprc /root/.toprc
 sudo -u $MISO_USERNAME cp ./toprc /home/$MISO_USERNAME/.toprc
 
 echo "=== Prepare peracotta ==="
-if [ "$HOSTTYPE" = "i686" ]; then
-echo "=== Compile Qt from source ==="
-# cmake complains
-export CXX=/usr/bin/g++
-
-# Both Qt5 and Qt6 don't have precomiled binaries for 32bit architectures on modern versions
-# https://wiki.qt.io/Building_Qt_6_from_Git
-apt-get install -y cmake ninja-build libfontconfig1-dev libgl-dev libegl-dev libfontconfig1-dev libfreetype6-dev libx11-dev libx11-xcb-dev libxext-dev libxfixes-dev libxi-dev libxrender-dev libxcb1-dev libxcb-cursor-dev libxcb-glx0-dev libxcb-keysyms1-dev libxcb-image0-dev libxcb-shm0-dev libxcb-icccm4-dev libxcb-sync-dev libxcb-xfixes0-dev libxcb-shape0-dev libxcb-randr0-dev libxcb-render-util0-dev libxcb-util-dev libxcb-xinerama0-dev libxcb-xkb-dev libxkbcommon-dev libxkbcommon-x11-dev
-
-git clone git://code.qt.io/qt/qt5.git qt6 # I know this says qt5, but it's the same repo used for Qt6 I swear
-cd qt6
-git switch 6.6
-
-perl init-repository --module-subset=essential
-mkdir qt6-build
-cd qt6-build
-# default prefix is /usr/local/Qt-6.6.2
-../configure -release \
--skip qt3d \
--skip  qtmultimedia \
--skip qtactiveqt \
--skip qtcharts \
--skip qtgamepad \
--skip qtgraphs \
--skip qtgrpc \
--skip qthttpserver \
--skip qtimageformats \
--skip qtlocation \
--skip qtlottie \
--skip qtmultimedia \
--skip qtnetworkauth \
--skip qtopcua \
--skip qtpositioning \
--skip qtquick3d \
--skip qtquick3dphysics \
--skip qtquickeffectmaker \
--skip qtquicktimeline \
--skip qtremoteobjects \
--skip qtscxml \
--skip qtsensors \
--skip qtserialbus \
--skip qtserialport \
--skip qtshadertools \
--skip qtspeech \
--skip qtvirtualkeyboard \
--skip qtwebchannel \
--skip qtwebengine \
--skip qtwebglplugin \
--skip qtwebsockets \
--skip qtwebview \
--skip qtsql \
-
-cmake --build . --parallel
-sudo cmake --install .
-cd ../..
-# ctest -V -R qlocale # if you want to run tests
-fi
-
-apt-get  install -y python3-pip
-pip install pipx
+apt-get  install -y python3-pip pipx
 
 sudo -u $MISO_USERNAME pipx ensurepath
 sudo -u $MISO_USERNAME pipx install peracotta
@@ -300,13 +247,13 @@ sudo -u $MISO_USERNAME pipx install peracotta
 cp ./peracotta_update /etc/cron.d/peracotta_update
 
 #sudo -u $MISO_USERNAME sh -c 'cd /home/$MISO_USERNAME/peracotta && python3 polkit.py'
-sudo -u $MISO_USERNAME mkdir -p /home/$MISO_USERNAME/.config/peracotta # Ensure the dir exists
-sudo -u $MISO_USERNAME cp ./features.json /home/$MISO_USERNAME/.config/peracotta/features.json
+sudo -u $MISO_USERNAME mkdir -p /home/$MISO_USERNAME/.config/WEEE\ Open/peracotta # Ensure the dir exists
+sudo -u $MISO_USERNAME cp ./features.json /home/$MISO_USERNAME/.config/WEEE\ Open/peracotta/features.json
 
 
 echo "=== Add env to peracotta ==="
 if [[ -f "./env.txt" ]]; then
-  sudo -u $MISO_USERNAME cp ./env.txt /home/$MISO_USERNAME/.config/peracotta/.env
+  sudo -u $MISO_USERNAME cp ./env.txt /home/$MISO_USERNAME/.config/WEEE\ Open/peracotta/.env
 else
   echo "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
   echo "@                                                          @"
@@ -314,7 +261,7 @@ else
   echo "@                                                          @"
   echo "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
   echo "@                                                          @"
-  echo "@   env.txt not found in weeedebian_files.                 @"
+  echo "@   env.txt not found in weeedebian/.                      @"
   echo "@   You're missing out many great peracotta features!      @"
   echo "@   Check README for more info if you want to create the   @"
   echo "@   file and automate your life!                           @"
@@ -336,28 +283,38 @@ sudo -u $MISO_USERNAME cp ./light-locker.desktop /home/$MISO_USERNAME/.config/au
 # sudo -u $MISO_USERNAME mkdir -p /home/$MISO_USERNAME/.config/xfce4/desktop /home/$MISO_USERNAME/.config/xfce4/terminal
 
 echo "=== Desktop shortcuts ==="
-if [[ -d "/home/$MISO_USERNAME/limone" ]]; then
-  sudo -u $MISO_USERNAME git -C /home/$MISO_USERNAME/limone pull --ff-only
-else
-  sudo -u $MISO_USERNAME mkdir -p /home/$MISO_USERNAME/limone
-  sudo -u $MISO_USERNAME git clone https://github.com/WEEE-Open/limone.git /home/$MISO_USERNAME/limone
-fi
+#if [[ -d "/home/$MISO_USERNAME/limone" ]]; then
+#  sudo -u $MISO_USERNAME git -C /home/$MISO_USERNAME/limone pull --ff-only
+#else
+#  sudo -u $MISO_USERNAME mkdir -p /home/$MISO_USERNAME/limone
+#  sudo -u $MISO_USERNAME git clone https://github.com/WEEE-Open/limone.git /home/$MISO_USERNAME/limone
+#fi
+#
+#for desktop_file in $(sudo -u $MISO_USERNAME find /home/$MISO_USERNAME/limone -name "*.desktop" -type f -printf "%f "); do
+#  sudo -u $MISO_USERNAME cp "/home/$MISO_USERNAME/limone/$desktop_file" "/home/$MISO_USERNAME/Desktop/$desktop_file"
+#  sudo -u $MISO_USERNAME chmod +x "/home/$MISO_USERNAME/Desktop/$desktop_file"
+#  sed -ri -e "s#Icon=(.*/)*([a-zA-Z0-9\-\.]+)#Icon=/home/$MISO_USERNAME/limone/\2#" "/home/$MISO_USERNAME/Desktop/$desktop_file"
+#done
 
-for desktop_file in $(sudo -u $MISO_USERNAME find /home/$MISO_USERNAME/limone -name "*.desktop" -type f -printf "%f "); do
-  sudo -u $MISO_USERNAME cp "/home/$MISO_USERNAME/limone/$desktop_file" "/home/$MISO_USERNAME/Desktop/$desktop_file"
-  sudo -u $MISO_USERNAME chmod +x "/home/$MISO_USERNAME/Desktop/$desktop_file"
-  sed -ri -e "s#Icon=(.*/)*([a-zA-Z0-9\-\.]+)#Icon=/home/$MISO_USERNAME/limone/\2#" "/home/$MISO_USERNAME/Desktop/$desktop_file"
-done
+sudo -u $MISO_USERNAME cp ./Tarallo.desktop /home/$MISO_USERNAME/Desktop
+sudo -u $MISO_USERNAME cp ./tarallo.png /home/$MISO_USERNAME/.config/WEEE\ Open/tarallo/tarallo.png
+sudo -u $MISO_USERNAME chmod +x /home/$MISO_USERNAME/Desktop/Tarallo.desktop
 
-if [[ -f "/home/$MISO_USERNAME/Desktop/PeracottaGUI.desktop" ]]; then
-  rm -f "/home/$MISO_USERNAME/Desktop/PeracottaGUI.desktop"
-fi
+sudo -u $MISO_USERNAME cp ./Wiki.desktop /home/$MISO_USERNAME/Desktop
+sudo -u $MISO_USERNAME cp ./wiki.png /home/$MISO_USERNAME/.config/WEEE\ Open/wiki/wiki.png
+sudo -u $MISO_USERNAME chmod +x /home/$MISO_USERNAME/Desktop/Wiki.desktop
+
+
+
+#if [[ -f "/home/$MISO_USERNAME/Desktop/PeracottaGUI.desktop" ]]; then
+#  rm -f "/home/$MISO_USERNAME/Desktop/PeracottaGUI.desktop"
+#fi
 sudo -u $MISO_USERNAME cp ./Peracotta.desktop /home/$MISO_USERNAME/Desktop
-sudo -u $MISO_USERNAME cp ./peracotta.png /home/$MISO_USERNAME/.config/peracotta/peracotta.png
+sudo -u $MISO_USERNAME cp ./peracotta.png /home/$MISO_USERNAME/.config/WEEE\ Open/peracotta/peracotta.png
 sudo -u $MISO_USERNAME chmod +x /home/$MISO_USERNAME/Desktop/Peracotta.desktop
 
 sudo -u $MISO_USERNAME cp ./Peracruda.desktop /home/$MISO_USERNAME/Desktop
-sudo -u $MISO_USERNAME cp ./peracruda.png /home/$MISO_USERNAME/.config/peracotta/peracruda.png
+sudo -u $MISO_USERNAME cp ./peracruda.png /home/$MISO_USERNAME/.config/WEEE\ Open/peracotta/peracruda.png
 sudo -u $MISO_USERNAME chmod +x /home/$MISO_USERNAME/Desktop/Peracruda.desktop
 
 echo "=== Pointerkeys thing ==="

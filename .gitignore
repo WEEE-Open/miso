@@ -2,3 +2,4 @@
 build/*
 !build/README.md
 weeedebian/env.txt
+.direnv

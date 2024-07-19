@@ -2,6 +2,9 @@
 . .env
 echo "MISO v$VERSION"
 set -x
+. .env
+echo "MISO v$VERSION"
+set -x
 if [[ -z "$MISO_BUILD_DIR" ]]; then
     if [[ -z "$1" ]]; then
         echo "Set the build dir as the first parameter or via MISO_BUILD_DIR"
@@ -96,7 +99,7 @@ else
   $MISO_SUDO debootstrap \
     --arch=$MISO_ARCH \
     --variant=minbase \
-    oldstable \
+    bookworm \
     $MISO_BUILD_DIR/chroot \
     http://ftp.it.debian.org/debian/
 fi
