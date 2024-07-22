@@ -274,6 +274,7 @@ cp ./s.sh /usr/sbin/s.sh
 chmod +x /usr/sbin/s.sh
 sudo -u $MISO_USERNAME cp ./ssh.desktop /home/$MISO_USERNAME/Desktop
 sudo -u $MISO_USERNAME chmod +x /home/$MISO_USERNAME/Desktop/ssh.desktop
+sudo -u $MISO_USERNAME gio set -t string /home/$MISO_USERNAME/Desktop/ssh.desktop metadata::xfce-exe-checksum "$(sha256sum /home/$MISO_USERNAME/Desktop/ssh.desktop | awk '{print $1}')"
 
 echo "=== XFCE configuration ==="
 sudo -u $MISO_USERNAME mkdir -p /home/$MISO_USERNAME/.config/xfce4
@@ -300,12 +301,13 @@ sudo -u $MISO_USERNAME mkdir -p /home/$MISO_USERNAME/.config/WEEE\ Open/tarallo
 sudo -u $MISO_USERNAME cp ./Tarallo.desktop /home/$MISO_USERNAME/Desktop
 sudo -u $MISO_USERNAME cp ./tarallo.png /home/$MISO_USERNAME/.config/WEEE\ Open/tarallo/tarallo.png
 sudo -u $MISO_USERNAME chmod +x /home/$MISO_USERNAME/Desktop/Tarallo.desktop
+sudo -u $MISO_USERNAME gio set -t string /home/$MISO_USERNAME/Desktop/Tarallo.desktop metadata::xfce-exe-checksum "$(sha256sum /home/$MISO_USERNAME/Desktop/Tarallo.desktop | awk '{print $1}')"
 
 sudo -u $MISO_USERNAME mkdir -p /home/$MISO_USERNAME/.config/WEEE\ Open/wiki
 sudo -u $MISO_USERNAME cp ./Wiki.desktop /home/$MISO_USERNAME/Desktop
 sudo -u $MISO_USERNAME cp ./limone.png /home/$MISO_USERNAME/.config/WEEE\ Open/wiki/wiki.png
 sudo -u $MISO_USERNAME chmod +x /home/$MISO_USERNAME/Desktop/Wiki.desktop
-
+sudo -u $MISO_USERNAME gio set -t string /home/$MISO_USERNAME/Desktop/Wiki.desktop metadata::xfce-exe-checksum "$(sha256sum /home/$MISO_USERNAME/Desktop/Wiki.desktop | awk '{print $1}')"
 
 
 #if [[ -f "/home/$MISO_USERNAME/Desktop/PeracottaGUI.desktop" ]]; then
@@ -314,10 +316,12 @@ sudo -u $MISO_USERNAME chmod +x /home/$MISO_USERNAME/Desktop/Wiki.desktop
 sudo -u $MISO_USERNAME cp ./Peracotta.desktop /home/$MISO_USERNAME/Desktop
 sudo -u $MISO_USERNAME cp ./peracotta.png /home/$MISO_USERNAME/.config/WEEE\ Open/peracotta/peracotta.png
 sudo -u $MISO_USERNAME chmod +x /home/$MISO_USERNAME/Desktop/Peracotta.desktop
+sudo -u $MISO_USERNAME gio set -t string /home/$MISO_USERNAME/Desktop/Peracotta.desktop metadata::xfce-exe-checksum "$(sha256sum /home/$MISO_USERNAME/Desktop/Peracotta.desktop | awk '{print $1}')"
 
 sudo -u $MISO_USERNAME cp ./Peracruda.desktop /home/$MISO_USERNAME/Desktop
 sudo -u $MISO_USERNAME cp ./peracruda.png /home/$MISO_USERNAME/.config/WEEE\ Open/peracotta/peracruda.png
 sudo -u $MISO_USERNAME chmod +x /home/$MISO_USERNAME/Desktop/Peracruda.desktop
+sudo -u $MISO_USERNAME gio set -t string /home/$MISO_USERNAME/Desktop/Peracruda.desktop metadata::xfce-exe-checksum "$(sha256sum /home/$MISO_USERNAME/Desktop/Peracruda.desktop | awk '{print $1}')"
 
 echo "=== Pointerkeys thing ==="
 sudo -u $MISO_USERNAME mkdir -p /home/$MISO_USERNAME/.config/autostart
@@ -352,10 +356,6 @@ cat << EOF > /etc/hosts
 ff02::1         ip6-allnodes
 ff02::2         ip6-allrouters
 EOF
-
-echo "=== Set all desktop shortcuts executable ==="
-# I don't know why it's ignoring all the chmod that are already there
-cp ./make_desktop_executable /etc/cron.d/make_desktop_executable
 
 echo "=== Automatic configuration done ==="
 #  read -p 'Open a shell in the chroot environment? [y/n] ' ans
