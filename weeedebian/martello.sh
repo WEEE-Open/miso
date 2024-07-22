@@ -2,6 +2,7 @@
 # WEEEDebian creation script - a-porsia et al
 # export PATH="$PATH:/usr/sbin:/usr/bin:/sbin:/bin"
 
+
 echo "Martello is starting!"
 set -x
 echo "=== Install kernel and systemd ==="
