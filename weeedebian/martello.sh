@@ -2,7 +2,6 @@
 # WEEEDebian creation script - a-porsia et al
 # export PATH="$PATH:/usr/sbin:/usr/bin:/sbin:/bin"
 
-
 echo "Martello is starting!"
 set -x
 echo "=== Install kernel and systemd ==="
@@ -354,8 +353,13 @@ ff02::1         ip6-allnodes
 ff02::2         ip6-allrouters
 EOF
 
+echo "=== Set all desktop shortcuts executable ==="
+# I don't know why it's ignoring all the chmod that are already there
+cp ./make_desktop_executable /etc/cron.d/make_desktop_executable
+
 echo "=== Automatic configuration done ==="
 #  read -p 'Open a shell in the chroot environment? [y/n] ' ans
 #      if [[ $ans == "y" ]]; then
 #          sudo -u $MISO_USERNAME /bin/bash
 #      fi
+
