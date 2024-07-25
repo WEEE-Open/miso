@@ -1,37 +1,17 @@
 #!/bin/bash
+
+set -x # Logs
+set -e # exit at any error
+
 . .env
 echo "MISO v$VERSION"
-set -x
-. .env
-echo "MISO v$VERSION"
-set -x
-if [[ -z "$MISO_BUILD_DIR" ]]; then
-    if [[ -z "$1" ]]; then
-        echo "Set the build dir as the first parameter or via MISO_BUILD_DIR"
-        exit 1
-    else
-        MISO_BUILD_DIR="$1"
-    fi
-fi
 
-if [[ -z "$MISO_CHROOT_SCRIPT" ]]; then
-    if [[ -z "$2" ]]; then
-        echo "Set the chroot script as the second parameter or via MISO_CHROOT_SCRIPT"
-        exit 1
-    else
-        MISO_CHROOT_SCRIPT="$2"
-    fi
-fi
+MISO_BUILD_DIR="build"
+MISO_CHROOT_SCRIPTS_DIR="chroot_scripts"
 
-if [[ -z "$MISO_NO_SUDO" ]]; then
-    MISO_SUDO="sudo"
-else
-    MISO_SUDO=""
-fi
-
-if [[ -z "$MISO_ARCH" ]]; then
+if [[ -z "$MISO_ARCH" ]]; then # '32' or 'i386' for 32bit, everything else is 64
     if [[ -z "$3" ]]; then
-        echo "Set the architecture as the third parameter or via MISO_ARCH"
+        echo "Set the architecture as the first parameter or via MISO_ARCH"
         exit 1
     else
         MISO_ARCH="$3"
@@ -39,33 +19,38 @@ if [[ -z "$MISO_ARCH" ]]; then
 fi
 
 # These cannot be moved to the chroot, read doesn't work thru all those levels
-
 while [[ -z "$MISO_HOSTNAME" ]]; do
-  # read -p does not work from docker for some reason
-  echo -n "Hostname: "
-  read MISO_HOSTNAME
+    # read -p does not work from docker for some reason
+    echo -n "Hostname: "
+    read MISO_HOSTNAME
 done
 
 while [[ -z "$MISO_ROOTPASSWD" ]]; do
-  echo -n "Root password: "
-  # read -s doesn't work from docker
-  stty -echo
-  read MISO_ROOTPASSWD
-  stty echo
+    echo -n "Root password: "
+    # read -s doesn't work from docker
+    stty -echo
+    read MISO_ROOTPASSWD
+    stty echo
 done
 
 while [[ -z "$MISO_USERNAME" ]]; do
-  echo -n "Username: "
-  read MISO_USERNAME
-  stty echo
+    echo -n "Username: "
+    read MISO_USERNAME
 done
 
 while [[ -z $MISO_USERPASSWD ]]; do
-  echo -n "$MISO_USERNAME password: "
-  stty -echo
-  read MISO_USERPASSWD
-  stty echo
+    echo -n "$MISO_USERNAME password: "
+    stty -echo
+    read MISO_USERPASSWD
+    stty echo
 done
+
+mkdir -p $MISO_BUILD_DIR
+mkdir -p $MISO_CHROOT_SCRIPTS_DIR
+
+MISO_BUILD_DIR=$(readlink -f "$MISO_BUILD_DIR")
+MISO_BUILD_DIR="$MISO_BUILD_DIR/$MISO_DISTRO_NAME-$MISO_ARCH"
+MISO_CHROOT_SCRIPTS_DIR=$(readlink -f "$MISO_CHROOT_SCRIPTS_DIR")
 
 _ORANGE='\033[0;33m'
 _RED='\033[0;31m'
@@ -82,56 +67,53 @@ else
     MISO_ARCH=amd64
 fi
 
-MISO_CHROOT_SCRIPT=$(readlink -f "$MISO_CHROOT_SCRIPT")
-_MISO_SOURCE_DIR=$(dirname "$MISO_CHROOT_SCRIPT")
-_MISO_SOURCE_SCRIPT=$(basename "$MISO_CHROOT_SCRIPT")
-_MISO_BUILD_NAME=$(basename "$_MISO_SOURCE_DIR")
-MISO_BUILD_DIR=$(readlink -f "$MISO_BUILD_DIR")
-MISO_BUILD_DIR="$MISO_BUILD_DIR/$_MISO_BUILD_NAME-$MISO_ARCH"
-
-mkdir -p $MISO_BUILD_DIR
-
-if [[ -d "$MISO_BUILD_DIR/chroot" ]]; then
-  echo -e "${_ORANGE}Chroot directory exists, skipping bootstrap!${_RESET_COLOR}"
-  echo -e "${_ORANGE}To bootstrap again, delete $MISO_BUILD_DIR/chroot${_RESET_COLOR}"
+if [[ "$MISO_ARCH" == "i386" ]]; then
+    # There's also 686-pae
+    LINUX_IMAGE_ARCH="686"
 else
-  echo -e "${_BLUE}Bootstrapping${_RESET_COLOR}"
-  $MISO_SUDO debootstrap \
-    --arch=$MISO_ARCH \
-    --variant=minbase \
-    bookworm \
-    $MISO_BUILD_DIR/chroot \
-    http://ftp.it.debian.org/debian/
+    LINUX_IMAGE_ARCH=$MISO_ARCH
 fi
 
-$MISO_SUDO rm -rf "$MISO_BUILD_DIR/chroot/source" 2>/dev/null
-$MISO_SUDO cp -r $_MISO_SOURCE_DIR "$MISO_BUILD_DIR/chroot/source"
+if [[ -d "$MISO_BUILD_DIR/chroot" ]]; then
+    echo -e "${_ORANGE}Chroot directory exists, skipping bootstrap!${_RESET_COLOR}"
+    echo -e "${_ORANGE}To bootstrap again, delete $MISO_BUILD_DIR/chroot${_RESET_COLOR}"
+else
+    echo -e "${_BLUE}Bootstrapping${_RESET_COLOR}"
+    sudo debootstrap \
+        --arch=$MISO_ARCH \
+        --variant=minbase \
+        --include=linux-image-$LINUX_IMAGE_ARCH,live-boot,systemd-sysv,apt-utils,zstd \
+        bookworm \
+        $MISO_BUILD_DIR/chroot \
+        http://ftp.it.debian.org/debian/
+fi
+
+if [[ "$1" == "--bootstrap" ]]; then
+    exit 0
+fi
+
+echo -e "${_BLUE}Running setup...${_RESET_COLOR}"
+#$MISO_SUDO rm -rf "$MISO_BUILD_DIR/chroot/source" 2>/dev/null
+sudo cp -r "$MISO_CHROOT_SCRIPTS_DIR" "$MISO_BUILD_DIR/chroot/"
 # Get rid of some warnings: https://wiki.debian.org/chroot (does not work inside docker)
 
-$MISO_SUDO mount -t proc none $MISO_BUILD_DIR/chroot/proc
-$MISO_SUDO mount -o bind /dev $MISO_BUILD_DIR/chroot/dev
-$MISO_SUDO mount -o bind /sys $MISO_BUILD_DIR/chroot/sys
-
-cat << EOF | $MISO_SUDO chroot $MISO_BUILD_DIR/chroot
-set +m
-
-# Subsitution is done outside the chroot
-# export MISO_HOSTNAME
-# export MISO_ROOTPASSWD
-# export MISO_USERNAME
-# export MISO_USERPASSWD
-# export MISO_ARCH
-
-# For some reason export doesn't work in GH CI?
-
-cd /source
-MISO_ARCH=$MISO_ARCH MISO_USERPASSWD=$MISO_USERPASSWD MISO_USERNAME=$MISO_USERNAME MISO_ROOTPASSWD=$MISO_ROOTPASSWD MISO_HOSTNAME=$MISO_HOSTNAME bash ./$_MISO_SOURCE_SCRIPT
+#$MISO_SUDO mount -t proc none $MISO_BUILD_DIR/chroot/proc
+#$MISO_SUDO mount -o bind /dev $MISO_BUILD_DIR/chroot/dev
+#$MISO_SUDO mount -o bind /sys $MISO_BUILD_DIR/chroot/sys
+set +e
+cat <<EOF | sudo chroot $MISO_BUILD_DIR/chroot "/bin/bash"
+    export PATH=/bin:/sbin:/usr/bin:/usr/sbin
+    cd chroot_scripts
+    for file in *; do [ ! -d "\$file" ] && [ -x "\$file" ] && echo -e "${_GREEN}Running ./\$file${_RESET_COLOR}" && bash ./\$file; done
 EOF
+set -e
 
-$MISO_SUDO rm -rf "$MISO_BUILD_DIR/chroot/source" 2>/dev/null
-$MISO_SUDO umount $MISO_BUILD_DIR/chroot/dev
-$MISO_SUDO umount $MISO_BUILD_DIR/chroot/proc
-$MISO_SUDO umount $MISO_BUILD_DIR/chroot/run
+#
+#$MISO_SUDO rm -rf "$MISO_BUILD_DIR/chroot/source" 2>/dev/null
+#$MISO_SUDO umount $MISO_BUILD_DIR/chroot/dev
+#$MISO_SUDO umount $MISO_BUILD_DIR/chroot/proc
+#$MISO_SUDO umount $MISO_BUILD_DIR/chroot/sys
+#$MISO_SUDO umount $MISO_BUILD_DIR/chroot/run
 #echo "TEST POINT"
 #exit 0
 
@@ -141,14 +123,17 @@ $MISO_SUDO umount $MISO_BUILD_DIR/chroot/run
 #fi
 
 # Create directory tree
-mkdir -p $MISO_BUILD_DIR/{staging/{EFI/boot,boot/grub/x86_64-efi,isolinux,live},tmp}
+sudo mkdir -p $MISO_BUILD_DIR/{staging/{EFI/boot,boot/grub/x86_64-efi,isolinux,live},tmp}
 
 # Squash filesystem
 echo -e "${_BLUE}Squashing filesystem ...${_RESET_COLOR}"
-$MISO_SUDO mksquashfs \
+sudo mksquashfs \
     $MISO_BUILD_DIR/chroot \
     $MISO_BUILD_DIR/staging/live/filesystem.squashfs \
-    -e boot $MISO_MKSQUASHFS_MEM
+    -b 1048576 -comp xz -Xdict-size 100% \
+    -noappend \
+    -e boot proc tmp sys run dev $MISO_CHROOT_SCRIPTS_DIR
+
 #if [[ $? -ne 0 ]]; then
 #  $MISO_SUDO rm -f "$MISO_BUILD_DIR/staging/live/filesystem.squashfs"
 #  $MISO_SUDO mksquashfs \
@@ -157,13 +142,13 @@ $MISO_SUDO mksquashfs \
 #    -e boot $MISO_MKSQUASHFS_MEM
 #fi
 
-$MISO_SUDO cp $MISO_BUILD_DIR/chroot/boot/vmlinuz-* \
-    $MISO_BUILD_DIR/staging/live/vmlinuz-live && \
-$MISO_SUDO cp $MISO_BUILD_DIR/chroot/boot/initrd.img-* \
-    $MISO_BUILD_DIR/staging/live/initrd.img
+sudo cp $MISO_BUILD_DIR/chroot/boot/vmlinuz-* \
+    $MISO_BUILD_DIR/staging/live/vmlinuz-live &&
+    sudo cp $MISO_BUILD_DIR/chroot/boot/initrd.img-* \
+        $MISO_BUILD_DIR/staging/live/initrd.img
 
 echo -e "${_BLUE}Building bootloader ...${_RESET_COLOR}"
-cat << EOF > $MISO_BUILD_DIR/staging/isolinux/isolinux.cfg
+sudo tee $MISO_BUILD_DIR/staging/isolinux/isolinux.cfg <<EOF
 UI vesamenu.c32
 
 MENU TITLE Boot Menu
@@ -181,19 +166,19 @@ MENU COLOR msg07        37;40   #90ffffff #a0000000 std
 MENU COLOR tabmsg       31;40   #30ffffff #00000000 std
 
 LABEL linux
-  MENU LABEL $_MISO_BUILD_NAME $MISO_ARCH [BIOS/ISOLINUX]
+  MENU LABEL $_MISO_BUILD_NAME ($MISO_VARIANT) $MISO_ARCH [BIOS/ISOLINUX]
   MENU DEFAULT
   KERNEL /live/vmlinuz-live
   APPEND initrd=/live/initrd.img boot=live
 
 LABEL linux
-  MENU LABEL $_MISO_BUILD_NAME $MISO_ARCH [BIOS/ISOLINUX] (nomodeset)
+  MENU LABEL $_MISO_BUILD_NAME ($MISO_VARIANT) $MISO_ARCH [BIOS/ISOLINUX] (nomodeset)
   MENU DEFAULT
   KERNEL /live/vmlinuz-live
   APPEND initrd=/live/initrd.img boot=live nomodeset
 EOF
 
-cat << EOF > $MISO_BUILD_DIR/staging/boot/grub/grub.cfg
+sudo tee $MISO_BUILD_DIR/staging/boot/grub/grub.cfg <<EOF
 search --set=root --file /DEBIAN_CUSTOM
 
 set default="0"
@@ -212,17 +197,17 @@ menuentry "$_MISO_BUILD_NAME $MISO_ARCH [EFI/GRUB] (nomodeset)" {
 }
 EOF
 
-cat << EOF > $MISO_BUILD_DIR/tmp/grub-standalone.cfg
+sudo tee $MISO_BUILD_DIR/tmp/grub-standalone.cfg <<EOF
 search --set=root --file /DEBIAN_CUSTOM
 set prefix=(\$root)/boot/grub/
 configfile /boot/grub/grub.cfg
 EOF
 
-touch $MISO_BUILD_DIR/staging/DEBIAN_CUSTOM
+sudo touch $MISO_BUILD_DIR/staging/DEBIAN_CUSTOM
 
-$MISO_SUDO cp /usr/lib/ISOLINUX/isolinux.bin "$MISO_BUILD_DIR/staging/isolinux/"
-$MISO_SUDO cp /usr/lib/syslinux/modules/bios/* "$MISO_BUILD_DIR/staging/isolinux/"
-$MISO_SUDO cp -r /usr/lib/grub/x86_64-efi/* "$MISO_BUILD_DIR/staging/boot/grub/x86_64-efi/"
+sudo cp /usr/lib/ISOLINUX/isolinux.bin "$MISO_BUILD_DIR/staging/isolinux/"
+sudo cp /usr/lib/syslinux/modules/bios/* "$MISO_BUILD_DIR/staging/isolinux/"
+sudo cp -r /usr/lib/grub/x86_64-efi/* "$MISO_BUILD_DIR/staging/boot/grub/x86_64-efi/"
 
 grub-mkstandalone \
     --format=x86_64-efi \
@@ -231,30 +216,31 @@ grub-mkstandalone \
     --fonts="" \
     "boot/grub/grub.cfg=$MISO_BUILD_DIR/tmp/grub-standalone.cfg"
 
-(cd $MISO_BUILD_DIR/staging/EFI/boot && \
-dd if=/dev/zero of=efiboot.img bs=1M count=20 && \
-mkfs.vfat efiboot.img && \
-mmd -i efiboot.img efi efi/boot && \
-mcopy -vi efiboot.img $MISO_BUILD_DIR/tmp/bootx64.efi ::efi/boot/
+(
+    cd $MISO_BUILD_DIR/staging/EFI/boot &&
+        dd if=/dev/zero of=efiboot.img bs=1M count=20 &&
+        mkfs.vfat efiboot.img &&
+        mmd -i efiboot.img efi efi/boot &&
+        mcopy -vi efiboot.img $MISO_BUILD_DIR/tmp/bootx64.efi ::efi/boot/
 )
 
 echo -e "${_BLUE}Building final ISO ...${_RESET_COLOR}"
 xorriso \
     -as mkisofs \
     -iso-level 3 \
-    -o "$MISO_BUILD_DIR/$_MISO_BUILD_NAME-$MISO_ARCH.iso" \
+    -o "$MISO_BUILD_DIR/$MISO_DISTRO_NAME-$MISO_ARCH.iso" \
     -full-iso9660-filenames \
-    -volid "${_MISO_BUILD_NAME^^}" \
+    -volid "${MISO_DISTRO_NAME^^}" \
     -isohybrid-mbr /usr/lib/ISOLINUX/isohdpfx.bin \
     -eltorito-boot \
-        isolinux/isolinux.bin \
-        -no-emul-boot \
-        -boot-load-size 4 \
-        -boot-info-table \
-        --eltorito-catalog isolinux/isolinux.cat \
+    isolinux/isolinux.bin \
+    -no-emul-boot \
+    -boot-load-size 4 \
+    -boot-info-table \
+    --eltorito-catalog isolinux/isolinux.cat \
     -eltorito-alt-boot \
-        -e /EFI/boot/efiboot.img \
-        -no-emul-boot \
-        -isohybrid-gpt-basdat \
+    -e /EFI/boot/efiboot.img \
+    -no-emul-boot \
+    -isohybrid-gpt-basdat \
     -append_partition 2 0xef $MISO_BUILD_DIR/staging/EFI/boot/efiboot.img \
     "$MISO_BUILD_DIR/staging"

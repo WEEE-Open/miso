@@ -1,1 +1,0 @@
-@reboot root cp /etc/hosts_fixed /etc/hosts &>/dev/null

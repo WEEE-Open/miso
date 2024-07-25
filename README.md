@@ -19,7 +19,7 @@ docker run --name miso \
   -e MISO_USERNAME=weee \
   -e MISO_USERPASSWD=asd \
   -e MISO_ARCH=amd64 \
-  -e MISO_NO_SUDO=1 \
+  -e MISO_CONTAINER=true \
   weee-open/miso:latest
 ```
 
