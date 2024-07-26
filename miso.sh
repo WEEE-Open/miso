@@ -78,22 +78,24 @@ else
     LINUX_IMAGE_ARCH=$MISO_ARCH
 fi
 
-if [[ -d "$MISO_BUILD_DIR/chroot" ]]; then
-    echo -e "${_ORANGE}Chroot directory exists, skipping bootstrap!${_RESET_COLOR}"
-    echo -e "${_ORANGE}To bootstrap again, delete $MISO_BUILD_DIR/chroot${_RESET_COLOR}"
-else
-    echo -e "${_BLUE}Bootstrapping${_RESET_COLOR}"
-    mmdebstrap \
-        --arch=$MISO_ARCH \
-        --variant=minbase \
-        --mode=sudo \
-        --include=linux-image-$LINUX_IMAGE_ARCH,live-boot,systemd-sysv,apt-utils,zstd,gpgv \
-        --components=main,contrib,non-free-firmware \
-        "--customize-hook=set +e; cp -r $MISO_CHROOT_SCRIPTS_DIR \$1; echo 'cd chroot_scripts; for file in *; do [ ! -d \$file ] && [ -x \$file ] && echo && echo -e +++ Running \$file +++ && bash ./\$file; done' | chroot \$1 '/bin/bash'; set -e" \
-        $MISO_VARIANT \
-        $MISO_BUILD_DIR/chroot \
-        http://ftp.it.debian.org/debian/
-fi
+#if [[ -d "$MISO_BUILD_DIR/chroot" ]]; then
+#    echo -e "${_ORANGE}Chroot directory exists, skipping bootstrap!${_RESET_COLOR}"
+#    echo -e "${_ORANGE}To bootstrap again, delete $MISO_BUILD_DIR/chroot${_RESET_COLOR}"
+#else
+# For now, always redo bootstrap since the setup is done with hooks. Eventually, this whole thing could be done properly through a makefile
+# Skipping this skep isn't so important, since boostrap takes about 1 minute of the 5/6 total
+echo -e "${_BLUE}Bootstrapping${_RESET_COLOR}"
+mmdebstrap \
+    --arch=$MISO_ARCH \
+    --variant=minbase \
+    --mode=sudo \
+    --include=linux-image-$LINUX_IMAGE_ARCH,live-boot,systemd-sysv,apt-utils,zstd,gpgv \
+    --components=main,contrib,non-free-firmware \
+    "--customize-hook=set +e; cp -r $MISO_CHROOT_SCRIPTS_DIR \$1; echo 'cd chroot_scripts; for file in *; do [ ! -d \$file ] && [ -x \$file ] && echo && echo -e +++ Running \$file +++ && bash ./\$file; done' | chroot \$1 '/bin/bash'; set -e" \
+    $MISO_VARIANT \
+    $MISO_BUILD_DIR/chroot \
+    http://ftp.it.debian.org/debian/
+#fi
 
 if [[ "$1" == "--bootstrap" ]]; then
     exit 0
