@@ -11,7 +11,7 @@ jobs:
     steps:
         - uses: actions/checkout@v4
         - name: Install dependencies
-          run: sudo apt-get update && sudo apt-get install -y debootstrap squashfs-tools dosfstools xorriso isolinux syslinux-efi grub-pc-bin grub-efi-amd64-bin mtools debian-archive-keyring isolinux syslinux
+          run: sudo apt-get update && sudo apt-get install -y mmdebstrap squashfs-tools dosfstools xorriso isolinux syslinux-efi grub-pc-bin grub-efi-amd64-bin mtools debian-archive-keyring isolinux syslinux
         - name: Dotenv Action
           uses: falti/dotenv-action@v1.1
           id: dotenv
