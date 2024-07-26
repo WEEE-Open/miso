@@ -1,42 +1,6 @@
 #!/bin/bash
 # WEEEDebian creation script - a-porsia et al
 
-echo "=== Sudo configuration ==="
-cp ./$MISO_USERNAME /etc/sudoers.d/$MISO_USERNAME
-
-echo "=== Shell and home configuration ==="
-sudo -u $MISO_USERNAME mkdir -p /home/$MISO_USERNAME/Desktop
-# sudo -u $MISO_USERNAME ln -sf ./Desktop /home/$MISO_USERNAME/Scrivania
-chsh -s /bin/zsh root
-# chsh -s /bin/zsh weee
-sudo -u $MISO_USERNAME curl -L -o /home/$MISO_USERNAME/.zshrc https://git.grml.org/f/grml-etc-core/etc/zsh/zshrc
-cp /home/$MISO_USERNAME/.zshrc /root/.zshrc
-
-sudo -u $MISO_USERNAME rm /home/$MISO_USERNAME/.bash_history >/dev/null 2>/dev/null
-rm /root/.bash_history >/dev/null 2>/dev/null
-
-echo "=== Keymap configuration ==="
-# Needed for sure on Debian 11:
-cp ./keyboard /etc/default/keyboard
-# Keyboard layout switcher:
-sudo -u $MISO_USERNAME mkdir -p /home/$MISO_USERNAME/.config/autostart
-sudo -u $MISO_USERNAME cp ./fbxkb.desktop /home/$MISO_USERNAME/.config/autostart/fbxkb.desktop
-# 00-keyboard.conf can be managed by localectl. In fact, this is one of such files produced by localectl.
-# May not be needed in Debian 11:
-mkdir -p /etc/X11/xorg.conf.d
-cp ./00-keyboard.conf /etc/X11/xorg.conf.d/00-keyboard.conf
-echo "KEYMAP=it" >/etc/vconsole.conf
-
-echo "=== Locale configuration ==="
-cp ./locale.gen /etc/locale.gen
-cp ./locale.conf /etc/locale.conf
-locale-gen
-update-locale
-# . /etc/locale.conf
-# Prints POSIX everywhere despite different variables have just been sourced.
-# Whatever, it is correct once boot.
-# locale
-
 echo "=== SSH daemon configuration ==="
 cp ./sshd_config /etc/ssh/sshd_config
 

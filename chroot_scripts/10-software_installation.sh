@@ -94,3 +94,5 @@ apt-get -qq -o Dpkg::Use-Pty=false -y install \
     xserver-xorg \
     zsh \
     >/dev/null
+
+chsh -s /bin/zsh root

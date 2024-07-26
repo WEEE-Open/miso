@@ -17,3 +17,19 @@ fi
 # So...
 sed -i "s#root:.*#root:$ROOTPASSWD:18214:0:99999:7:::#" /etc/shadow
 sed -i "s#$MISO_USERNAME:.*#$MISO_USERNAME:$MISO_USERPASSWD:18214:0:99999:7:::#" /etc/shadow
+
+echo "=== Sudo configuration ==="
+sudo tee /etc/sudoers.d/$MISO_USERNAME <<EOF
+Defaults lecture = never
+weee ALL=(ALL) NOPASSWD: ALL
+EOF
+
+echo "=== Shell and home configuration ==="
+sudo -u $MISO_USERNAME mkdir -p /home/$MISO_USERNAME/Desktop
+# sudo -u $MISO_USERNAME ln -sf ./Desktop /home/$MISO_USERNAME/Scrivania
+# chsh -s /bin/zsh weee
+sudo -u $MISO_USERNAME curl -L -o /home/$MISO_USERNAME/.zshrc https://git.grml.org/f/grml-etc-core/etc/zsh/zshrc
+cp /home/$MISO_USERNAME/.zshrc /root/.zshrc
+
+sudo -u $MISO_USERNAME rm /home/$MISO_USERNAME/.bash_history >/dev/null 2>/dev/null
+rm /root/.bash_history >/dev/null 2>/dev/null
