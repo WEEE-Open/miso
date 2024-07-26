@@ -52,6 +52,7 @@ mkdir -p $MISO_CHROOT_SCRIPTS_DIR
 
 MISO_BUILD_DIR=$(readlink -f "$MISO_BUILD_DIR")
 MISO_BUILD_DIR="$MISO_BUILD_DIR/$MISO_DISTRO_NAME-$MISO_ARCH"
+export TMPDOR=$MISO_BUILD_DIR
 MISO_CHROOT_SCRIPTS_DIR=$(readlink -f "$MISO_CHROOT_SCRIPTS_DIR")
 mkdir -p $MISO_BUILD_DIR
 
@@ -77,7 +78,7 @@ else
     LINUX_IMAGE_ARCH=$MISO_ARCH
 fi
 
-if [[ -d "$MISO_BUILD_DIR/chroot" ]]; then
+if [[ -e "$MISO_BUILD_DIR/chroot.tar" ]]; then
     echo -e "${_ORANGE}Chroot directory exists, skipping bootstrap!${_RESET_COLOR}"
     echo -e "${_ORANGE}To bootstrap again, delete $MISO_BUILD_DIR/chroot${_RESET_COLOR}"
 else
@@ -87,9 +88,9 @@ else
         --variant=minbase \
         --include=linux-image-$LINUX_IMAGE_ARCH,live-boot,systemd-sysv,apt-utils,zstd,gpgv \
         --components=main,contrib,non-free-firmware \
-        "--customize-hook=cp -r $MISO_CHROOT_SCRIPTS_DIR $MISO_BUILD_DIR/chroot/tmp/; echo 'cd /tmp/chroot_scripts; for file in *; do [ ! -d \$file ] && [ -x \$file ] && echo && echo -e +++ Running \$file +++ && bash ./\$file; done' | chroot '$MISO_BUILD_DIR/chroot' '/bin/bash'; rm -r $MISO_BUILD_DIR/chroot/tmp/chroot_scripts" \
+        "--customize-hook=set +e; cp -r $MISO_CHROOT_SCRIPTS_DIR \$1; echo 'cd chroot_scripts; for file in *; do [ ! -d \$file ] && [ -x \$file ] && echo && echo -e +++ Running \$file +++ && bash ./\$file; done' | chroot \$1 '/bin/bash'; set -e" \
         $MISO_VARIANT \
-        $MISO_BUILD_DIR/chroot \
+        $MISO_BUILD_DIR/chroot.tar \
         http://ftp.it.debian.org/debian/
 fi
 
@@ -133,11 +134,11 @@ mkdir -p $MISO_BUILD_DIR/{staging/{EFI/boot,boot/grub/x86_64-efi,isolinux,live},
 # Squash filesystem
 echo -e "${_BLUE}Squashing filesystem ...${_RESET_COLOR}"
 mksquashfs \
-    $MISO_BUILD_DIR/chroot \
+    $MISO_BUILD_DIR/chroot.tar \
     $MISO_BUILD_DIR/staging/live/filesystem.squashfs \
     -b 1048576 -comp xz -Xdict-size 100% \
     -noappend \
-    -e boot $MISO_CHROOT_SCRIPTS_DIR
+    -e boot chroot_scripts
 # proc sys run dev
 
 #if [[ $? -ne 0 ]]; then
@@ -148,10 +149,13 @@ mksquashfs \
 #    -e boot $MISO_MKSQUASHFS_MEM
 #fi
 
-cp $MISO_BUILD_DIR/chroot/boot/vmlinuz-* \
-    $MISO_BUILD_DIR/staging/live/vmlinuz-live &&
-    cp $MISO_BUILD_DIR/chroot/boot/initrd.img-* \
-        $MISO_BUILD_DIR/staging/live/initrd.img
+tar -C $MISO_BUILD_DIR/tmp --xattrs --xattrs-include='*' -xf $MISO_BUILD_DIR/chroot.tar --wildcards './boot/vmlinuz-*'
+tar -C $MISO_BUILD_DIR/tmp --xattrs --xattrs-include='*' -xf $MISO_BUILD_DIR/chroot.tar --wildcards './boot/initrd.img-*'
+
+cp $MISO_BUILD_DIR/tmp/boot/vmlinuz-* \
+    $MISO_BUILD_DIR/staging/live/vmlinuz-live
+cp $MISO_BUILD_DIR/tmp/boot/initrd.img-* \
+    $MISO_BUILD_DIR/staging/live/initrd.img
 
 echo -e "${_BLUE}Building bootloader ...${_RESET_COLOR}"
 tee $MISO_BUILD_DIR/staging/isolinux/isolinux.cfg <<EOF
