@@ -1,13 +1,12 @@
 services:
     miso:
-        hostname: weeedebian
         container_name: miso
-        tty: true
-        privileged: true
+        build: .
+        hostname: weeedebian
         volumes:
             - ./build:/miso/build:rwz
             - ./weeedebian:/miso/weeedebian:roz
             - ./chroot_scripts:/miso/chroot_scripts:roz
-            - /proc:/proc:rwz
-        build: .
+        tty: true
         stdin_open: true
+        privileged: true

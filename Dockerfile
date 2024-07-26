@@ -4,7 +4,7 @@ FROM debian:stable
 RUN apt-get update -y \
 	&& apt-get install -y \
 	sudo \
-	debootstrap \
+	mmdebstrap \
 	squashfs-tools \
 	dosfstools \
 	xorriso \
@@ -16,6 +16,7 @@ RUN apt-get update -y \
 	mtools \
 	debian-archive-keyring \
 	fakeroot \
+	fakechroot \
 	&& apt-get clean -y
 WORKDIR /miso
 # RUN debootstrap \

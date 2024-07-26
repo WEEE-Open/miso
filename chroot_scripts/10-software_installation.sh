@@ -1,23 +1,14 @@
 #!/bin/bash
 # WEEEDebian creation script - a-porsia et al
 
-set -x
+#set -x
 set -e
 
 echo "=== Software installation ==="
 export DEBIAN_FRONTEND=noninteractive
 
-apt-get clean -y
-apt-get update -y
-apt-get install -y software-properties-common # add `apt-add-repository` command
-
-# Add non-free repo and update to pull in all the good firmware
-# apt-add-repository non-free 2>&1 # since bookworm non free firmware is its own component. See https://www.debian.org/releases/bookworm/amd64/release-notes/ch-information.html#non-free-split
-# For now, we are not installing any non-free package that isn't a firmware so this is not needed
-apt-add-repository non-free-firmware 2>&1
-apt-add-repository contrib 2>&1
-
-apt-get update -y
+apt-get -qq -o Dpkg::Use-Pty=false -y clean
+apt-get -qq -o Dpkg::Use-Pty=false -y update
 
 # Remove useless packages, courtesy of "wajig large". Cool command.
 # Do not remove mousepad, it removes xfce-goodies too
@@ -25,9 +16,9 @@ apt-get update -y
 # This is commented because none of these packages is present at this time
 
 # Upgrade and install useful packages
-apt-get upgrade -y
+apt-get -qq -o Dpkg::Use-Pty=false -y upgrade
 # libxkbcommon-x11-0 may be not needed (see Add library to installation if needed #28)
-apt-get install -y \
+apt-get -qq -o Dpkg::Use-Pty=false -y install \
     alsa-firmware-loaders \
     apt-transport-https \
     atmel-firmware \
@@ -39,23 +30,13 @@ apt-get install -y \
     dnsutils \
     firefox-esr \
     firmware-linux \
-    firmware-atheros \
     firmware-bnx2 \
     firmware-bnx2x \
     firmware-brcm80211 \
-    firmware-cavium \
-    firmware-intel-sound \
     firmware-iwlwifi \
-    firmware-libertas \
-    firmware-myricom \
-    firmware-netronome \
     firmware-netxen \
-    firmware-qcom-media \
-    firmware-qcom-soc \
-    firmware-qlogic \
     firmware-realtek \
     firmware-samsung \
-    firmware-siano \
     firmware-ti-connectivity \
     firmware-zd1211 \
     geany \
@@ -111,4 +92,5 @@ apt-get install -y \
     xinit \
     xorg \
     xserver-xorg \
-    zsh
+    zsh \
+    >/dev/null
