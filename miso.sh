@@ -78,7 +78,7 @@ else
     LINUX_IMAGE_ARCH=$MISO_ARCH
 fi
 
-if [[ -e "$MISO_BUILD_DIR/chroot.tar" ]]; then
+if [[ -d "$MISO_BUILD_DIR/chroot" ]]; then
     echo -e "${_ORANGE}Chroot directory exists, skipping bootstrap!${_RESET_COLOR}"
     echo -e "${_ORANGE}To bootstrap again, delete $MISO_BUILD_DIR/chroot${_RESET_COLOR}"
 else
@@ -91,7 +91,7 @@ else
         --components=main,contrib,non-free-firmware \
         "--customize-hook=set +e; cp -r $MISO_CHROOT_SCRIPTS_DIR \$1; echo 'cd chroot_scripts; for file in *; do [ ! -d \$file ] && [ -x \$file ] && echo && echo -e +++ Running \$file +++ && bash ./\$file; done' | chroot \$1 '/bin/bash'; set -e" \
         $MISO_VARIANT \
-        $MISO_BUILD_DIR/chroot.tar \
+        $MISO_BUILD_DIR/chroot \
         http://ftp.it.debian.org/debian/
 fi
 
@@ -135,7 +135,7 @@ mkdir -p $MISO_BUILD_DIR/{staging/{EFI/boot,boot/grub/x86_64-efi,isolinux,live},
 # Squash filesystem
 echo -e "${_BLUE}Squashing filesystem ...${_RESET_COLOR}"
 mksquashfs \
-    $MISO_BUILD_DIR/chroot.tar \
+    $MISO_BUILD_DIR/chroot \
     $MISO_BUILD_DIR/staging/live/filesystem.squashfs \
     -b 1048576 -comp xz -Xdict-size 100% \
     -noappend \
@@ -150,12 +150,9 @@ mksquashfs \
 #    -e boot $MISO_MKSQUASHFS_MEM
 #fi
 
-tar -C $MISO_BUILD_DIR/tmp --xattrs --xattrs-include='*' -xf $MISO_BUILD_DIR/chroot.tar --wildcards './boot/vmlinuz-*'
-tar -C $MISO_BUILD_DIR/tmp --xattrs --xattrs-include='*' -xf $MISO_BUILD_DIR/chroot.tar --wildcards './boot/initrd.img-*'
-
-cp $MISO_BUILD_DIR/tmp/boot/vmlinuz-* \
+cp $MISO_BUILD_DIR/chroot/boot/vmlinuz-* \
     $MISO_BUILD_DIR/staging/live/vmlinuz-live
-cp $MISO_BUILD_DIR/tmp/boot/initrd.img-* \
+cp $MISO_BUILD_DIR/chroot/boot/initrd.img-* \
     $MISO_BUILD_DIR/staging/live/initrd.img
 
 echo -e "${_BLUE}Building bootloader ...${_RESET_COLOR}"
