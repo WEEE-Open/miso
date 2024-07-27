@@ -44,18 +44,18 @@ apt-get -qq -o Dpkg::Use-Pty=false -y install \
     gparted \
     gsmartcontrol \
     gvfs-backends \
+    gxkb \
     hdparm \
     i2c-tools \
     iproute2 \
     iputils-arping \
     iputils-ping \
     iputils-tracepath \
+    less \
+    libglib2.0-bin \
     libglu1-mesa-dev \
     libx11-xcb-dev \
     libxi-dev \
-    libxkbcommon-dev \
-    libxkbcommon-x11-0 \
-    libxkbcommon-x11-dev \
     libxrender-dev \
     lightdm \
     lm-sensors \
@@ -69,6 +69,7 @@ apt-get -qq -o Dpkg::Use-Pty=false -y install \
     openssh-client \
     openssh-server \
     openssl \
+    pavucontrol \
     pciutils \
     python3 \
     python3-venv \
@@ -83,6 +84,7 @@ apt-get -qq -o Dpkg::Use-Pty=false -y install \
     systemd-timesyncd \
     systemd-timesyncd \
     traceroute \
+    vim \
     wget \
     wireless-tools \
     wpagui \

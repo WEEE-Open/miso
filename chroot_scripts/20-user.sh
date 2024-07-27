@@ -42,6 +42,8 @@ echo "=== XFCE configuration ==="
 sudo -u $MISO_USERNAME mkdir -p /home/$MISO_USERNAME/.config/xfce4
 rsync -a --force ./xfce4 /home/$MISO_USERNAME/.config
 chown weee: -R /home/$MISO_USERNAME/.config
+#echo "export XDG_DATA_DIRS=$XDG_DATA_DIRS:$HOME/Desktop >> $HOME/.zprofile"
+echo 'export XDG_DATA_DIRS="$XDG_DATA_DIRS:$HOME/Desktop"' | sudo tee /etc/profile
 sudo -u $MISO_USERNAME tee /home/$MISO_USERNAME/.config/autostart/light-locker.desktop <<EOF
 [Desktop Entry]
 Hidden=true

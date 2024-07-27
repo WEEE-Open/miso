@@ -46,9 +46,9 @@ sudo -u $MISO_USERNAME tee /home/$MISO_USERNAME/.config/autostart/fbxkb.desktop 
 Encoding=UTF-8
 Version=0.9.4
 Type=Application
-Name=fbxkb
+Name=gxkb
 Comment=Keyboard layout switcher
-Exec=fbxkb
+Exec=gxkb
 OnlyShowIn=XFCE;
 StartupNotify=false
 Terminal=false
