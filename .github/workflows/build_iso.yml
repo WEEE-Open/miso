@@ -12,25 +12,25 @@ jobs:
         - uses: actions/checkout@v4
         - name: Install dependencies
           run: sudo apt-get update && sudo apt-get install -y mmdebstrap squashfs-tools dosfstools xorriso isolinux syslinux-efi grub-pc-bin grub-efi-amd64-bin mtools debian-archive-keyring isolinux syslinux
+        - name: Set T.A.R.A.L.L.O. Token
+          uses: "DamianReeves/write-file-action@master"
+          with:
+            path: ./.env
+            write-mode: append
+            contents: |
+              export TARALLO_URL=${{ secrets.TARALLO_URL }}
+              export TARALLO_TOKEN=${{ secrets.TARALLO_TOKEN }}
         - name: Dotenv Action
           uses: falti/dotenv-action@v1.1
           id: dotenv
           with:
             export-variables: true
-        - name: Set T.A.R.A.L.L.O. Token
-          uses: "DamianReeves/write-file-action@master"
-          with:
-            path: weeedebian/env.txt
-            write-mode: overwrite
-            contents: |
-              export TARALLO_URL=${{ secrets.TARALLO_URL }}
-              export TARALLO_TOKEN=${{ secrets.TARALLO_TOKEN }}
         - name: build amd64
           env:
             MISO_ARCH: amd64
           run: sudo ./miso.sh
           shell: bash
-        # i386 CI is disabled for now because I couldn't get QT (either 5 or 6)to work on a modern 32bit release of debian
+        # i386 CI is disabled because I couldn't get QT (either 5 or 6)to work on a modern 32bit release of debian
         #- name: build i386
         #  env:
         #    MISO_ARCH: i386
