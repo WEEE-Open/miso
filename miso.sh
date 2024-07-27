@@ -135,11 +135,14 @@ fi
 mkdir -p $MISO_BUILD_DIR/{staging/{EFI/boot,boot/grub/x86_64-efi,isolinux,live},tmp}
 
 # Squash filesystem
+# compression algorithms available: gzip, lzo, lzma, xz, zstd
+# xz has the highest compression ration, but it's also the slowest to decompress
+# zstd is the fastest to decompress, and it's close to xz in compression ratio
 echo -e "${_BLUE}Squashing filesystem ...${_RESET_COLOR}"
 mksquashfs \
     $MISO_BUILD_DIR/chroot \
     $MISO_BUILD_DIR/staging/live/filesystem.squashfs \
-    -b 1048576 -comp xz -Xdict-size 100% \
+    -b 1048576 -comp zstd \
     -noappend \
     -e boot chroot_scripts
 # proc sys run dev
