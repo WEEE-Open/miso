@@ -33,3 +33,17 @@ cp /home/$MISO_USERNAME/.zshrc /root/.zshrc
 
 sudo -u $MISO_USERNAME rm /home/$MISO_USERNAME/.bash_history >/dev/null 2>/dev/null
 rm /root/.bash_history >/dev/null 2>/dev/null
+
+echo "=== Top configuration ==="
+cp ./toprc /root/.toprc
+sudo -u $MISO_USERNAME cp ./toprc /home/$MISO_USERNAME/.toprc
+
+echo "=== XFCE configuration ==="
+sudo -u $MISO_USERNAME mkdir -p /home/$MISO_USERNAME/.config/xfce4
+rsync -a --force ./xfce4 /home/$MISO_USERNAME/.config
+chown weee: -R /home/$MISO_USERNAME/.config
+sudo -u $MISO_USERNAME tee /home/$MISO_USERNAME/.config/autostart/light-locker.desktop <<EOF
+[Desktop Entry]
+Hidden=true
+EOF
+# sudo -u $MISO_USERNAME mkdir -p /home/$MISO_USERNAME/.config/xfce4/desktop /home/$MISO_USERNAME/.config/xfce4/terminal

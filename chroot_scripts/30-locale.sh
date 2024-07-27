@@ -41,7 +41,7 @@ BACKSPACE="guess"
 EOF
 # Keyboard layout switcher:
 sudo -u $MISO_USERNAME mkdir -p /home/$MISO_USERNAME/.config/autostart
-sudo -u $MISO_USERNAME tee /home/$MISO_USERNAME/.config/autostart/keyboard.desktop <<EOF
+sudo -u $MISO_USERNAME tee /home/$MISO_USERNAME/.config/autostart/fbxkb.desktop <<EOF
 [Desktop Entry]
 Encoding=UTF-8
 Version=0.9.4
