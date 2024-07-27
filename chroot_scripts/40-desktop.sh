@@ -6,15 +6,14 @@ for file in ./desktop/*.desktop; do
     sudo -u $MISO_USERNAME cp ./img/$file.png /home/$MISO_USERNAME/.config/WEEE\ Open/
     sudo -u $MISO_USERNAME chmod +x /home/$MISO_USERNAME/Desktop/$file.desktop
 done
-sudo tee /home/$MISO_USERNAME/.config/autostart/trust_desktop_shortcuts.dekstop <<EOF >/dev/null
+sudo -u $MISO_USERNAME tee /home/$MISO_USERNAME/.config/autostart/trust_desktop_shortcuts.desktop <<EOF >/dev/null
 [Desktop Entry]
 Encoding=UTF-8
 Version=1.0
 Type=Application
 Name=Trust Desktop Shortcuts
 Comment=Automatically trust all the .desktop files on the desktop
-Exec=for file in *.desktop; do gio set -t string \$file metadata::xfce-exe-checksum "\$(sha256sum \$file | awk '{print \$1}')"; done
-Path=/home/$MISO_USERNAME/Desktop/
+Exec=bash -c "for file in /home/$MISO_USERNAME/Desktop/*.desktop; do gio set -t string \\\$file metadata::xfce-exe-checksum \\\$(sha256sum \\\$file | awk '{print \\\$1}'); done"
 OnlyShowIn=XFCE;
 StartupNotify=false
 Terminal=false
