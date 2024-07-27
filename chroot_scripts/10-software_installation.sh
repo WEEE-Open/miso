@@ -7,8 +7,8 @@ set -e
 echo "=== Software installation ==="
 export DEBIAN_FRONTEND=noninteractive
 
-apt-get -qq -o Dpkg::Use-Pty=false -y clean
-apt-get -qq -o Dpkg::Use-Pty=false -y update
+apt-get -qq -o Dpkg::Use-Pty=false -y clean >/dev/null
+apt-get -qq -o Dpkg::Use-Pty=false -y update >/dev/null
 
 # Remove useless packages, courtesy of "wajig large". Cool command.
 # Do not remove mousepad, it removes xfce-goodies too
@@ -16,7 +16,7 @@ apt-get -qq -o Dpkg::Use-Pty=false -y update
 # This is commented because none of these packages is present at this time
 
 # Upgrade and install useful packages
-apt-get -qq -o Dpkg::Use-Pty=false -y upgrade
+apt-get -qq -o Dpkg::Use-Pty=false -y upgrade >/dev/null
 # libxkbcommon-x11-0 may be not needed (see Add library to installation if needed #28)
 apt-get -qq -o Dpkg::Use-Pty=false -y install \
     alsa-firmware-loaders \
@@ -25,6 +25,7 @@ apt-get -qq -o Dpkg::Use-Pty=false -y install \
     bluez-firmware \
     ca-certificates \
     cifs-utils \
+    cron \
     curl \
     dmidecode \
     dnsutils \
@@ -37,6 +38,7 @@ apt-get -qq -o Dpkg::Use-Pty=false -y install \
     firmware-netxen \
     firmware-realtek \
     firmware-samsung \
+    firmware-intel-sound \
     firmware-ti-connectivity \
     firmware-zd1211 \
     geany \

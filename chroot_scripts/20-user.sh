@@ -28,15 +28,15 @@ echo "=== Shell and home configuration ==="
 sudo -u $MISO_USERNAME mkdir -p /home/$MISO_USERNAME/Desktop
 # sudo -u $MISO_USERNAME ln -sf ./Desktop /home/$MISO_USERNAME/Scrivania
 # chsh -s /bin/zsh weee
-sudo -u $MISO_USERNAME curl -L -o /home/$MISO_USERNAME/.zshrc https://git.grml.org/f/grml-etc-core/etc/zsh/zshrc
+sudo -u $MISO_USERNAME curl -sL -o /home/$MISO_USERNAME/.zshrc https://git.grml.org/f/grml-etc-core/etc/zsh/zshrc >/dev/null
 cp /home/$MISO_USERNAME/.zshrc /root/.zshrc
 
 sudo -u $MISO_USERNAME rm /home/$MISO_USERNAME/.bash_history >/dev/null 2>/dev/null
 rm /root/.bash_history >/dev/null 2>/dev/null
 
 echo "=== Top configuration ==="
-cp ./toprc /root/.toprc
-sudo -u $MISO_USERNAME cp ./toprc /home/$MISO_USERNAME/.toprc
+cp ./resources/toprc /root/.toprc
+sudo -u $MISO_USERNAME cp ./resources/toprc /home/$MISO_USERNAME/.toprc
 
 echo "=== XFCE configuration ==="
 sudo -u $MISO_USERNAME mkdir -p /home/$MISO_USERNAME/.config/xfce4
@@ -44,7 +44,7 @@ rsync -a --force ./xfce4 /home/$MISO_USERNAME/.config
 chown weee: -R /home/$MISO_USERNAME/.config
 #echo "export XDG_DATA_DIRS=$XDG_DATA_DIRS:$HOME/Desktop >> $HOME/.zprofile"
 echo 'export XDG_DATA_DIRS="$XDG_DATA_DIRS:$HOME/Desktop"' | sudo tee /etc/profile
-sudo -u $MISO_USERNAME tee /home/$MISO_USERNAME/.config/autostart/light-locker.desktop <<EOF
+sudo -u $MISO_USERNAME tee /home/$MISO_USERNAME/.config/autostart/light-locker.desktop <<EOF >/dev/null
 [Desktop Entry]
 Hidden=true
 EOF

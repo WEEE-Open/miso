@@ -1,11 +1,11 @@
 #!/bin/bash
 
 echo "=== Locale configuration ==="
-sudo tee /etc/locale.gen <<EOF
+sudo tee /etc/locale.gen <<EOF >/dev/null
 it_IT.UTF-8 UTF-8
 en_US.UTF-8 UTF-8
 EOF
-sudo tee /etc/locale.conf <<EOF
+sudo tee /etc/locale.conf <<EOF >/dev/null
 LANG=en_US.UTF-8
 LANGUAGE=en_US.UTF-8
 LC_CTYPE=it_IT.UTF-8
@@ -31,7 +31,7 @@ update-locale
 
 echo "=== Keymap configuration ==="
 # Needed for sure on Debian 11:
-sudo tee /etc/default/keyboard <<EOF
+sudo tee /etc/default/keyboard <<EOF >/dev/null
 XKBMODEL="pc105"
 XKBLAYOUT="it,us"
 XKBVARIANT=""
@@ -41,7 +41,7 @@ BACKSPACE="guess"
 EOF
 # Keyboard layout switcher:
 sudo -u $MISO_USERNAME mkdir -p /home/$MISO_USERNAME/.config/autostart
-sudo -u $MISO_USERNAME tee /home/$MISO_USERNAME/.config/autostart/fbxkb.desktop <<EOF
+sudo -u $MISO_USERNAME tee /home/$MISO_USERNAME/.config/autostart/fbxkb.desktop <<EOF >/dev/null
 [Desktop Entry]
 Encoding=UTF-8
 Version=0.9.4

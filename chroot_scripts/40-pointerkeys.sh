@@ -2,7 +2,7 @@
 
 echo "=== Pointerkeys thing ==="
 sudo -u $MISO_USERNAME mkdir -p /home/$MISO_USERNAME/.config/autostart
-sudo -u $MISO_USERNAME tee /home/$MISO_USERNAME/.config/autostart/Pointerkeys.desktop <<EOF
+sudo -u $MISO_USERNAME tee /home/$MISO_USERNAME/.config/autostart/Pointerkeys.desktop <<EOF >/dev/null
 [Desktop Entry]
 Encoding=UTF-8
 Version=0.9.4
@@ -16,7 +16,7 @@ Terminal=false
 Hidden=false
 EOF
 
-sudo -u $MISO_USERNAME tee /home/$MISO_USERNAME/Desktop/pointerkeys.txt <<EOF
+sudo -u $MISO_USERNAME tee /home/$MISO_USERNAME/Desktop/pointerkeys.txt <<EOF >/dev/null
 === Controlling your mouse pointer with the keyboard ===
 
 Hold shift and press num lock to enable this feature.

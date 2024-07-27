@@ -158,7 +158,7 @@ cp $MISO_BUILD_DIR/chroot/boot/initrd.img-* \
     $MISO_BUILD_DIR/staging/live/initrd.img
 
 echo -e "${_BLUE}Building bootloader ...${_RESET_COLOR}"
-tee $MISO_BUILD_DIR/staging/isolinux/isolinux.cfg <<EOF
+tee $MISO_BUILD_DIR/staging/isolinux/isolinux.cfg <<EOF >/dev/null
 UI vesamenu.c32
 
 MENU TITLE Boot Menu
@@ -188,7 +188,7 @@ LABEL linux
   APPEND initrd=/live/initrd.img boot=live nomodeset
 EOF
 
-tee $MISO_BUILD_DIR/staging/boot/grub/grub.cfg <<EOF
+tee $MISO_BUILD_DIR/staging/boot/grub/grub.cfg <<EOF >/dev/null
 search --set=root --file /DEBIAN_CUSTOM
 
 set default="0"
@@ -207,7 +207,7 @@ menuentry "$MISO_DISTRO_NAME $MISO_ARCH [EFI/GRUB] (nomodeset)" {
 }
 EOF
 
-tee $MISO_BUILD_DIR/tmp/grub-standalone.cfg <<EOF
+tee $MISO_BUILD_DIR/tmp/grub-standalone.cfg <<EOF >/dev/null
 search --set=root --file /DEBIAN_CUSTOM
 set prefix=(\$root)/boot/grub/
 configfile /boot/grub/grub.cfg
