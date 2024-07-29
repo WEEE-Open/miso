@@ -166,7 +166,7 @@ UI vesamenu.c32
 
 MENU TITLE Boot Menu
 DEFAULT linux
-TIMEOUT 300
+TIMEOUT 100
 MENU RESOLUTION 640 480
 MENU COLOR border       30;44   #40ffffff #a0000000 std
 MENU COLOR title        1;36;44 #9033ccff #a0000000 std
