@@ -40,20 +40,20 @@ XKBOPTIONS=""
 BACKSPACE="guess"
 EOF
 # Keyboard layout switcher:
-sudo -u $MISO_USERNAME mkdir -p /home/$MISO_USERNAME/.config/autostart
-sudo -u $MISO_USERNAME tee /home/$MISO_USERNAME/.config/autostart/fbxkb.desktop <<EOF >/dev/null
-[Desktop Entry]
-Encoding=UTF-8
-Version=0.9.4
-Type=Application
-Name=gxkb
-Comment=Keyboard layout switcher
-Exec=gxkb
-OnlyShowIn=XFCE;
-StartupNotify=false
-Terminal=false
-Hidden=false
-EOF
+#sudo -u $MISO_USERNAME mkdir -p /home/$MISO_USERNAME/.config/autostart
+#sudo -u $MISO_USERNAME tee /home/$MISO_USERNAME/.config/autostart/gxkb.desktop <<EOF >/dev/null
+#[Desktop Entry]
+#Encoding=UTF-8
+#Version=0.9.4
+#Type=Application
+#Name=gxkb
+#Comment=Keyboard layout switcher
+#Exec=gxkb
+#OnlyShowIn=XFCE;
+#StartupNotify=false
+#Terminal=false
+#Hidden=false
+#EOF
 # 00-keyboard.conf can be managed by localectl. In fact, this is one of such files produced by localectl.
 # May not be needed in Debian 11:
 #mkdir -p /etc/X11/xorg.conf.d

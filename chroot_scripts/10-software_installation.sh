@@ -46,7 +46,6 @@ apt-get -qq -o Dpkg::Use-Pty=false -y install \
     gparted \
     gsmartcontrol \
     gvfs-backends \
-    gxkb \
     hdparm \
     i2c-tools \
     iproute2 \
@@ -92,6 +91,7 @@ apt-get -qq -o Dpkg::Use-Pty=false -y install \
     wpagui \
     xfce4 \
     xfce4-terminal \
+    xfce4-xkb-plugin \
     xfce4-whiskermenu-plugin \
     xinit \
     xorg \

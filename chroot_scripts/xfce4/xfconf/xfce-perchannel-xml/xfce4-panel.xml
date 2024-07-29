@@ -27,6 +27,7 @@
         <value type="int" value="22"/>
         <value type="int" value="16"/>
         <value type="int" value="25"/>
+        <value type="int" value="1"/>
         <value type="int" value="26"/>
       </property>
     </property>
@@ -75,9 +76,6 @@
       <property name="known-legacy-items" type="array">
         <value type="string" value="ethernet network connection “wired connection 1” active"/>
       </property>
-      <property name="known-items" type="array">
-        <value type="string" value="example-simple-client"/>
-      </property>
       <property name="icon-size" type="int" value="0"/>
       <property name="single-row" type="bool" value="true"/>
       <property name="hide-new-items" type="bool" value="false"/>
@@ -88,5 +86,12 @@
       </property>
     </property>
     <property name="plugin-26" type="string" value="clock"/>
+    <property name="plugin-1" type="string" value="xkb">
+      <property name="display-name" type="uint" value="1"/>
+      <property name="display-scale" type="uint" value="50"/>
+      <property name="show-notifications" type="bool" value="false"/>
+      <property name="display-tooltip-icon" type="bool" value="true"/>
+      <property name="group-policy" type="uint" value="0"/>
+    </property>
   </property>
 </channel>
