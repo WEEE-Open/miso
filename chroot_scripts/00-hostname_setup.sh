@@ -2,7 +2,7 @@
 # WEEEDebian creation script - a-porsia et al
 
 #set -x
-set -e
+#set -e
 
 # this has to be done before sudo
 echo "=== Set hostname ==="

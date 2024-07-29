@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #set -x
-set -e
+#set -e
 echo "=== Network configuration ==="
 update-ca-certificates
 systemctl disable smartd

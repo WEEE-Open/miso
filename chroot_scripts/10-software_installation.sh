@@ -2,7 +2,7 @@
 # WEEEDebian creation script - a-porsia et al
 
 #set -x
-set -e
+#set -e
 
 echo "=== Software installation ==="
 export DEBIAN_FRONTEND=noninteractive
@@ -96,6 +96,7 @@ apt-get -qq -o Dpkg::Use-Pty=false -y install \
     xinit \
     xorg \
     xserver-xorg \
+    zip \
     zsh \
     >/dev/null
 

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #set -x
-set -e
+#set -e
 
 echo "=== User configuration ==="
 # openssl has been installed, so this can be done now
@@ -31,8 +31,8 @@ sudo -u $MISO_USERNAME mkdir -p /home/$MISO_USERNAME/Desktop
 sudo -u $MISO_USERNAME curl -sL -o /home/$MISO_USERNAME/.zshrc https://git.grml.org/f/grml-etc-core/etc/zsh/zshrc >/dev/null
 cp /home/$MISO_USERNAME/.zshrc /root/.zshrc
 
-sudo -u $MISO_USERNAME rm /home/$MISO_USERNAME/.bash_history >/dev/null 2>/dev/null
-rm /root/.bash_history >/dev/null 2>/dev/null
+sudo -u $MISO_USERNAME rm /home/$MISO_USERNAME/.bash_history >/dev/null
+rm /root/.bash_history >/dev/null
 
 echo "=== Top configuration ==="
 cp ./resources/toprc /root/.toprc
@@ -42,10 +42,15 @@ echo "=== XFCE configuration ==="
 sudo -u $MISO_USERNAME mkdir -p /home/$MISO_USERNAME/.config/xfce4
 rsync -a --force ./xfce4 /home/$MISO_USERNAME/.config
 chown weee: -R /home/$MISO_USERNAME/.config
+# All the launchers in XDG_DATA_DIRS are automatically trusted and don't need the checksum. For some reason nothing of what I tried could properly set that variable on startup, so I ended up using an autostart script to trust all the *.desktop files in $HOME/Desktop (in 40-desktop.sh)
 #echo "export XDG_DATA_DIRS=$XDG_DATA_DIRS:$HOME/Desktop >> $HOME/.zprofile"
-echo 'export XDG_DATA_DIRS="$XDG_DATA_DIRS:$HOME/Desktop"' | sudo tee /etc/profile
+#echo 'export XDG_DATA_DIRS="$XDG_DATA_DIRS:$HOME/Desktop"' | sudo tee /etc/profile
+sudo -u $MISO_USERNAME mkdir -p /home/$MISO_USERNAME/.config/autostart
 sudo -u $MISO_USERNAME tee /home/$MISO_USERNAME/.config/autostart/light-locker.desktop <<EOF >/dev/null
 [Desktop Entry]
 Hidden=true
 EOF
+mkdir -p /usr/share/pixmaps/weee
+cp ./img/logo.png /usr/share/pixmaps/weee
+cp ./img/weeellpaper.jpg /usr/share/backgrounds
 # sudo -u $MISO_USERNAME mkdir -p /home/$MISO_USERNAME/.config/xfce4/desktop /home/$MISO_USERNAME/.config/xfce4/terminal
