@@ -15,6 +15,3 @@ cat <<EOF >/etc/hosts
 ff02::1         ip6-allnodes
 ff02::2         ip6-allrouters
 EOF
-
-echo "=== Set desktop shortcuts as trusted ==="
-echo "@reboot weee f=/home/$MISO_USERNAME/Desktop/*.desktop; gio set -t string \$f metadata::xfce-exe-checksum \$(sha256sum \$f | awk '{print \$1}')" >/etc/cron.d/trust_desktop_shortcuts

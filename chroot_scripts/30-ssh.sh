@@ -45,6 +45,3 @@ read -p "Press enter to close"
 
 EOF
 chmod +x /usr/sbin/s.sh
-# sudo -u $MISO_USERNAME cp ./ssh.desktop /home/$MISO_USERNAME/Desktop
-# sudo -u $MISO_USERNAME chmod +x /home/$MISO_USERNAME/Desktop/ssh.desktop
-# su - $MISO_USERNAME -c "gio set -t string /home/$MISO_USERNAME/Desktop/ssh.desktop metadata::xfce-exe-checksum $(sha256sum /home/$MISO_USERNAME/Desktop/ssh.desktop | awk '{print $1}')"
