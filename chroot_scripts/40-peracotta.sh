@@ -40,3 +40,6 @@ else
     export TARALLO_TOKEN=$TARALLO_TOKEN
 EOF
 fi
+
+sudo -u $MISO_USERNAME echo 'AUTOMATIC_REPORT_ERRORS = true' >> /home/$MISO_USERNAME/.config/WEEE\ Open/peracotta/config.toml
+sudo -u $MISO_USERNAME echo 'REPORT_URL = "https://feedback.balzov.com"' >> /home/$MISO_USERNAME/.config/WEEE\ Open/peracotta/config.toml
