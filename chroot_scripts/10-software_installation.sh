@@ -89,6 +89,7 @@ apt-get -qq -o Dpkg::Use-Pty=false -y install \
     wget \
     wireless-tools \
     wpagui \
+    xdg-utils \
     xfce4 \
     xfce4-terminal \
     xfce4-xkb-plugin \
