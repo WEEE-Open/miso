@@ -10,6 +10,8 @@ echo '@reboot weee pipx upgrade peracotta' | sudo tee /etc/cron.d/peracotta_upda
 sudo -u $MISO_USERNAME mkdir -p /home/$MISO_USERNAME/.config/WEEE\ Open/peracotta # Ensure the dir exists
 sudo -u $MISO_USERNAME cp ./resources/features.json /home/$MISO_USERNAME/.config/WEEE\ Open/peracotta/features.json
 
+sudo -u $MISO_USERNAME cp ./resources/peracotta_config.toml /home/$MISO_USERNAME/.config/WEEE\ Open/peracotta/config.toml
+
 echo "=== Add env to peracotta ==="
 if [[ -z "$TARALLO_TOKEN" ]]; then
     missing="@   TARALLO_TOKEN not found in .env                        @"
@@ -35,11 +37,13 @@ if [[ -n "$missing" ]]; then
     echo "@                                                          @"
     echo "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
 else
-    sudo -u $MISO_USERNAME tee /home/$MISO_USERNAME/.config/WEEE\ Open/peracotta/.env <<EOF
-    export TARALLO_URL=$TARALLO_URL
-    export TARALLO_TOKEN=$TARALLO_TOKEN
+    sudo -u $MISO_USERNAME tee /home/$MISO_USERNAME/.config/WEEE\ Open/peracotta/config.toml <<EOF
+    TARALLO_URL = "$TARALLO_URL"
+    TARALLO_TOKEN = "$TARALLO_TOKEN"
 EOF
 fi
 
-sudo -u $MISO_USERNAME echo 'AUTOMATIC_REPORT_ERRORS = true' >> /home/$MISO_USERNAME/.config/WEEE\ Open/peracotta/config.toml
-sudo -u $MISO_USERNAME echo 'REPORT_URL = "https://feedback.balzov.com"' >> /home/$MISO_USERNAME/.config/WEEE\ Open/peracotta/config.toml
+sudo -u $MISO_USERNAME tee /home/$MISO_USERNAME/.config/WEEE\ Open/peracotta/config.toml <<EOF
+    AUTOMATIC_REPORT_ERRORS = $PERACOTTA_AUTOMATIC_REPORT_ERRORS
+    REPORT_URL = "$PERACOTTA_REPORT_URL"
+EOF
