@@ -130,6 +130,10 @@ fi
 #    echo "Limiting mksquashfs memory to: $MISO_MKSQUASHFS_MEM"
 #    MISO_MKSQUASHFS_MEM="-mem $MISO_MKSQUASHFS_MEM"
 #fi
+#if [[ -z "$MISO_MKSQUASHFS_MEM" ]]; then
+#    echo "Limiting mksquashfs memory to: $MISO_MKSQUASHFS_MEM"
+#    MISO_MKSQUASHFS_MEM="-mem $MISO_MKSQUASHFS_MEM"
+#fi
 
 # Create directory tree
 mkdir -p $MISO_BUILD_DIR/{staging/{EFI/boot,boot/grub/x86_64-efi,isolinux,live},tmp}
@@ -218,9 +222,9 @@ EOF
 
 touch $MISO_BUILD_DIR/staging/DEBIAN_CUSTOM
 
-cp /usr/lib/ISOLINUX/isolinux.bin "$MISO_BUILD_DIR/staging/isolinux/"
-cp /usr/lib/syslinux/modules/bios/* "$MISO_BUILD_DIR/staging/isolinux/"
-cp -r /usr/lib/grub/x86_64-efi/* "$MISO_BUILD_DIR/staging/boot/grub/x86_64-efi/"
+$MISO_SUDO cp /usr/lib/ISOLINUX/isolinux.bin "$MISO_BUILD_DIR/staging/isolinux/"
+$MISO_SUDO cp /usr/lib/syslinux/modules/bios/* "$MISO_BUILD_DIR/staging/isolinux/"
+$MISO_SUDO cp -r /usr/lib/grub/x86_64-efi/* "$MISO_BUILD_DIR/staging/boot/grub/x86_64-efi/"
 
 grub-mkstandalone \
     --format=x86_64-efi \
