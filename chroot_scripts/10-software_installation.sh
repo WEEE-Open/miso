@@ -29,6 +29,7 @@ apt-get -qq -o Dpkg::Use-Pty=false -y install \
     curl \
     dmidecode \
     dnsutils \
+    eject \
     firefox-esr \
     firmware-linux \
     firmware-bnx2 \
