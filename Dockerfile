@@ -1,22 +1,33 @@
 
-FROM debian:stable-slim
+FROM debian:stable
 # Do not install apt-utils, you just get even more errors
 RUN apt-get update -y \
-    && apt-get install -y \
+	&& apt-get install -y \
 	sudo \
-	debootstrap \
+	mmdebstrap \
 	squashfs-tools \
 	dosfstools \
 	xorriso \
 	isolinux \
 	syslinux-efi \
-	grub-pc-bin \
+	syslinux \
 	grub-efi-amd64-bin \
+	grub-pc-bin \
 	mtools \
 	debian-archive-keyring \
-	isolinux \
-	syslinux \
-    && apt-get clean -y
+	fakeroot \
+	fakechroot \
+	&& apt-get clean -y
 WORKDIR /miso
+# RUN debootstrap \
+# 	--arch=amd64 \
+# 	--variant=minbase \
+# 	--include=linux-image-amd64,live-boot,systemd-sysv,apt-utils,zstd \
+# 	bookworm \
+# 	/miso/build/chroot \
+# 	http://ftp.it.debian.org/debian/
 COPY miso.sh .
-ENTRYPOINT ["/miso/miso.sh"]
+COPY .env .
+#ENV LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libfakeroot/libfakeroot-sysv.so
+#ENV MISO_SUDO=fakeroot
+ENTRYPOINT ["/bin/bash", "-c", "/miso/miso.sh"]

@@ -1,9 +1,0 @@
-[Desktop Entry]
-Version=1.0
-Type=Application
-Name=Peracruda
-Comment=Start peracruda (peracotta CLI)
-Terminal=true
-Exec=/home/weee/.local/bin/peracruda; echo "Press enter to exit"; read FOO'
-Icon=/home/weee/.config/WEEE\ Open/peracotta/peracruda.png
-Path=/home/weee/peracotta

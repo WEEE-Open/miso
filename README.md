@@ -6,38 +6,28 @@ Build Debian Live images, with the maximum amount of automation
 
 ## Usage
 
+Appropriately configure the `.env` file. 
+Also useful if you don't have an endless amount of RAM: `MISO_MKSQUASHFS_MEM=500m`
+
+If needed, customization can be done by modifying or adding files in the directory `chroot_scripts`. They must be marked as executable.
+
+To build the iso, run
+
 ```shell
-docker build -t weee-open/miso:latest .
-docker run --name miso \
-  -i --rm \
-  -v $(readlink -f build):/build:rw \
-  -v $(readlink -f weeedebian):/weeedebian:ro \
-  -e MISO_BUILD_DIR=/build \
-  -e MISO_CHROOT_SCRIPT=/weeedebian/martello.sh \
-  -e MISO_HOSTNAME=weeedebian \
-  -e MISO_ROOTPASSWD=asd \
-  -e MISO_USERNAME=weee \
-  -e MISO_USERPASSWD=asd \
-  -e MISO_ARCH=amd64 \
-  -e MISO_NO_SUDO=1 \
-  weee-open/miso:latest
+docker compose up --build
 ```
+This will output weeedebian-{MISO_ARCH}.iso into build/weeedebian-{MISO_ARCH}.
 
-Also useful if you don't have an endless amount of RAM: `-e MISO_MKSQUASHFS_MEM=500m \`
-
-This will output weeedebian-amd64.iso into build/weeedebian.
-
-On a Debian/Ubuntu machine, you can run the script without any container:
-
+On a Debian/Ubuntu machine, you could also run the script without any container:
 ```shell
 # Install dependencies
 ./install_dep.sh
-./miso.sh build weeedebian/martello.sh amd64
+./miso.sh
 # Uninstall dependencies if you want to save space
 ./uninstall_dep.sh
 ```
 
-This also works on WSL.
+This also works on WSL (Untested).
 
 ### Requirements
 
@@ -48,8 +38,7 @@ Checklist:
 * A [Tarallo](https://github.com/WEEE-Open/tarallo) token (optional)
 * A bit of asd
 
-Get the Tarallo token and create a file named `env.txt` inside `weeedebian` with this content:
-
+To configure TARALLO, just add these two keys to the `.env` file
 ```text
 export TARALLO_URL=http://127.0.0.1:8080
 export TARALLO_TOKEN=yoLeCHmEhNNseN0BlG0s3A:ksfPYziGg7ebj0goT0Zc7pbmQEIYvZpRTIkwuscAM_k
