@@ -18,10 +18,10 @@ jobs:
             path: ./.env
             write-mode: append
             contents: |
-              export TARALLO_URL=${{ secrets.TARALLO_URL }}
-              export TARALLO_TOKEN=${{ secrets.TARALLO_TOKEN }}
-              export PERACOTTA_REPORT_URL=${{ secrets.PERACOTTA_REPORT_URL }}
-              export PERACOTTA_AUTOMATIC_REPORT_ERRORS=true
+              export TARALLO_URL="${{ secrets.TARALLO_URL }}"
+              export TARALLO_TOKEN="${{ secrets.TARALLO_TOKEN }}"
+              export PERACOTTA_REPORT_URL="${{ secrets.PERACOTTA_REPORT_URL }}"
+              export PERACOTTA_AUTOMATIC_REPORT_ERRORS="true"
         - name: Dotenv Action
           uses: falti/dotenv-action@v1.1
           id: dotenv
