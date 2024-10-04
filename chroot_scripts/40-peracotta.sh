@@ -37,13 +37,13 @@ if [[ -n "$missing" ]]; then
     echo "@                                                          @"
     echo "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
 else
-    sudo -u $MISO_USERNAME tee /home/$MISO_USERNAME/.config/WEEE\ Open/peracotta/config.toml <<EOF
+    sudo -u $MISO_USERNAME tee -a /home/$MISO_USERNAME/.config/WEEE\ Open/peracotta/config.toml <<EOF
     TARALLO_URL = "$TARALLO_URL"
     TARALLO_TOKEN = "$TARALLO_TOKEN"
 EOF
 fi
 
-sudo -u $MISO_USERNAME tee /home/$MISO_USERNAME/.config/WEEE\ Open/peracotta/config.toml <<EOF
+sudo -u $MISO_USERNAME tee -a /home/$MISO_USERNAME/.config/WEEE\ Open/peracotta/config.toml <<EOF
     AUTOMATIC_REPORT_ERRORS = $PERACOTTA_AUTOMATIC_REPORT_ERRORS
     REPORT_URL = "$PERACOTTA_REPORT_URL"
 EOF
