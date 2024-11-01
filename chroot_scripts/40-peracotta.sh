@@ -31,7 +31,7 @@ if [[ -n "$missing" ]]; then
     echo "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
     echo "@                                                          @"
     echo "$missing"
-    echo "@   You're missing out many great peracotta features!      @"
+    echo "@   You're missing out on many great peracotta features!   @"
     echo "@   Check README for more info if you want to automate     @"
     echo "@   your life!                                             @"
     echo "@                                                          @"

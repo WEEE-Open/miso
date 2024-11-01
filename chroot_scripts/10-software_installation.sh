@@ -25,6 +25,7 @@ apt-get -qq -o Dpkg::Use-Pty=false -y install \
     bluez-firmware \
     ca-certificates \
     cifs-utils \
+    codium \
     cron \
     curl \
     dmidecode \
@@ -42,7 +43,6 @@ apt-get -qq -o Dpkg::Use-Pty=false -y install \
     firmware-intel-sound \
     firmware-ti-connectivity \
     firmware-zd1211 \
-    geany \
     git \
     gparted \
     gsmartcontrol \
@@ -79,7 +79,9 @@ apt-get -qq -o Dpkg::Use-Pty=false -y install \
     python-is-python3 \
     libxcb-cursor0 \
     libxcb-cursor0 \
+    ripgrep \
     rsync \
+    rust-fd-find \
     smartmontools \
     strace \
     sudo \
