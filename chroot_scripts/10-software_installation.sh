@@ -93,12 +93,10 @@ apt-get -qq -o Dpkg::Use-Pty=false -y install \
     rsync \
     smartmontools \
     strace \
-    sudo \
     systemd-timesyncd \
     systemd-timesyncd \
     traceroute \
     vim \
-    wget \
     wireless-tools \
     wpagui \
     xdg-utils \
