@@ -89,7 +89,7 @@ mmdebstrap \
     --arch=$MISO_ARCH \
     --variant=minbase \
     --mode=sudo \
-    --include=linux-image-$LINUX_IMAGE_ARCH,live-boot,systemd-sysv,apt-utils,zstd,gpg,wget,sudo \
+    --include=linux-image-$LINUX_IMAGE_ARCH,live-boot,systemd-sysv,apt-utils,zstd,gpg,wget,sudo,ca-certificates \
     --components=main,contrib,non-free-firmware \
     "--customize-hook=set +e; cp -r $MISO_CHROOT_SCRIPTS_DIR \$1; echo 'cd chroot_scripts; for file in *; do [ ! -d \$file ] && [ -x \$file ] && echo && echo -e +++ Running \$file +++ && bash ./\$file; done' | chroot \$1 '/bin/bash'; set -e" \
     $MISO_VARIANT \

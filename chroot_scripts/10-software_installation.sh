@@ -32,7 +32,6 @@ apt-get -qq -o Dpkg::Use-Pty=false -y install \
     apt-transport-https \
     atmel-firmware \
     bluez-firmware \
-    ca-certificates \
     cifs-utils \
     codium \
     cron \
