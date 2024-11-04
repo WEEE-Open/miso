@@ -17,6 +17,15 @@ apt-get -qq -o Dpkg::Use-Pty=false -y update >/dev/null
 
 # Upgrade and install useful packages
 apt-get -qq -o Dpkg::Use-Pty=false -y upgrade >/dev/null
+
+# Add vscodium repository
+wget -qO - https://gitlab.com/paulcarroty/vscodium-deb-rpm-repo/raw/master/pub.gpg \
+    | gpg --dearmor \
+    | sudo dd of=/usr/share/keyrings/vscodium-archive-keyring.gpg
+echo 'deb [ signed-by=/usr/share/keyrings/vscodium-archive-keyring.gpg ] https://download.vscodium.com/debs vscodium main' \
+    | sudo tee /etc/apt/sources.list.d/vscodium.list
+
+
 # libxkbcommon-x11-0 may be not needed (see Add library to installation if needed #28)
 apt-get -qq -o Dpkg::Use-Pty=false -y install \
     alsa-firmware-loaders \
@@ -31,6 +40,7 @@ apt-get -qq -o Dpkg::Use-Pty=false -y install \
     dmidecode \
     dnsutils \
     eject \
+    fd-find \
     firefox-esr \
     firmware-linux \
     firmware-bnx2 \
@@ -81,7 +91,6 @@ apt-get -qq -o Dpkg::Use-Pty=false -y install \
     libxcb-cursor0 \
     ripgrep \
     rsync \
-    rust-fd-find \
     smartmontools \
     strace \
     sudo \
