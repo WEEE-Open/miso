@@ -30,12 +30,10 @@ jobs:
       #  shell: bash
       - uses: ncipollo/release-action@v1
         with:
-          artifacts: "./build/*/*.iso"
+          artifacts: |
+            ./build/*.iso
+            ./build/*.img
           allowUpdates: true
           prerelease: true
-          draft: true
-          tag: v${{ steps.dotenv.outputs.version }}
-          # body: |
-          #   > [!CAUTION]
-          #   > Do NOT publish this draft.
-          #   > It is only to be used internally as the T.A.R.A.L.L.O. secret token is visible in the built iso.
+          draft: false
+          tag: ${{ steps.dotenv.outputs.miso_distro_name }} v${{ steps.dotenv.outputs.version }}
