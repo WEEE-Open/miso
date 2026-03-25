@@ -10,3 +10,4 @@ sudo apt install \
     grub-efi-amd64-bin \
     mtools \
     debian-archive-keyring \
+    libguestfstools \

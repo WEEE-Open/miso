@@ -9,13 +9,19 @@ RUN apt-get update -y \
 	dosfstools \
 	xorriso \
 	isolinux \
-	syslinux-efi \
+	parted \
+    syslinux-efi \
 	syslinux \
+	grub-efi-amd64 \
 	grub-efi-amd64-bin \
-	grub-pc-bin \
+    binutils \
 	mtools \
 	debian-archive-keyring \
-	fakeroot \
+	udev \
+	libguestfs-tools \
+	libguestfs-dev \
+	supermin \
+    fakeroot \
 	fakechroot \
 	&& apt-get clean -y
 WORKDIR /miso

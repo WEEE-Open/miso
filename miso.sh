@@ -6,10 +6,9 @@ set -e # exit at any error
 . .env
 echo "MISO v$VERSION"
 
-# These are not in the .env because they can't just be changed and might require some changes in miso or in the hooks
+# These are not in the .env because they can't just be changed and might require some changes in miso.sh or in the chroot scripts
 MISO_VARIANT="bookworm"
-MISO_BUILD_DIR="build"
-MISO_CHROOT_SCRIPTS_DIR="chroot_scripts"
+IMG_SIZE=10G
 
 if [[ -z "$MISO_ARCH" ]]; then # '32' or 'i386' for 32bit, everything else is 64
     if [[ -z "$3" ]]; then
@@ -47,15 +46,6 @@ while [[ -z $MISO_USERPASSWD ]]; do
     stty echo
 done
 
-mkdir -p $MISO_BUILD_DIR
-mkdir -p $MISO_CHROOT_SCRIPTS_DIR
-
-MISO_BUILD_DIR=$(readlink -f "$MISO_BUILD_DIR")
-MISO_BUILD_DIR="$MISO_BUILD_DIR/$MISO_DISTRO_NAME-$MISO_ARCH"
-export TMPDOR=$MISO_BUILD_DIR
-MISO_CHROOT_SCRIPTS_DIR=$(readlink -f "$MISO_CHROOT_SCRIPTS_DIR")
-mkdir -p $MISO_BUILD_DIR
-
 _ORANGE='\033[0;33m'
 _RED='\033[0;31m'
 _BLUE='\033[0;34m'
@@ -78,98 +68,112 @@ else
     LINUX_IMAGE_ARCH=$MISO_ARCH
 fi
 
-#if [[ -d "$MISO_BUILD_DIR/chroot" ]]; then
-#    echo -e "${_ORANGE}Chroot directory exists, skipping bootstrap!${_RESET_COLOR}"
-#    echo -e "${_ORANGE}To bootstrap again, delete $MISO_BUILD_DIR/chroot${_RESET_COLOR}"
-#else
-# For now, always redo bootstrap since the setup is done with hooks. Eventually, this whole thing could be done properly through a makefile
-# Skipping this skep isn't so important, since boostrap takes about 1 minute of the 5/6 total
+if [[ $MISO_PART_TABLE =~ ^(dos|mbr)$ ]]; then
+    PART_TABLE="mbr"
+    GRUB_PACKAGE=grub-pc
+    GRUB_TARGET="i386-pc"
+else
+    PART_TABLE="gpt"
+    if [[ "$MISO_ARCH" == "i386" ]]; then
+        GRUB_TARGET="i386-efi"
+        GRUB_PACKAGE=grub-efi-i386
+    else
+        GRUB_TARGET="x86_64-efi"
+        GRUB_PACKAGE=grub-efi-amd64
+    fi
+
+fi
+mkdir -p $MISO_BUILD_DIR
+mkdir -p $MISO_CHROOT_SCRIPTS_DIR
+
+CHROOT_SCRIPTS_DIR=$(readlink -f "$MISO_CHROOT_SCRIPTS_DIR")
+BUILD_DIR=$(readlink -f "$MISO_BUILD_DIR")
+BUILD_DIR="$BUILD_DIR/$MISO_DISTRO_NAME-$MISO_ARCH-$PART_TABLE"
+IMG_PATH="$BUILD_DIR.$MISO_OUTPUT_EXT"
+mkdir -p $BUILD_DIR
+
+
 echo -e "${_BLUE}Bootstrapping${_RESET_COLOR}"
 mmdebstrap \
     --arch=$MISO_ARCH \
     --variant=minbase \
     --mode=sudo \
-    --include=linux-image-$LINUX_IMAGE_ARCH,live-boot,systemd-sysv,apt-utils,zstd,gpg,wget,sudo,ca-certificates \
+    --include=linux-image-$LINUX_IMAGE_ARCH,systemd-sysv,apt-utils,zstd,gpg,wget,sudo,ca-certificates,curl,cron,$GRUB_PACKAGE \
     --components=main,contrib,non-free-firmware \
-    "--customize-hook=set +e; cp -r $MISO_CHROOT_SCRIPTS_DIR \$1; echo 'cd chroot_scripts; for file in *; do [ ! -d \$file ] && [ -x \$file ] && echo && echo -e +++ Running \$file +++ && bash ./\$file; done' | chroot \$1 '/bin/bash'; set -e" \
+    "--customize-hook=set +e; cp -r $CHROOT_SCRIPTS_DIR \$1; echo 'cd chroot_scripts; for file in *; do [ ! -d \$file ] && [ -x \$file ] && echo && echo -e +++ Running \$file +++ && bash ./\$file; done' | chroot \$1 '/bin/bash'; set -e" \
     $MISO_VARIANT \
-    $MISO_BUILD_DIR/chroot \
+    $BUILD_DIR/chroot \
     http://ftp.it.debian.org/debian/
-#fi
-
-if [[ "$1" == "--bootstrap" ]]; then
-    exit 0
-fi
-
-#echo -e "${_BLUE}Running setup...${_RESET_COLOR}"
-#$MISO_SUDO rm -rf "$MISO_BUILD_DIR/chroot/source" 2>/dev/null
-#cp -r "$MISO_CHROOT_SCRIPTS_DIR" "$MISO_BUILD_DIR/chroot/"
-# Get rid of some warnings: https://wiki.debian.org/chroot (does not work inside docker)
-
-#$MISO_SUDO mount -t proc none $MISO_BUILD_DIR/chroot/proc
-#$MISO_SUDO mount -o bind /dev $MISO_BUILD_DIR/chroot/dev
-#$MISO_SUDO mount -o bind /sys $MISO_BUILD_DIR/chroot/sys
-#set +e
-#cat <<EOF | chroot $MISO_BUILD_DIR/chroot "/bin/bash"
-#    export PATH=/bin:/sbin:/usr/bin:/usr/sbin
-#    cd chroot_scripts
-#    for file in *; do [ ! -d "\$file" ] && [ -x "\$file" ] && echo -e "${_GREEN}Running ./\$file${_RESET_COLOR}" && bash ./\$file; done
-#EOF
-#set -e
-#
-#
-#$MISO_SUDO rm -rf "$MISO_BUILD_DIR/chroot/source" 2>/dev/null
-#$MISO_SUDO umount $MISO_BUILD_DIR/chroot/dev
-#$MISO_SUDO umount $MISO_BUILD_DIR/chroot/proc
-#$MISO_SUDO umount $MISO_BUILD_DIR/chroot/sys
-#$MISO_SUDO umount $MISO_BUILD_DIR/chroot/run
-#echo "TEST POINT"
-#exit 0
-
-#if [[ -z "$MISO_MKSQUASHFS_MEM" ]]; then
-#    echo "Limiting mksquashfs memory to: $MISO_MKSQUASHFS_MEM"
-#    MISO_MKSQUASHFS_MEM="-mem $MISO_MKSQUASHFS_MEM"
-#fi
-#if [[ -z "$MISO_MKSQUASHFS_MEM" ]]; then
-#    echo "Limiting mksquashfs memory to: $MISO_MKSQUASHFS_MEM"
-#    MISO_MKSQUASHFS_MEM="-mem $MISO_MKSQUASHFS_MEM"
-#fi
 
 # Create directory tree
-mkdir -p $MISO_BUILD_DIR/{staging/{EFI/boot,boot/grub/x86_64-efi,isolinux,live},tmp}
+mkdir -p $BUILD_DIR/{staging/{EFI/boot,boot/grub/x86_64-efi,isolinux,live},tmp}
 
-# Squash filesystem
-# compression algorithms available: gzip, lzo, lzma, xz, zstd
-# xz has the highest compression ration, but it's also the slowest to decompress
-# zstd is the fastest to decompress, and it's close to xz in compression ratio
-echo -e "${_BLUE}Squashing filesystem ...${_RESET_COLOR}"
-mksquashfs \
-    $MISO_BUILD_DIR/chroot \
-    $MISO_BUILD_DIR/staging/live/filesystem.squashfs \
-    -b 1048576 -comp zstd \
-    -noappend \
-    -e boot chroot_scripts
-# proc sys run dev
+if [[ "$MISO_OUTPUT_EXT" = "img" ]]; then
+    echo -e "${_BLUE}Creating empty img${_RESET_COLOR}"
+    truncate -s $IMG_SIZE "$IMG_PATH"
 
-#if [[ $? -ne 0 ]]; then
-#  $MISO_SUDO rm -f "$MISO_BUILD_DIR/staging/live/filesystem.squashfs"
-#  $MISO_SUDO mksquashfs \
-#    $MISO_BUILD_DIR/chroot \
-#    $MISO_BUILD_DIR/staging/live/filesystem.squashfs \
-#    -e boot $MISO_MKSQUASHFS_MEM
-#fi
+    # build command string with actual newlines
+    GUEST_COMMANDS="run"
+    GUEST_COMMANDS+=$'\n'"part-init /dev/sda $PART_TABLE"
 
-cp $MISO_BUILD_DIR/chroot/boot/vmlinuz-* \
-    $MISO_BUILD_DIR/staging/live/vmlinuz-live
-cp $MISO_BUILD_DIR/chroot/boot/initrd.img-* \
-    $MISO_BUILD_DIR/staging/live/initrd.img
+    if [[ "$PART_TABLE" == "gpt" ]]; then
+        GUEST_COMMANDS+=$'\n'"part-add /dev/sda p 2048 104447"
+        GUEST_COMMANDS+=$'\n'"part-add /dev/sda p 104448 -64" # use -64 to leave room for backup GPT
+        GUEST_COMMANDS+=$'\n'"part-set-bootable /dev/sda 1 true"
+        GUEST_COMMANDS+=$'\n'"mkfs vfat /dev/sda1 label:EFI"
+        GUEST_COMMANDS+=$'\n'"mkfs ext4 /dev/sda2 label:Meeent"
+        GUEST_COMMANDS+=$'\n'"mount /dev/sda2 /"
+        GUEST_COMMANDS+=$'\n'"mkdir /boot"
+        GUEST_COMMANDS+=$'\n'"mkdir /boot/efi"
+        GUEST_COMMANDS+=$'\n'"mount /dev/sda1 /boot/efi"
+    else
+        GUEST_COMMANDS+=$'\n'"part-add /dev/sda p 2048 -1"
+        GUEST_COMMANDS+=$'\n'"part-set-bootable /dev/sda 1 true"
+        GUEST_COMMANDS+=$'\n'"mkfs ext4 /dev/sda1 label:Meeent"
+        GUEST_COMMANDS+=$'\n'"mount /dev/sda1 /"
+    fi
 
-echo -e "${_BLUE}Building bootloader ...${_RESET_COLOR}"
-tee $MISO_BUILD_DIR/staging/isolinux/isolinux.cfg <<EOF >/dev/null
+    GUEST_COMMANDS+=$'\n'"copy-in $BUILD_DIR/chroot/. /"
+    GUEST_COMMANDS+=$'\n'"sh '/usr/sbin/grub-install --target=$GRUB_TARGET --removable --recheck /dev/sda'"
+    GUEST_COMMANDS+=$'\n'"sh 'update-grub'"
+    GUEST_COMMANDS+=$'\n'"sync"
+    GUEST_COMMANDS+=$'\n'"umount-all"
+
+    echo -e "${_BLUE}Formatting partitions and installing GRUB${_RESET_COLOR}"
+    echo "$GUEST_COMMANDS" | guestfish --format=raw -a "$IMG_PATH"
+else
+    # Squash filesystem
+    # compression algorithms available: gzip, lzo, lzma, xz, zstd
+    # xz has the highest compression ration, but it's also the slowest to decompress
+    # zstd is the fastest to decompress, and it's close to xz in compression ratio
+    echo -e "${_BLUE}Squashing filesystem${_RESET_COLOR}"
+    mksquashfs \
+        $BUILD_DIR/chroot \
+        $BUILD_DIR/staging/live/filesystem.squashfs \
+        -b 1048576 -comp zstd \
+        -noappend \
+        -e boot chroot_scripts
+    # proc sys run dev
+
+    #if [[ $? -ne 0 ]]; then
+    #  $MISO_SUDO rm -f "$BUILD_DIR/staging/live/filesystem.squashfs"
+    #  $MISO_SUDO mksquashfs \
+    #    $BUILD_DIR/chroot \
+    #    $BUILD_DIR/staging/live/filesystem.squashfs \
+    #    -e boot $MISO_MKSQUASHFS_MEM
+    #fi
+
+    cp $BUILD_DIR/chroot/boot/vmlinuz-* \
+        $BUILD_DIR/staging/live/vmlinuz-live
+    cp $BUILD_DIR/chroot/boot/initrd.img-* \
+        $BUILD_DIR/staging/live/initrd.img
+
+    echo -e "${_BLUE}Building bootloader${_RESET_COLOR}"
+    tee "$BUILD_DIR/staging/isolinux/isolinux.cfg" <<EOF >/dev/null
 UI vesamenu.c32
 
 MENU TITLE Boot Menu
-DEFAULT linux
+DEFAULT normal
 TIMEOUT 100
 MENU RESOLUTION 640 480
 MENU COLOR border       30;44   #40ffffff #a0000000 std
@@ -182,20 +186,19 @@ MENU COLOR timeout      1;37;40 #c0ffffff #00000000 std
 MENU COLOR msg07        37;40   #90ffffff #a0000000 std
 MENU COLOR tabmsg       31;40   #30ffffff #00000000 std
 
-LABEL linux
-  MENU LABEL $MISO_DISTRO_NAME ($MISO_VARIANT) $MISO_ARCH [BIOS/ISOLINUX]
-  MENU DEFAULT
-  KERNEL /live/vmlinuz-live
-  APPEND initrd=/live/initrd.img boot=live
+LABEL normal
+    MENU LABEL $MISO_DISTRO_NAME ($MISO_VARIANT) $MISO_ARCH [BIOS/ISOLINUX]
+    MENU DEFAULT
+    KERNEL /live/vmlinuz-live
+    APPEND initrd=/live/initrd.img boot=live
 
-LABEL linux
-  MENU LABEL $MISO_DISTRO_NAME ($MISO_VARIANT) $MISO_ARCH [BIOS/ISOLINUX] (nomodeset)
-  MENU DEFAULT
-  KERNEL /live/vmlinuz-live
-  APPEND initrd=/live/initrd.img boot=live nomodeset
+LABEL nomodeset
+    MENU LABEL $MISO_DISTRO_NAME ($MISO_VARIANT) $MISO_ARCH [BIOS/ISOLINUX] (nomodeset)
+    KERNEL /live/vmlinuz-live
+    APPEND initrd=/live/initrd.img boot=live nomodeset
 EOF
 
-tee $MISO_BUILD_DIR/staging/boot/grub/grub.cfg <<EOF >/dev/null
+    tee $BUILD_DIR/staging/boot/grub/grub.cfg <<EOF >/dev/null
 search --set=root --file /DEBIAN_CUSTOM
 
 set default="0"
@@ -214,50 +217,51 @@ menuentry "$MISO_DISTRO_NAME $MISO_ARCH [EFI/GRUB] (nomodeset)" {
 }
 EOF
 
-tee $MISO_BUILD_DIR/tmp/grub-standalone.cfg <<EOF >/dev/null
+    tee $BUILD_DIR/tmp/grub-standalone.cfg <<EOF >/dev/null
 search --set=root --file /DEBIAN_CUSTOM
 set prefix=(\$root)/boot/grub/
 configfile /boot/grub/grub.cfg
 EOF
 
-touch $MISO_BUILD_DIR/staging/DEBIAN_CUSTOM
+    touch $BUILD_DIR/staging/DEBIAN_CUSTOM
 
-$MISO_SUDO cp /usr/lib/ISOLINUX/isolinux.bin "$MISO_BUILD_DIR/staging/isolinux/"
-$MISO_SUDO cp /usr/lib/syslinux/modules/bios/* "$MISO_BUILD_DIR/staging/isolinux/"
-$MISO_SUDO cp -r /usr/lib/grub/x86_64-efi/* "$MISO_BUILD_DIR/staging/boot/grub/x86_64-efi/"
+    $MISO_SUDO cp /usr/lib/ISOLINUX/isolinux.bin "$BUILD_DIR/staging/isolinux/"
+    $MISO_SUDO cp /usr/lib/syslinux/modules/bios/* "$BUILD_DIR/staging/isolinux/"
+    $MISO_SUDO cp -r /usr/lib/grub/x86_64-efi/* "$BUILD_DIR/staging/boot/grub/x86_64-efi/"
 
-grub-mkstandalone \
-    --format=x86_64-efi \
-    --output=$MISO_BUILD_DIR/tmp/bootx64.efi \
-    --locales="" \
-    --fonts="" \
-    "boot/grub/grub.cfg=$MISO_BUILD_DIR/tmp/grub-standalone.cfg"
+    grub-mkstandalone \
+        --format=x86_64-efi \
+        --output=$BUILD_DIR/tmp/bootx64.efi \
+        --locales="" \
+        --fonts="" \
+        "boot/grub/grub.cfg=$BUILD_DIR/tmp/grub-standalone.cfg"
 
-(
-    cd $MISO_BUILD_DIR/staging/EFI/boot &&
-        dd if=/dev/zero of=efiboot.img bs=1M count=20 &&
-        mkfs.vfat efiboot.img &&
-        mmd -i efiboot.img efi efi/boot &&
-        mcopy -vi efiboot.img $MISO_BUILD_DIR/tmp/bootx64.efi ::efi/boot/
-)
+    (
+        cd $BUILD_DIR/staging/EFI/boot &&
+            dd if=/dev/zero of=efiboot.img bs=1M count=20 &&
+            mkfs.vfat efiboot.img &&
+            mmd -i efiboot.img efi efi/boot &&
+            mcopy -vi efiboot.img $BUILD_DIR/tmp/bootx64.efi ::efi/boot/
+    )
 
-echo -e "${_BLUE}Building final ISO ...${_RESET_COLOR}"
-xorriso \
-    -as mkisofs \
-    -iso-level 3 \
-    -o "$MISO_BUILD_DIR/$MISO_DISTRO_NAME-$MISO_ARCH.iso" \
-    -full-iso9660-filenames \
-    -volid "${MISO_DISTRO_NAME^^}" \
-    -isohybrid-mbr /usr/lib/ISOLINUX/isohdpfx.bin \
-    -eltorito-boot \
-    isolinux/isolinux.bin \
-    -no-emul-boot \
-    -boot-load-size 4 \
-    -boot-info-table \
-    --eltorito-catalog isolinux/isolinux.cat \
-    -eltorito-alt-boot \
-    -e /EFI/boot/efiboot.img \
-    -no-emul-boot \
-    -isohybrid-gpt-basdat \
-    -append_partition 2 0xef $MISO_BUILD_DIR/staging/EFI/boot/efiboot.img \
-    "$MISO_BUILD_DIR/staging"
+    echo -e "${_BLUE}Building final ISO${_RESET_COLOR}"
+    xorriso \
+        -as mkisofs \
+        -iso-level 3 \
+        -o "$BUILD_DIR/$MISO_DISTRO_NAME-$MISO_ARCH.iso" \
+        -full-iso9660-filenames \
+        -volid "${MISO_DISTRO_NAME^^}" \
+        -isohybrid-mbr /usr/lib/ISOLINUX/isohdpfx.bin \
+        -eltorito-boot \
+        isolinux/isolinux.bin \
+        -no-emul-boot \
+        -boot-load-size 4 \
+        -boot-info-table \
+        --eltorito-catalog isolinux/isolinux.cat \
+        -eltorito-alt-boot \
+        -e /EFI/boot/efiboot.img \
+        -no-emul-boot \
+        -isohybrid-gpt-basdat \
+        -append_partition 2 0xef $BUILD_DIR/staging/EFI/boot/efiboot.img \
+        "$BUILD_DIR/staging"
+fi
