@@ -94,10 +94,12 @@ mkdir -p $BUILD_DIR
 
 
 echo -e "${_BLUE}Bootstrapping${_RESET_COLOR}"
+
+# Debian
 mmdebstrap \
     --arch=$MISO_ARCH \
     --variant=minbase \
-    --mode=sudo \
+    --mode=auto \
     --include=linux-image-$LINUX_IMAGE_ARCH,systemd-sysv,apt-utils,zstd,gpg,wget,sudo,ca-certificates,curl,cron,$GRUB_PACKAGE \
     --components=main,contrib,non-free-firmware \
     "--customize-hook=set +e; cp -r $CHROOT_SCRIPTS_DIR \$1; echo 'cd chroot_scripts; for file in *; do [ ! -d \$file ] && [ -x \$file ] && echo && echo -e +++ Running \$file +++ && bash ./\$file; done' | chroot \$1 '/bin/bash'; set -e" \
@@ -105,6 +107,44 @@ mmdebstrap \
     $BUILD_DIR/chroot \
     http://ftp.it.debian.org/debian/
 
+
+# wget -O mint-keyring.gpg "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x302F0738F465C1535761F965A6616109451BBBF2"
+# gpg --no-default-keyring --keyring ./temp-m.gpg --import mint-keyring.gpg
+# gpg --no-default-keyring --keyring ./temp-m.gpg --export > mint-archive-keyring.gpg
+# rm temp-m.gpg
+# wget -O ubuntu-keyring.gpg "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0xF6ECB3762474EDA9D21B7022871920D1991BC93C"
+# gpg --no-default-keyring --keyring ./temp-u.gpg --import ubuntu-keyring.gpg
+# gpg --no-default-keyring --keyring ./temp-u.gpg --export > ubuntu-archive-keyring.gpg
+# rm temp-u.gpg
+# Linux Mint
+# mmdebstrap \
+#     --arch=$MISO_ARCH \
+#     --variant=essential \
+#     --merged-usr \
+#     --setup-hook='mkdir -p "$1/etc" && echo "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin" > "$1/etc/environment"' \
+#     --include=linux-image-$LINUX_IMAGE_ARCH,systemd-sysv,apt-utils,zstd,gpg,wget,sudo,ca-certificates,curl,cron,$GRUB_PACKAGE,linuxmint-keyring,debianutils,coreutils,binutils \
+#     --components=main,upstream,import,restricted,universe,multiverse \
+#     "--customize-hook=set +e; cp -r $CHROOT_SCRIPTS_DIR \$1; echo 'cd chroot_scripts; for file in *; do [ ! -d \$file ] && [ -x \$file ] && echo && echo -e +++ Running \$file +++ && bash ./\$file; done' | chroot \$1 '/bin/bash'; set -e" \
+#     wilma \
+#     $BUILD_DIR/chroot \
+#     "deb [signed-by=$(pwd)/mint-archive-keyring.gpg] http://packages.linuxmint.com wilma main upstream import backport" \
+#     "deb [signed-by=$(pwd)/ubuntu-archive-keyring.gpg] http://archive.ubuntu.com/ubuntu noble main restricted universe multiverse" \
+#     "deb [signed-by=$(pwd)/ubuntu-archive-keyring.gpg] http://archive.ubuntu.com/ubuntu noble-updates main restricted universe multiverse"
+# Linux Mint Debian Based
+# mmdebstrap \
+#     --arch=$MISO_ARCH \
+#     --variant=essential \
+#     --keyring=./mint-archive-keyring.gpg \
+#     --include=linux-image-$LINUX_IMAGE_ARCH,dpkg,systemd-sysv,apt-utils,zstd,gpg,wget,sudo,ca-certificates,curl,cron,$GRUB_PACKAGE,linuxmint-keyring,usr-is-merged \
+#     --components="main,upstream,import,backport,contrib,non-free,non-free-firmware" \
+#     --setup-hook='mkdir -p "$1/usr/bin" "$1/usr/sbin" "$1/usr/lib" "$1/usr/lib64"' \
+#     --setup-hook='ln -sf usr/bin "$1/bin"; ln -sf usr/sbin "$1/sbin"; ln -sf usr/lib "$1/lib"; ln -sf usr/lib64 "$1/lib64"' \
+#     --customize-hook="cp -r $CHROOT_SCRIPTS_DIR \$1; chroot \$1 /bin/bash -c 'cd chroot_scripts && for file in *; do [ -x \$file ] && ./\$file; done'" \
+#     faye \
+#     "$BUILD_DIR/chroot" \
+#     "deb [signed-by=$(pwd)/mint-archive-keyring.gpg] http://packages.linuxmint.com faye main upstream import backport" \
+#     "deb http://deb.debian.org/debian bookworm main contrib non-free non-free-firmware" \
+#     "deb http://security.debian.org/debian-security bookworm-security main contrib non-free non-free-firmware"
 # Create directory tree
 mkdir -p $BUILD_DIR/{staging/{EFI/boot,boot/grub/x86_64-efi,isolinux,live},tmp}
 
@@ -121,7 +161,7 @@ if [[ "$MISO_OUTPUT_EXT" = "img" ]]; then
         GUEST_COMMANDS+=$'\n'"part-add /dev/sda p 104448 -64" # use -64 to leave room for backup GPT
         GUEST_COMMANDS+=$'\n'"part-set-bootable /dev/sda 1 true"
         GUEST_COMMANDS+=$'\n'"mkfs vfat /dev/sda1 label:EFI"
-        GUEST_COMMANDS+=$'\n'"mkfs ext4 /dev/sda2 label:Meeent"
+        GUEST_COMMANDS+=$'\n'"mkfs ext4 /dev/sda2 label:root"
         GUEST_COMMANDS+=$'\n'"mount /dev/sda2 /"
         GUEST_COMMANDS+=$'\n'"mkdir /boot"
         GUEST_COMMANDS+=$'\n'"mkdir /boot/efi"
@@ -129,7 +169,7 @@ if [[ "$MISO_OUTPUT_EXT" = "img" ]]; then
     else
         GUEST_COMMANDS+=$'\n'"part-add /dev/sda p 2048 -1"
         GUEST_COMMANDS+=$'\n'"part-set-bootable /dev/sda 1 true"
-        GUEST_COMMANDS+=$'\n'"mkfs ext4 /dev/sda1 label:Meeent"
+        GUEST_COMMANDS+=$'\n'"mkfs ext4 /dev/sda1 label:root"
         GUEST_COMMANDS+=$'\n'"mount /dev/sda1 /"
     fi
 

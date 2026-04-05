@@ -1,1 +1,7 @@
 build/
+.direnv/
+.github/
+.gitignore
+install_dep.sh
+uninstall_dep.sh
+README.md

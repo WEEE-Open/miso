@@ -18,6 +18,7 @@ OVMF_PATH ?= /usr/share/OVMF/OVMF_CODE.fd
 # THE ONLY BUILD TARGET
 build:
 	sudo rm -rf $(BUILD_DIR)/chroot
+	chmod +x chroot_scripts/*.sh
 ifneq ($(DOCKER_CMD),)
 	@echo "--- [$(notdir $(DOCKER_CMD))] detected: building via container ---"
 	$(MAKE) build-container
@@ -39,10 +40,7 @@ MISO_SRCS := miso.sh $(shell find chroot_scripts -type f 2>/dev/null) .env
 
 # actual file target
 $(IMG_PATH): .deps_installed $(MISO_SRCS)
-	@echo "--- cleaning previous build artifacts ---"
-	# sudo rm -f $(IMG_PATH)
 	@mkdir -p $(MISO_BUILD_DIR)
-	@echo "--- host deps ok, starting miso.sh ---"
 	./miso.sh
 
 build-debian: $(IMG_PATH)

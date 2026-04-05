@@ -7,7 +7,8 @@ RUN apt-get update -y \
 	mmdebstrap \
 	squashfs-tools \
 	dosfstools \
-	xorriso \
+	dpkg \
+    xorriso \
 	isolinux \
 	parted \
     syslinux-efi \
@@ -18,7 +19,8 @@ RUN apt-get update -y \
 	mtools \
 	debian-archive-keyring \
 	udev \
-	libguestfs-tools \
+	wget \
+    libguestfs-tools \
 	libguestfs-dev \
 	supermin \
     fakeroot \
