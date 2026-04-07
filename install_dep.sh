@@ -1,13 +1,23 @@
 sudo apt install \
-    debootstrap \
-    squashfs-tools \
-    dosfstools \
+    sudo \
+   	mmdebstrap \
+   	squashfs-tools \
+   	dosfstools \
+   	dpkg \
     xorriso \
-    isolinux \
-    syslinux \
+   	isolinux \
+   	parted \
     syslinux-efi \
-    grub-pc-bin \
-    grub-efi-amd64-bin \
-    mtools \
-    debian-archive-keyring \
-    libguestfstools \
+    syslinux \
+   	grub-efi-amd64 \
+   	grub-efi-amd64-bin \
+    binutils \
+   	mtools \
+   	debian-archive-keyring \
+   	udev \
+   	wget \
+    libguestfs-tools \
+   	libguestfs-dev \
+   	supermin \
+    fakeroot \
+   	fakechroot \
