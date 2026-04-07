@@ -11,7 +11,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Install dependencies
-        run: sudo apt-get update && sudo apt-get install -y \
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
           sudo \
           mmdebstrap \
           squashfs-tools \
