@@ -1,7 +1,7 @@
 #!/bin/bash
 # This script creates a GUI wizard with yad, to be shown to the final user
 # AFTER the pc has been prepared for donation.
-# It's set to automatically run on the tmp 'oem' profile and ask
+# It's set to automatically run on the tmp '$MISO_USERNAME' profile and ask
 # the user for the fields that are not defined in the skeleton.toml
 
 set -x
@@ -21,6 +21,9 @@ fi
 if [ -z "$NEW_PASS" ]; then
     YAD_CMD="$YAD_CMD --field=\"Password:H\" --field=\"Repeat Password:H\""
     PASS_WAS_SET=true
+fi
+if [ -z "$NEW_LOCALE" ]; then
+    TAD_CMD="$YAD_CMD --field=\"Language\"" # TODO make this into a dropdown menu
 fi
 
 YAD_CMD="$YAD_CMD --button=\"Done:0\" --button=\"Exit:1\""

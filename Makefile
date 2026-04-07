@@ -51,7 +51,7 @@ build-container:
 	@mkdir -p $(MISO_BUILD_DIR)
 	$(DOCKER_CMD) run -it --rm \
 		--name miso \
-		--hostname weee \
+		--hostname $(MISO_HOSTNAME) \
 		--privileged \
 		--device /dev/kvm:/dev/kvm \
 		--device /dev/fuse:/dev/fuse \
