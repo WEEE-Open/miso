@@ -9,7 +9,7 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Install dependencies
         run: |
           sudo apt-get update
@@ -37,7 +37,7 @@ jobs:
           fakeroot \
           fakechroot
       - name: Dotenv Action
-        uses: falti/dotenv-action@v1.1
+        uses: falti/dotenv-action@v1.2
         id: dotenv
         with:
           export-variables: true
@@ -54,11 +54,9 @@ jobs:
       #    MISO_ARCH: i386
       #  run: ./miso.sh
       #  shell: bash
-      - uses: ncipollo/release-action@v1
+      - uses: ncipollo/release-action@v1.21
         with:
-          artifacts: |
-            ./build/*.iso
-            ./build/*.img
+          artifacts: ./build/*.{iso,img}
           allowUpdates: true
           prerelease: true
           draft: false
