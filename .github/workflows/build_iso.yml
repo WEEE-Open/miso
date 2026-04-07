@@ -62,4 +62,4 @@ jobs:
           allowUpdates: true
           prerelease: true
           draft: false
-          tag: ${{ steps.dotenv.outputs.miso_distro_name }} v${{ steps.dotenv.outputs.version }}
+          tag: v${{ steps.dotenv.outputs.version }}-${{ steps.dotenv.outputs.miso_distro_name }}
