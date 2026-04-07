@@ -7,7 +7,7 @@ defaults:
 jobs:
   build_output:
     name: Build
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - name: Install dependencies
@@ -41,6 +41,8 @@ jobs:
         id: dotenv
         with:
           export-variables: true
+      # - name: Fix libguestfs permissions
+      #   run: sudo chmod 0666 /dev/kvm || true
       - name: build amd64
         env:
           MISO_ARCH: amd64
