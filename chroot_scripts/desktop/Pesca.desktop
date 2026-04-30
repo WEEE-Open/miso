@@ -1,9 +1,0 @@
-[Desktop Entry]
-Name=Pesca
-Comment=Esegue le operazioni da effettuare per preparare la Golden Image
-Exec=/home/$MISO_USERNAME/pesca/pesca.sh
-Path=/home/$MISO_USERNAME/pesca/
-Type=Application
-Terminal=true
-Icon=software-sources
-StartupNotify=false

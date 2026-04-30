@@ -18,3 +18,8 @@ if [[ -z "\$DISPLAY" && "\$(tty)" =~ tty1 ]]; then
     exec startx /usr/local/bin/wizard.sh -- :0
 fi
 EOF
+
+tee /etc/resolv.conf <<EOF >/dev/null
+nameserver 127.0.0.1
+option edns0
+EOF

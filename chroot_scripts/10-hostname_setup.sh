@@ -16,3 +16,9 @@ cat <<EOF >/etc/hosts
 ff02::1         ip6-allnodes
 ff02::2         ip6-allrouters
 EOF
+
+echo "=== Set dns ==="
+cat <<EOF >/etc/resolv.conf
+nameserver  192.168.2.1
+nameserver  1.1.1.1
+EOF

@@ -8,7 +8,7 @@ echo "MISO v$VERSION"
 
 # These are not in the .env because they can't just be changed and might require some changes in miso.sh or in the chroot scripts
 MISO_VARIANT="trixie"
-IMG_SIZE=10G
+IMG_SIZE=4G
 
 if [[ -z "$MISO_ARCH" ]]; then # '32' or 'i386' for 32bit, everything else is 64
     if [[ -z "$3" ]]; then
@@ -105,7 +105,7 @@ mmdebstrap \
     "--customize-hook=set +e; cp -r $CHROOT_SCRIPTS_DIR \$1; echo 'cd chroot_scripts; for file in *; do [ ! -d \$file ] && [ -x \$file ] && echo && echo -e +++ Running \$file +++ && bash ./\$file; done' | chroot \$1 '/bin/bash'; set -e" \
     $MISO_VARIANT \
     $BUILD_DIR/chroot \
-    http://ftp.it.debian.org/debian/
+    http://deb.debian.org/debian/
 
 
 # wget -O mint-keyring.gpg "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x302F0738F465C1535761F965A6616109451BBBF2"
@@ -149,7 +149,7 @@ mmdebstrap \
 mkdir -p $BUILD_DIR/{staging/{EFI/boot,boot/grub/x86_64-efi,isolinux,live},tmp}
 
 if [[ "$MISO_OUTPUT_EXT" = "img" ]]; then
-    echo -e "${_BLUE}Creating empty img${_RESET_COLOR}"
+    echo -e "${_BLUE}Creating img${_RESET_COLOR}"
     truncate -s $IMG_SIZE "$IMG_PATH"
 
     # build command string with actual newlines
@@ -163,6 +163,8 @@ if [[ "$MISO_OUTPUT_EXT" = "img" ]]; then
         GUEST_COMMANDS+=$'\n'"mkfs vfat /dev/sda1 label:EFI"
         GUEST_COMMANDS+=$'\n'"mkfs ext4 /dev/sda2 label:root"
         GUEST_COMMANDS+=$'\n'"mount /dev/sda2 /"
+        # GUEST_COMMANDS+=$'\n'"mkfs btrfs /dev/sda2 label:root"
+        # GUEST_COMMANDS+=$'\n'"mount-options compress=zstd:1 /dev/sda2 /"
         GUEST_COMMANDS+=$'\n'"mkdir /boot"
         GUEST_COMMANDS+=$'\n'"mkdir /boot/efi"
         GUEST_COMMANDS+=$'\n'"mount /dev/sda1 /boot/efi"
@@ -171,20 +173,36 @@ if [[ "$MISO_OUTPUT_EXT" = "img" ]]; then
         GUEST_COMMANDS+=$'\n'"part-set-bootable /dev/sda 1 true"
         GUEST_COMMANDS+=$'\n'"mkfs ext4 /dev/sda1 label:root"
         GUEST_COMMANDS+=$'\n'"mount /dev/sda1 /"
+        # GUEST_COMMANDS+=$'\n'"mkfs btrfs /dev/sda1 label:root"
+        # GUEST_COMMANDS+=$'\n'"mount-options compress=zstd:1 /dev/sda1 /"
     fi
 
     GUEST_COMMANDS+=$'\n'"copy-in $BUILD_DIR/chroot/. /"
     GUEST_COMMANDS+=$'\n'"sh '/usr/sbin/grub-install --target=$GRUB_TARGET --removable --recheck /dev/sda'"
     GUEST_COMMANDS+=$'\n'"sh 'update-grub'"
     GUEST_COMMANDS+=$'\n'"sync"
+    GUEST_COMMANDS+=$'\n'"fstrim /"
     GUEST_COMMANDS+=$'\n'"umount-all"
 
     echo -e "${_BLUE}Formatting partitions and installing GRUB${_RESET_COLOR}"
     echo "$GUEST_COMMANDS" | guestfish --format=raw -a "$IMG_PATH"
+
+    echo -e "${_BLUE}Resizing image to save space${_RESET_COLOR}"
+    if [[ "$PART_TABLE" == "gpt" ]]; then
+        SHRINK_PART="/dev/sda2"
+    else
+        SHRINK_PART="/dev/sda1"
+    fi
+    # USED_BYTES=$(virt-df -a "$IMG_PATH" | grep "$SHRINK_PART" | awk '{print $3}')
+    # NEW_SIZE=$((USED_BYTES / 1024 + 1024))
+    # truncate -s "$NEW_SIZE"M "$IMG_PATH.resized"
+    # virt-resize --shrink "$SHRINK_PART" "$IMG_PATH" "$IMG_PATH.resized"
+    # mv "$IMG_PATH.resized" "$IMG_PATH"
+    virt-sparsify "$IMG_PATH" --in-place
 else
     # Squash filesystem
     # compression algorithms available: gzip, lzo, lzma, xz, zstd
-    # xz has the highest compression ration, but it's also the slowest to decompress
+    # xz has the highest compression ratio, but it's also the slowest to decompress
     # zstd is the fastest to decompress, and it's close to xz in compression ratio
     echo -e "${_BLUE}Squashing filesystem${_RESET_COLOR}"
     mksquashfs \

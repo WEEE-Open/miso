@@ -40,8 +40,7 @@ lightdm-gtk-greeter
 lm-sensors
 locales
 lshw
-lximage-qt
-lxqt
+kde-plasma-desktop
 mesa-utils
 mesa-va-drivers
 nano
@@ -52,7 +51,6 @@ openssh-client
 openssl
 p7zip-full
 papirus-icon-theme
-pavucontrol-qt
 pciutils
 plymouth
 plymouth-themes
@@ -65,7 +63,6 @@ unzip
 va-driver-all
 vlc
 wget
-whiptail
 wireless-tools
 wpagui
 x11-xserver-utils

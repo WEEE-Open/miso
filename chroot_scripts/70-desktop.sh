@@ -1,3 +1,7 @@
+#!/bin/bash
+#
+# set -x
+
 echo "=== Desktop shortcuts ==="
 sudo -u $MISO_USERNAME mkdir -p /home/$MISO_USERNAME/.local/share/WEEE\ Open
 sudo -u $MISO_USERNAME mkdir -p "/home/$MISO_USERNAME/Desktop"
@@ -61,9 +65,9 @@ for session in lxqt openbox labwc; do
     fi
 done
 
-echo "=== Set Wallpaper ==="
-mkdir -p /usr/share/images/desktop-base
-cp img/weeellpaper.jpg /usr/share/images/desktop-base/weeellpaper.jpg
+# echo "=== Set Wallpaper ==="
+# mkdir -p /usr/share/images/desktop-base
+# cp img/weeellpaper.jpg /usr/share/images/desktop-base/weeellpaper.jpg
 
 echo "=== Trust .desktop files ==="
 sudo sed -i 's/^QuickExec=false/QuickExec=true/' "/home/$MISO_USERNAME/.config/pcmanfm-qt/lxqt/settings.conf"
