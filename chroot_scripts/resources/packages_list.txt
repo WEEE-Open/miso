@@ -29,7 +29,6 @@ intel-media-va-driver
 iproute2
 iputils-ping
 iw
-labwc
 less
 libavcodec-extra
 libglib2.0-bin
@@ -46,7 +45,6 @@ mesa-va-drivers
 nano
 network-manager
 nm-tray
-openbox
 openssh-client
 openssl
 p7zip-full

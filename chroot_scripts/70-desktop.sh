@@ -31,39 +31,39 @@ Exec=/usr/local/bin/choose-session.sh
 Type=Application
 EOF
 
-# Wayland
-tee /usr/share/xsessions/miso-wayland.desktop <<EOF >/dev/null
-[Desktop Entry]
-Name=MISO Wayland (Labwc)
-Exec=env MISO_FORCE_SESSION=wayland /usr/local/bin/choose-session.sh
-Type=Application
-EOF
+# # Wayland
+# tee /usr/share/xsessions/miso-wayland.desktop <<EOF >/dev/null
+# [Desktop Entry]
+# Name=MISO Wayland (Labwc)
+# Exec=env MISO_FORCE_SESSION=wayland /usr/local/bin/choose-session.sh
+# Type=Application
+# EOF
 
-# X11
-tee /usr/share/xsessions/miso-x11.desktop <<EOF >/dev/null
-[Desktop Entry]
-Name=MISO X11 (Openbox)
-Exec=env MISO_FORCE_SESSION=x11 /usr/local/bin/choose-session.sh
-Type=Application
-EOF
+# # X11
+# tee /usr/share/xsessions/miso-x11.desktop <<EOF >/dev/null
+# [Desktop Entry]
+# Name=MISO X11 (Openbox)
+# Exec=env MISO_FORCE_SESSION=x11 /usr/local/bin/choose-session.sh
+# Type=Application
+# EOF
 
 # Default Auto
 echo "[Seat:*]
 user-session=miso-auto" | tee /etc/lightdm/lightdm.conf.d/20-miso.conf >/dev/null
 
 # Hide standard sessions - would boot without DE
-for session in lxqt openbox labwc; do
-    # Per X11
-    if [ -f "/usr/share/xsessions/${session}.desktop" ]; then
-        sed -i '/NoDisplay=/d' "/usr/share/xsessions/${session}.desktop"
-        echo "NoDisplay=true" | tee -a "/usr/share/xsessions/${session}.desktop" > /dev/null
-    fi
-    # Per Wayland
-    if [ -f "/usr/share/wayland-sessions/${session}.desktop" ]; then
-        sed -i '/NoDisplay=/d' "/usr/share/wayland-sessions/${session}.desktop"
-        echo "NoDisplay=true" | tee -a "/usr/share/wayland-sessions/${session}.desktop" > /dev/null
-    fi
-done
+# for session in lxqt openbox labwc; do
+#     # Per X11
+#     if [ -f "/usr/share/xsessions/${session}.desktop" ]; then
+#         sed -i '/NoDisplay=/d' "/usr/share/xsessions/${session}.desktop"
+#         echo "NoDisplay=true" | tee -a "/usr/share/xsessions/${session}.desktop" > /dev/null
+#     fi
+#     # Per Wayland
+#     if [ -f "/usr/share/wayland-sessions/${session}.desktop" ]; then
+#         sed -i '/NoDisplay=/d' "/usr/share/wayland-sessions/${session}.desktop"
+#         echo "NoDisplay=true" | tee -a "/usr/share/wayland-sessions/${session}.desktop" > /dev/null
+#     fi
+# done
 
 # echo "=== Set Wallpaper ==="
 # mkdir -p /usr/share/images/desktop-base

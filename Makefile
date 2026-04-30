@@ -73,7 +73,7 @@ test:
 		iso) DISK="-cdrom $(IMG_PATH)" ;; \
 		*)     DISK="-drive file=$(IMG_PATH),format=raw" ;; \
 	esac; \
-	qemu-system-x86_64 -accel kvm -m 2G $$ARGS $$DISK
+	qemu-system-x86_64 -accel kvm -m 4G $$ARGS $$DISK
 
 prune:
 ifneq ($(DOCKER_CMD),)

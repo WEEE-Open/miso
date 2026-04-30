@@ -8,7 +8,7 @@ echo "MISO v$VERSION"
 
 # These are not in the .env because they can't just be changed and might require some changes in miso.sh or in the chroot scripts
 MISO_VARIANT="trixie"
-IMG_SIZE=4G
+IMG_SIZE=5G
 
 if [[ -z "$MISO_ARCH" ]]; then # '32' or 'i386' for 32bit, everything else is 64
     if [[ -z "$3" ]]; then
